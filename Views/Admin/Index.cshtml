@@ -1,0 +1,571 @@
+﻿@{
+    ViewData["Title"] = "Trang chủ";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard - The Bag Studio Admin</title>
+
+    <!-- Bootstrap & FontAwesome -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #ffc107;
+            --sidebar-width: 280px;
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: linear-gradient(135deg, #1a1d29, #2c3142);
+            color: white;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: all 0.3s;
+        }
+
+            .sidebar.collapsed {
+                width: 80px;
+            }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            transition: all 0.3s;
+        }
+
+            .main-content.expanded {
+                margin-left: 80px;
+            }
+
+        .nav-link {
+            color: rgba(255,255,255,0.8) !important;
+            border-radius: 8px;
+            margin: 2px 0;
+            transition: all 0.3s;
+        }
+
+            .nav-link:hover, .nav-link.active {
+                background: rgba(255,255,255,0.1) !important;
+                color: white !important;
+                transform: translateX(8px);
+            }
+
+        .sidebar.collapsed .nav-link:hover, .sidebar.collapsed .nav-link.active {
+            transform: none;
+        }
+
+        .sidebar.collapsed .nav-text {
+            display: none;
+        }
+
+        .stat-card {
+            border-left: 4px solid var(--primary-color);
+            transition: all 0.3s;
+        }
+
+            .stat-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            }
+
+        .activity-item {
+            border-left: 3px solid var(--primary-color);
+            padding-left: 15px;
+            margin-bottom: 15px;
+        }
+        @@media (max-width:768px) {
+            .sidebar
+
+        {
+            width: 80px;
+        }
+
+        .main-content {
+            margin-left: 80px;
+        }
+
+        .sidebar.collapsed {
+            width: 0;
+            transform: translateX(-100%);
+        }
+
+        .main-content.expanded {
+            margin-left: 0;
+        }
+
+        }
+    </style>
+
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="p-3 border-bottom border-secondary">
+            <div class="d-flex align-items-center justify-content-center mb-3">
+                <div class="d-flex shadow-sm rounded overflow-hidden">
+                    <span class="px-3 py-1 text-warning fw-bold bg-secondary">THE BAG</span>
+                    <span class="px-3 py-1 text-dark fw-bold bg-warning">STUDIO</span>
+                </div>
+            </div>
+            <div class="text-center">
+                <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm overflow-hidden" style="width:60px;height:60px;">
+                    <img src="~/hinh/logo.jpg" alt="Logo" class="img-fluid" style="max-width:100%;max-height:100%;" />
+                </div>
+                <div class="mt-2">
+                    <h6 class="mb-0 text-white">Admin User</h6>
+                    <small class="text-secondary">Quản trị viên</small>
+                </div>
+            </div>
+        </div>
+        <nav class="p-3">
+            <div class="mb-4">
+                <h6 class="text-secondary fw-semibold mb-2">Tổng quan</h6>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" asp-controller="Admin" asp-action="Index">
+                            <i class="fas fa-chart-pie me-2"></i><span class="nav-text">Thống kê</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Admin" asp-action="PhanTich">
+                            <i class="fas fa-chart-line me-2"></i><span class="nav-text">Phân tích</span>
+                        </a>
+                    </li>                   
+                </ul>
+            </div>
+            <div class="mb-4">
+                <h6 class="text-secondary fw-semibold mb-2">Quản lý</h6>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Admin" asp-action="SanPham">
+                            <i class="fas fa-shopping-bag me-2"></i><span class="nav-text">Sản phẩm</span><span class="badge bg-primary ms-auto nav-text">567</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Admin" asp-action="DonHang">
+                            <i class="fas fa-shopping-cart me-2"></i><span class="nav-text">Đơn hàng</span><span class="badge bg-danger ms-auto nav-text">24</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Admin" asp-action="KhachHang">
+                            <i class="fas fa-users me-2"></i><span class="nav-text">Khách hàng</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Admin" asp-action="DanhMuc">
+                            <i class="fas fa-tags me-2"></i><span class="nav-text">Danh mục</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Admin" asp-action="KhoHang">
+                            <i class="fas fa-warehouse me-2"></i><span class="nav-text">Kho hàng</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="mb-4">
+                <h6 class="text-secondary fw-semibold mb-2">Marketing</h6>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Admin" asp-action="ChienDich">
+                            <i class="fas fa-bullhorn me-2"></i><span class="nav-text">Chiến dịch</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Admin" asp-action="MaGiamGia">
+                            <i class="fas fa-ticket-alt me-2"></i><span class="nav-text">Mã giảm giá</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="mb-4">
+                <h6 class="text-secondary fw-semibold mb-2">Hệ thống</h6>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Admin" asp-action="CaiDat">
+                            <i class="fas fa-cog me-2"></i><span class="nav-text">Cài đặt</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-danger" href="#" onclick="logout()">
+                            <i class="fas fa-sign-out-alt me-2"></i><span class="nav-text">Đăng xuất</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top">
+            <div class="container-fluid">
+                <button class="btn btn-outline-secondary me-3" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div>
+                    <h4 class="mb-0">Thống kê</h4>
+                    <small class="text-muted">Tổng quan hoạt động cửa hàng</small>
+                </div>
+            </div>
+        </nav>
+        <div class="container-fluid p-4">
+            <!-- Stats Cards -->
+            <div class="row mb-4">
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card stat-card h-100">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                        Doanh thu tháng này
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold">100.000.000 VNĐ</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-dollar-sign fa-2x text-success"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card stat-card h-100">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                        Đơn hàng mới
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold">1,247</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-shopping-cart fa-2x text-primary"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card stat-card h-100">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                        Khách hàng đăng ký
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold">20</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-users fa-2x text-info"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card stat-card h-100">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                        Sản phẩm trong kho
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold">567</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-shopping-bag fa-2x text-warning"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="row mb-4">
+                <div class="col-xl-8 col-lg-7">
+                    <div class="card h-100">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h6 class="m-0 font-weight-bold">Doanh thu & Đơn hàng</h6>
+                            <div class="btn-group btn-group-sm">
+                                <button class="btn btn-outline-primary active">7 ngày</button>
+                                <button class="btn btn-outline-primary">30 ngày</button>
+                                <button class="btn btn-outline-primary">90 ngày</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="revenueChart" height="300"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-4 col-lg-5">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h6 class="m-0 font-weight-bold">Hoạt động gần đây</h6>
+                        </div>
+                        <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                            <div class="activity-item">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width:32px; height:32px;">
+                                        <i class="fas fa-shopping-cart text-white small"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold small">Đơn hàng mới #ORD-1247</div>
+                                        <div class="text-muted small">Nguyễn Văn A đã đặt mua Túi xách da cao cấp</div>
+                                        <div class="text-muted small">2 phút trước</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="activity-item">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="bg-success rounded-circle d-flex align-items-center justify-content-center me-3" style="width:32px; height:32px;">
+                                        <i class="fas fa-user-plus text-white small"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold small">Khách hàng mới đăng ký</div>
+                                        <div class="text-muted small">Trần Thị B vừa tạo tài khoản mới</div>
+                                        <div class="text-muted small">5 phút trước</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="activity-item">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="bg-warning rounded-circle d-flex align-items-center justify-content-center me-3" style="width:32px; height:32px;">
+                                        <i class="fas fa-exclamation-triangle text-white small"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold small">Sản phẩm sắp hết hàng</div>
+                                        <div class="text-muted small">Balo du lịch chỉ còn 5 sản phẩm</div>
+                                        <div class="text-muted small">10 phút trước</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="activity-item">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="bg-info rounded-circle d-flex align-items-center justify-content-center me-3" style="width:32px; height:32px;">
+                                        <i class="fas fa-credit-card text-white small"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold small">Thanh toán thành công</div>
+                                        <div class="text-muted small">Đơn hàng #ORD-1245 đã được thanh toán</div>
+                                        <div class="text-muted small">15 phút trước</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Data Tables -->
+            <div class="row">
+                <div class="col-xl-6 col-lg-6">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h6 class="m-0 font-weight-bold">Đơn hàng gần đây</h6>
+                            <div>
+                                <button class="btn btn-outline-primary btn-sm me-2">
+                                    <i class="fas fa-download"></i> Xuất Excel
+                                </button>
+                                <button class="btn btn-primary btn-sm">
+                                    <i class="fas fa-plus"></i> Thêm đơn hàng
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Mã đơn</th>
+                                            <th>Khách hàng</th>
+                                            <th>Tổng tiền</th>
+                                            <th>Trạng thái</th>
+                                            <th>Thao tác</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><strong>#ORD-1247</strong></td>
+                                            <td>Nguyễn Văn A</td>
+                                            <td><span class="fw-bold">1.250.000 VNĐ</span></td>
+                                            <td><span class="badge bg-success">Hoàn thành</span></td>
+                                            <td>
+                                                <div class="d-flex gap-2">
+                                                    <button class="btn btn-outline-primary btn-sm" title="Xem">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                    <button class="btn btn-outline-warning btn-sm" title="Sửa">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <button class="btn btn-outline-danger btn-sm" title="Xóa">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>#ORD-1246</strong></td>
+                                            <td>Trần Thị B</td>
+                                            <td><strong>850,000 VNĐ</strong></td>
+                                            <td><span class="badge bg-primary">Đang xử lý</span></td>
+                                            <td>
+                                                <div class="d-flex gap-2">
+                                                    <button class="btn btn-outline-primary btn-sm">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                    <button class="btn btn-outline-warning btn-sm">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <button class="btn btn-outline-danger btn-sm">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>#ORD-1245</strong></td>
+                                            <td>Lê Văn C</td>
+                                            <td><strong>450,000 VNĐ</strong></td>
+                                            <td><span class="badge bg-warning">Chờ thanh toán</span></td>
+                                            <td>
+                                                <div class="d-flex gap-2">
+                                                    <button class="btn btn-outline-primary btn-sm">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                    <button class="btn btn-outline-warning btn-sm">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <button class="btn btn-outline-danger btn-sm">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-6 col-lg-6">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h6 class="m-0 font-weight-bold">Sản phẩm bán chạy</h6>
+                            <div>
+                                <button class="btn btn-outline-primary btn-sm me-2">
+                                    <i class="fas fa-chart-bar"></i> Xem báo cáo
+                                </button>
+                                <button class="btn btn-primary btn-sm">
+                                    <i class="fas fa-plus"></i> Thêm sản phẩm
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Sản phẩm</th>
+                                            <th>Danh mục</th>
+                                            <th>Đã bán</th>
+                                            <th>Doanh thu</th>
+                                            <th>Thao tác</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><strong>Túi xách da cao cấp</strong></td>
+                                            <td>Túi xách</td>
+                                            <td><strong>156</strong></td>
+                                            <td><strong>19.500 VNĐ</strong></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-warning">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Balo du lịch</strong></td>
+                                            <td>Balo</td>
+                                            <td><strong>134</strong></td>
+                                            <td><strong>20.000 VNĐ</strong></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-warning">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Ví da nam</strong></td>
+                                            <td>Ví</td>
+                                            <td><strong>98</strong></td>
+                                            <td><strong>45.000.000 VNĐ</strong></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-warning">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @* === DASHBOARD CONTENT BẮT ĐẦU TẠI ĐÂY === *@
+            <!-- Bạn dán nguyên phần dashboard mình đã gửi ở trên vào đây -->
+            <!-- Quá dài nên mình không paste hết vào 1 lần để tránh vượt giới hạn. -->
+            <!-- Nếu bạn muốn mình gửi trọn đoạn content kèm sẵn ở đây, bạn reply "Gửi tiếp nội dung" và mình sẽ chia thành nhiều phần paste lần lượt. -->
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.getElementById('sidebarToggle').addEventListener('click', function(){
+            const sidebar=document.getElementById('sidebar');
+            const main=document.getElementById('mainContent');
+            sidebar.classList.toggle('collapsed');
+            main.classList.toggle('expanded');
+        });
+        function logout(){
+            if(confirm('Bạn có chắc chắn muốn đăng xuất?')){
+                alert('Đăng xuất thành công!');
+            }
+        }
+        const ctx=document.getElementById('revenueChart').getContext('2d');
+        new Chart(ctx,{type:'line',data:{labels:['T1','T2','T3','T4','T5','T6','T7'],datasets:[{label:'Doanh thu (triệu VNĐ)',data:[85,92,78,105,98,110,125],borderColor:'#ffc107',backgroundColor:'rgba(255,193,7,0.1)',tension:0.4,fill:true},{label:'Đơn hàng',data:[45,52,38,65,58,70,85],borderColor:'#0d6efd',backgroundColor:'rgba(13,110,253,0.1)',tension:0.4,fill:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'}},scales:{y:{beginAtZero:true}}}});
+    </script>
+</body>
+</html>
