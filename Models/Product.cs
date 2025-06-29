@@ -1,41 +1,48 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace DATN.Models;
-
-public partial class Product
+namespace DATN.Models
 {
-    public int ProductId { get; set; }
+    public class Product
+    {
+        public int ProductID { get; set; }
 
-    public string? ProductName { get; set; }
+        [Required]
+        [StringLength(200)]
+        public string ProductName { get; set; }
 
-    public string? Description { get; set; }
+        [StringLength(225)]
+        public string Description { get; set; }
 
-    public decimal? SalePrice { get; set; }
+        [Required]
+        public decimal SalePrice { get; set; }
 
-    public decimal? OriginalPrice { get; set; }
+        public decimal OriginalPrice { get; set; }
 
-    public int? Stock { get; set; }
+        public int Stock { get; set; }
 
-    public string? Size { get; set; }
+        [StringLength(50)]
+        public string Size { get; set; }
 
-    public string? Color { get; set; }
+        [StringLength(50)]
+        public string Color { get; set; }
 
-    public string? Material { get; set; }
+        [StringLength(100)]
+        public string Material { get; set; }
 
-    public int? CategoryId { get; set; }
+        public int CategoryID { get; set; }
 
-    public DateTime? CreatedDate { get; set; }
+        public DateTime CreatedDate { get; set; }
 
-    public DateTime? UpdatedDate { get; set; }
+        public DateTime? UpdatedDate { get; set; }
 
-    public string? ThumbnailImage { get; set; }
+        [StringLength(225)]
+        public string ThumbnailImage { get; set; }
 
-    public string? Status { get; set; }
+        [StringLength(50)]
+        public string Status { get; set; }
 
-    public virtual ICollection<CartDetail> CartDetails { get; set; } = new List<CartDetail>();
+        //// Nếu muốn join Category
+        //public Category Category { get; set; }
+    }
 
-    public virtual Category? Category { get; set; }
-
-    public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
 }
