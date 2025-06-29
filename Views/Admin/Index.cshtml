@@ -207,15 +207,51 @@
     </div>
 
     <!-- Main Content -->
+    <!-- Main Content -->
     <div class="main-content" id="mainContent">
+        <!-- Header -->
         <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top">
             <div class="container-fluid">
                 <button class="btn btn-outline-secondary me-3" id="sidebarToggle">
                     <i class="fas fa-bars"></i>
                 </button>
+
                 <div>
                     <h4 class="mb-0">Thống kê</h4>
                     <small class="text-muted">Tổng quan hoạt động cửa hàng</small>
+                </div>
+
+                <div class="d-flex align-items-center ms-auto">
+
+                    <div class="dropdown me-2">
+                        <button class="btn btn-outline-secondary position-relative" data-bs-toggle="dropdown">
+                            <i class="fas fa-bell"></i>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">5</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#">Mã SALE50 sắp hết hạn</a></li>
+                            <li><a class="dropdown-item" href="#">Mã NEWUSER đã được sử dụng 100 lần</a></li>
+                            <li><a class="dropdown-item" href="#">Cần tạo mã cho chiến dịch mới</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary d-flex align-items-center" data-bs-toggle="dropdown">
+                            <div class="bg-warning rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
+                                <i class="fas fa-user text-dark small"></i>
+                            </div>
+                            <div class="text-start d-none d-md-block">
+                                <div class="small fw-bold">Admin User</div>
+                                <div class="small text-muted">Quản trị viên</div>
+                            </div>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Hồ sơ</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Cài đặt</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="#" onclick="logout()"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </nav>

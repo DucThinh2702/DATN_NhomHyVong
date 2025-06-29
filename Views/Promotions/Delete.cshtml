@@ -1,0 +1,360 @@
+﻿@model DATN.Models.Promotion
+@{
+    Layout = null;
+    ViewData["Title"] = "Xóa mã giảm giá";
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mã giảm giá - The Bag Studio Admin</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #ffc107;
+            --sidebar-width: 280px;
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: linear-gradient(135deg, #1a1d29 0%, #2c3142 100%);
+            color: white;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+            .sidebar.collapsed {
+                width: 80px;
+            }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            transition: all 0.3s ease;
+        }
+
+            .main-content.expanded {
+                margin-left: 80px;
+            }
+
+        .nav-link {
+            color: rgba(255,255,255,0.8) !important;
+            border-radius: 8px;
+            margin: 2px 0;
+            transition: all 0.3s ease;
+        }
+
+            .nav-link:hover, .nav-link.active {
+                background: rgba(255,255,255,0.1) !important;
+                color: white !important;
+                transform: translateX(8px);
+            }
+
+        .sidebar.collapsed .nav-link:hover,
+        .sidebar.collapsed .nav-link.active {
+            transform: none;
+        }
+
+        .sidebar.collapsed .nav-text {
+            display: none;
+        }
+
+        .brand-logo {
+            background: linear-gradient(135deg, var(--primary-color), #e0a800);
+            color: #1a1d29;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .stat-card {
+            border-left: 4px solid var(--primary-color);
+            transition: all 0.3s ease;
+        }
+
+            .stat-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            }
+
+        .coupon-card {
+            border-radius: 12px;
+            border: 2px dashed #dee2e6;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .coupon-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+                border-color: var(--primary-color);
+            }
+
+        .coupon-code {
+            background: linear-gradient(135deg, var(--primary-color), #e0a800);
+            color: #1a1d29;
+            font-weight: bold;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-family: 'Courier New', monospace;
+        }
+
+        @@media (max-width: 768px) {
+            .sidebar {
+                width: 80px;
+            }
+
+            .main-content {
+                margin-left: 80px;
+            }
+
+            .sidebar.collapsed {
+                width: 0;
+                transform: translateX(-100%);
+            }
+
+            .main-content.expanded {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="p-3 border-bottom border-secondary">
+            <div class="d-flex align-items-center justify-content-center mb-3">
+                <div class="d-flex shadow-sm rounded overflow-hidden">
+                    <span class="px-3 py-1 text-warning fw-bold bg-secondary">THE BAG</span>
+                    <span class="px-3 py-1 text-dark fw-bold bg-warning">STUDIO</span>
+                </div>
+            </div>
+            <div class="text-center">
+                <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm overflow-hidden" style="width:60px;height:60px;">
+                    <img src="~/hinh/logo.jpg" alt="Logo" class="img-fluid" style="max-width:100%;max-height:100%;" />
+                </div>
+                <div class="mt-2">
+                    <h6 class="mb-0 text-white">Admin User</h6>
+                    <small class="text-secondary">Quản trị viên</small>
+                </div>
+            </div>
+        </div>
+        <nav class="p-3">
+            <div class="mb-4">
+                <h6 class="text-secondary fw-semibold mb-2">Tổng quan</h6>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" asp-controller="Admin" asp-action="Index">
+                            <i class="fas fa-chart-pie me-2"></i><span class="nav-text">Thống kê</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Admin" asp-action="PhanTich">
+                            <i class="fas fa-chart-line me-2"></i><span class="nav-text">Phân tích</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="mb-4">
+                <h6 class="text-secondary fw-semibold mb-2">Quản lý</h6>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Admin" asp-action="SanPham">
+                            <i class="fas fa-shopping-bag me-2"></i><span class="nav-text">Sản phẩm</span><span class="badge bg-primary ms-auto nav-text">567</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Admin" asp-action="DonHang">
+                            <i class="fas fa-shopping-cart me-2"></i><span class="nav-text">Đơn hàng</span><span class="badge bg-danger ms-auto nav-text">24</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Admin" asp-action="KhachHang">
+                            <i class="fas fa-users me-2"></i><span class="nav-text">Khách hàng</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Admin" asp-action="DanhMuc">
+                            <i class="fas fa-tags me-2"></i><span class="nav-text">Danh mục</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Admin" asp-action="KhoHang">
+                            <i class="fas fa-warehouse me-2"></i><span class="nav-text">Kho hàng</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="mb-4">
+                <h6 class="text-secondary fw-semibold mb-2">Marketing</h6>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Admin" asp-action="ChienDich">
+                            <i class="fas fa-bullhorn me-2"></i><span class="nav-text">Chiến dịch</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Admin" asp-action="MaGiamGia">
+                            <i class="fas fa-ticket-alt me-2"></i><span class="nav-text">Mã giảm giá</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="mb-4">
+                <h6 class="text-secondary fw-semibold mb-2">Hệ thống</h6>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Admin" asp-action="CaiDat">
+                            <i class="fas fa-cog me-2"></i><span class="nav-text">Cài đặt</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-danger" href="#" onclick="logout()">
+                            <i class="fas fa-sign-out-alt me-2"></i><span class="nav-text">Đăng xuất</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <!-- Header -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top">
+            <div class="container-fluid">
+                <button class="btn btn-outline-secondary me-3" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+
+                <div>
+                    <h4 class="mb-0">Xóa mã giảm giá</h4>
+                    <small class="text-muted">Quản lý các mã khuyến mãi và ưu đãi</small>
+                </div>
+
+                <div class="d-flex align-items-center ms-auto">
+
+                    <div class="dropdown me-2">
+                        <button class="btn btn-outline-secondary position-relative" data-bs-toggle="dropdown">
+                            <i class="fas fa-bell"></i>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">5</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#">Mã SALE50 sắp hết hạn</a></li>
+                            <li><a class="dropdown-item" href="#">Mã NEWUSER đã được sử dụng 100 lần</a></li>
+                            <li><a class="dropdown-item" href="#">Cần tạo mã cho chiến dịch mới</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary d-flex align-items-center" data-bs-toggle="dropdown">
+                            <div class="bg-warning rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
+                                <i class="fas fa-user text-dark small"></i>
+                            </div>
+                            <div class="text-start d-none d-md-block">
+                                <div class="small fw-bold">Admin User</div>
+                                <div class="small text-muted">Quản trị viên</div>
+                            </div>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Hồ sơ</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Cài đặt</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="#" onclick="logout()"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container-fluid p-4">
+<h2 class="mb-4 text-danger">Bạn chắc chắn muốn xóa mã giảm giá này?</h2>
+
+<div class="mb-3">
+    <dl class="row">
+        <dt class="col-sm-3">Tên mã giảm giá</dt>
+        <dd class="col-sm-9">@Model.PromoName</dd>
+
+        <dt class="col-sm-3">Loại giảm giá</dt>
+        <dd class="col-sm-9">@Model.PromoType</dd>
+
+        <dt class="col-sm-3">Giá trị giảm</dt>
+                    <dd class="col-sm-9">@Model.DiscountValue?.ToString("0")</dd>
+        <dt class="col-sm-3">Đơn tối thiểu</dt>
+                    <dd class="col-sm-9">@Model.MinOrderAmount?.ToString("0")</dd>
+
+        <dt class="col-sm-3">Thời gian áp dụng</dt>
+        <dd class="col-sm-9">@Model.StartDate?.ToString("dd/MM/yyyy") - @Model.EndDate?.ToString("dd/MM/yyyy")</dd>
+
+        <dt class="col-sm-3">Số lượng</dt>
+        <dd class="col-sm-9">@Model.Quantity</dd>
+
+        <dt class="col-sm-3">Đã dùng</dt>
+        <dd class="col-sm-9">@Model.UsedQuantity</dd>
+
+        <dt class="col-sm-3">Trạng thái</dt>
+        <dd class="col-sm-9">@Model.Status</dd>
+    </dl>
+</div>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="PromoCode" />
+    <button type="submit" class="btn btn-danger">Xác nhận xóa</button>
+    <a asp-action="MaGiamGia" asp-controller="Admin" class="btn btn-secondary ms-2">Hủy</a>
+</form>
+</div>
+        <!-- Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+        <script>
+                // Sidebar Toggle
+                document.getElementById('sidebarToggle').addEventListener('click', function() {
+                    const sidebar = document.getElementById('sidebar');
+                    const mainContent = document.getElementById('mainContent');
+
+                    sidebar.classList.toggle('collapsed');
+                    mainContent.classList.toggle('expanded');
+
+                    localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+                });
+
+                // Restore sidebar state
+                if (localStorage.getItem('sidebarCollapsed') === 'true') {
+                    document.getElementById('sidebar').classList.add('collapsed');
+                    document.getElementById('mainContent').classList.add('expanded');
+                }
+
+                // Logout function
+                function logout() {
+                    if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+                        alert('Đăng xuất thành công!');
+                    }
+                }
+                  document.addEventListener("DOMContentLoaded", function () {
+                const currentPath = window.location.pathname.split("/").pop(); // Lấy tên file cuối
+                const navLinks = document.querySelectorAll(".sidebar .nav-link");
+
+                navLinks.forEach(link => {
+                    const href = link.getAttribute("href");
+                    if (href && currentPath === href) {
+                        link.classList.add("active");
+                    } else {
+                        link.classList.remove("active");
+                    }
+                });
+            });
+        </script>
+</body>
+</html>

@@ -1,9 +1,17 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using DATN.Data;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace DATN.Controllers
 {
     public class AdminController : Controller
     {
+        private readonly DatnContext _context;
+
+        public AdminController(DatnContext context)
+        {
+            _context = context;
+        }
         public IActionResult Index()
         {
             return View();
@@ -21,9 +29,10 @@ namespace DATN.Controllers
         {
             return View();
         }
-        public IActionResult MaGiamGia()
+        public async Task<IActionResult> MaGiamGia()
         {
-            return View();
+            var danhSachMa = await _context.Promotions.ToListAsync();
+            return View(danhSachMa); // Sử dụng List<Promotion> trực tiếp
         }
         public IActionResult KhachHang()
         {
