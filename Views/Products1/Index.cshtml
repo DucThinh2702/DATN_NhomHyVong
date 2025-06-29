@@ -1,0 +1,225 @@
+﻿
+@model IEnumerable<DATN.Models.Product>
+
+@{
+    ViewData["Title"] = "Danh sách sản phẩm";
+}
+<div class="main-content" id="mainContent">
+    <!-- Header -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top">
+        <div class="container-fluid">
+            <button class="btn btn-outline-secondary me-3" id="sidebarToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <div>
+                <h4 class="mb-0">Sản phẩm</h4>
+                <small class="text-muted">Quản lý danh mục sản phẩm</small>
+            </div>
+
+            <div class="d-flex align-items-center ms-auto">
+                <form method="get" class="input-group me-3" style="width: 300px;">
+                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    <input type="text" name="search" class="form-control" placeholder="Tìm kiếm sản phẩm..." value="@Context.Request.Query["search"]">
+                </form>
+
+
+                <div class="dropdown me-2">
+                    <button class="btn btn-outline-secondary position-relative" data-bs-toggle="dropdown">
+                        <i class="fas fa-bell"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            @ViewBag.LowStockProducts.Count
+                        </span>
+
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        @if (ViewBag.LowStockProducts.Count == 0)
+                        {
+                            <li><span class="dropdown-item text-muted">Không có sản phẩm sắp hết hàng</span></li>
+                        }
+                        else
+                        {
+                            @foreach (var p in ViewBag.LowStockProducts)
+                            {
+                                <li>
+                                    <a class="dropdown-item" href="@Url.Action("Edit", new { id = p.ProductID })">
+                                        @p.ProductName - còn @p.Stock
+                                    </a>
+                                </li>
+                            }
+                        }
+                    </ul>
+
+                </div>
+
+                <div class="dropdown">
+                    <button class="btn btn-outline-secondary d-flex align-items-center" data-bs-toggle="dropdown">
+                        <div class="bg-warning rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
+                            <i class="fas fa-user text-dark small"></i>
+                        </div>
+                        <div class="text-start d-none d-md-block">
+                            <div class="small fw-bold">Admin User</div>
+                            <div class="small text-muted">Quản trị viên</div>
+                        </div>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Hồ sơ</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Cài đặt</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="#" onclick="logout()"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Products Content -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary h-100">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Tổng sản phẩm</div>
+                            <div class="h5 mb-0 font-weight-bold">@ViewBag.TotalCount</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-shopping-bag fa-2x text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success h-100">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Đang bán</div>
+                            <div class="h5 mb-0 font-weight-bold">@ViewBag.InStockCount</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-check-circle fa-2x text-success"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning h-100">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Sắp hết hàng</div>
+                            <div class="h5 mb-0 font-weight-bold">@ViewBag.LowStockCount</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-exclamation-triangle fa-2x text-warning"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-danger h-100">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Hết hàng</div>
+                            <div class="h5 mb-0 font-weight-bold">@ViewBag.OutOfStockCount</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-times-circle fa-2x text-danger"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<h1 class="mb-4">Danh sách sản phẩm</h1>
+    <p>
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Thêm sản phẩm mới
+        </a>
+    </p>
+
+
+
+<table class="table table-bordered table-hover align-middle">
+    <thead class="table-dark">
+        <tr>
+            <th>Ảnh</th>
+            <th>Tên sản phẩm</th>
+            <th>Giá bán</th>
+            <th>Tồn kho</th>
+            <th>Trạng thái</th>
+            <th>Ngày tạo</th>
+            <th class="text-center">Hành động</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @if (!string.IsNullOrEmpty(item.ThumbnailImage))
+                    {
+                        <img src="@item.ThumbnailImage" style="width:60px; height:60px; object-fit:cover;" alt="Ảnh" />
+                    }
+                    else
+                    {
+                        <span class="text-muted">Chưa có</span>
+                    }
+                </td>
+                <td>
+                    <strong>@item.ProductName</strong><br />
+                    <small class="text-muted">SKU: BAG-@item.ProductID</small>
+                </td>
+                @* <td>@item.Category?.CategoryName</td> *@
+                <td>@item.SalePrice.ToString("N0") ₫</td>
+                <td>
+                    @item.Stock
+                </td>
+                <td>
+                    @if (item.Stock == 0)
+                    {
+                        <span class="badge bg-danger">Hết hàng</span>
+                    }
+                    else if (item.Stock <= 5)
+                    {
+                        <span class="badge bg-warning text-dark">Sắp hết</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-success">Đang bán</span>
+                    }
+                </td>
+                <td>@item.CreatedDate.ToString("dd/MM/yyyy")</td>
+                <td class="text-center">
+                    <div class="d-inline-flex border rounded overflow-hidden">
+                        <a asp-action="Details" asp-route-id="@item.ProductID"
+                           class="text-primary d-flex align-items-center justify-content-center px-2 py-1 border-end"
+                           title="Xem">
+                            <i class="fa-solid fa-eye"></i>
+                        </a>
+                        <a asp-action="Edit" asp-route-id="@item.ProductID"
+                           class="text-warning d-flex align-items-center justify-content-center px-2 py-1 border-end"
+                           title="Sửa">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </a>
+                        <a asp-action="Delete" asp-route-id="@item.ProductID"
+                           class="text-danger d-flex align-items-center justify-content-center px-2 py-1"
+                           title="Xóa">
+                            <i class="fa-solid fa-trash"></i>
+                        </a>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
