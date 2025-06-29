@@ -1,0 +1,38 @@
+﻿@model IEnumerable<DATN.Models.OrderDetail>
+@{
+    ViewData["Title"] = "Chi tiết đơn hàng";
+    string maDH = ViewBag.MaDH as string;
+}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="mb-0">Chi tiết đơn hàng <span class="text-primary">@maDH</span></h2>
+        <a asp-action="Create" asp-route-maDH="@maDH" class="btn btn-success">➕ Thêm mới</a>
+    </div>
+
+    <table class="table table-striped table-hover border rounded">
+        <thead class="thead-dark">
+            <tr>
+                <th>Mã SP</th>
+                <th>Số lượng</th>
+                <th>Đơn giá</th>
+                <th>Thành tiền</th>
+                <th class="text-end">Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.MaSP</td>
+                    <td>@item.SoLuong</td>
+                    <td>@item.DonGia.ToString("C")</td>
+                    <td>@item.ThanhTien.ToString("C")</td>
+                    <td class="text-end">
+                        <a asp-action="Edit" asp-route-id="@item.MaCTDH" class="btn btn-warning btn-sm">✏️ Sửa</a>
+                        <a asp-action="Delete" asp-route-id="@item.MaCTDH" class="btn btn-danger btn-sm">🗑️ Xoá</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

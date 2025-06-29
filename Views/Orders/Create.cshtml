@@ -1,0 +1,68 @@
+﻿@model DATN.Models.Order
+
+@{
+    ViewData["Title"] = "Thêm đơn hàng";
+}
+
+<h2>Thêm đơn hàng</h2>
+
+<form asp-action="Create" method="post">
+    <div class="mb-3">
+        <label asp-for="MaKH" class="form-label"></label>
+        <input asp-for="MaKH" class="form-control" />
+        <span asp-validation-for="MaKH" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="SoLuong" class="form-label"></label>
+        <input asp-for="SoLuong" class="form-control" />
+        <span asp-validation-for="SoLuong" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="TongTien" class="form-label"></label>
+        <input asp-for="TongTien" class="form-control" />
+        <span asp-validation-for="TongTien" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="MaPTTT" class="form-label"></label>
+        <input asp-for="MaPTTT" class="form-control" />
+        <span asp-validation-for="MaPTTT" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="TrangThaiThanhToan" class="form-label"></label>
+        <input asp-for="TrangThaiThanhToan" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="TrangThaiDonHang" class="form-label"></label>
+        <input asp-for="TrangThaiDonHang" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="TenNguoiNhan" class="form-label"></label>
+        <input asp-for="TenNguoiNhan" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="SoDienThoaiNguoiNhan" class="form-label"></label>
+        <input asp-for="SoDienThoaiNguoiNhan" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="DiaChiGiaoHang" class="form-label"></label>
+        <input asp-for="DiaChiGiaoHang" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="GhiChu" class="form-label"></label>
+        <textarea asp-for="GhiChu" class="form-control"></textarea>
+    </div>
+    <div class="mb-3">
+        <label asp-for="MaGiamGia" class="form-label"></label>
+        <input asp-for="MaGiamGia" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="PhiVanChuyen" class="form-label"></label>
+        <input asp-for="PhiVanChuyen" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-success">Lưu đơn hàng</button>
+    <a asp-action="Index" class="btn btn-secondary">Huỷ</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

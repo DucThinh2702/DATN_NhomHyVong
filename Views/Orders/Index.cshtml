@@ -1,0 +1,47 @@
+﻿@model List<DATN.Models.Order>
+
+@{
+    ViewData["Title"] = "Danh sách đơn hàng";
+}
+
+<h2>Danh sách đơn hàng</h2>
+<a asp-action="Create" class="btn btn-primary mb-3">Thêm đơn hàng</a>
+
+<table class="table table-bordered">
+    <thead class="table-dark">
+        <tr>
+            <th>Mã ĐH</th>
+            <th>Mã KH</th>
+            <th>Ngày đặt</th>
+            <th>Số lượng</th>
+            <th>Tổng tiền</th>
+            <th>Thanh toán</th>
+            <th>Trạng thái</th>
+            <th>Tên nhận</th>
+            <th>SĐT</th>
+            <th>Địa chỉ</th>
+            <th>Thao tác</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var order in Model)
+        {
+            <tr>
+                <td>@order.MaDH</td>
+                <td>@order.MaKH</td>
+                <td>@order.NgayDatHang.ToString("dd/MM/yyyy")</td>
+                <td>@order.SoLuong</td>
+                <td>@order.TongTien.ToString("N0") đ</td>
+                <td>@order.TrangThaiThanhToan</td>
+                <td>@order.TrangThaiDonHang</td>
+                <td>@order.TenNguoiNhan</td>
+                <td>@order.SoDienThoaiNguoiNhan</td>
+                <td>@order.DiaChiGiaoHang</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@order.MaDH" class="btn btn-sm btn-warning">Sửa</a>
+                    <a asp-action="Delete" asp-route-id="@order.MaDH" class="btn btn-sm btn-danger">Xóa</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

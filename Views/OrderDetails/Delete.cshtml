@@ -1,0 +1,29 @@
+﻿@model DATN.Models.OrderDetail
+@{
+    ViewData["Title"] = "Xác nhận xoá chi tiết đơn hàng";
+}
+<div class="container mt-4">
+    <h2 class="mb-3">@ViewData["Title"]</h2>
+    <div class="alert alert-warning">
+        <strong>Bạn có chắc muốn xoá mục này?</strong>
+    </div>
+
+    <dl class="row">
+        <dt class="col-sm-3">Mã sản phẩm</dt>
+        <dd class="col-sm-9">@Model.MaSP</dd>
+        <dt class="col-sm-3">Số lượng</dt>
+        <dd class="col-sm-9">@Model.SoLuong</dd>
+        <dt class="col-sm-3">Đơn giá</dt>
+        <dd class="col-sm-9">@Model.DonGia</dd>
+        <dt class="col-sm-3">Thành tiền</dt>
+        <dd class="col-sm-9">@Model.ThanhTien</dd>
+    </dl>
+
+    <form asp-action="DeleteConfirmed">
+        <input type="hidden" asp-for="MaCTDH" />
+        <div class="d-flex justify-content-between">
+            <button type="submit" class="btn btn-danger">🗑️ Xoá</button>
+            <a asp-action="ByOrder" asp-route-maDH="@Model.MaDH" class="btn btn-secondary">↩️ Huỷ</a>
+        </div>
+    </form>
+</div>

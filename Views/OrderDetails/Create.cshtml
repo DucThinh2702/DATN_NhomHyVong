@@ -1,0 +1,46 @@
+﻿@model DATN.Models.OrderDetail
+@{
+    ViewData["Title"] = "Thêm chi tiết đơn hàng";
+}
+<div class="container mt-4">
+    <h2 class="mb-3">@ViewData["Title"]</h2>
+    <form asp-action="Create" class="border rounded p-4 bg-light">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" asp-for="MaDH" />
+
+        <div class="mb-3">
+            <label asp-for="MaCTDH" class="form-label"></label>
+            <input asp-for="MaCTDH" class="form-control" />
+            <span asp-validation-for="MaCTDH" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="MaSP" class="form-label"></label>
+            <input asp-for="MaSP" class="form-control" />
+            <span asp-validation-for="MaSP" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="SoLuong" class="form-label"></label>
+            <input asp-for="SoLuong" class="form-control" />
+            <span asp-validation-for="SoLuong" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="DonGia" class="form-label"></label>
+            <input asp-for="DonGia" class="form-control" />
+            <span asp-validation-for="DonGia" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="ThanhTien" class="form-label"></label>
+            <input asp-for="ThanhTien" class="form-control" />
+            <span asp-validation-for="ThanhTien" class="text-danger"></span>
+        </div>
+
+        <div class="d-flex justify-content-between">
+            <button type="submit" class="btn btn-primary">💾 Lưu</button>
+            <a asp-action="ByOrder" asp-route-maDH="@Model.MaDH" class="btn btn-secondary">↩️ Huỷ</a>
+        </div>
+    </form>
+</div>
