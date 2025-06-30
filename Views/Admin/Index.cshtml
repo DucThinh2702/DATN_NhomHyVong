@@ -1,7 +1,10 @@
-﻿@{
+﻿@using DATN.Models.ViewModels
+@model DashboardViewModel
+@{
     ViewData["Title"] = "Trang chủ";
     Layout = null;
 }
+
 
 <!DOCTYPE html>
 <html lang="vi">
@@ -266,7 +269,7 @@
                                     <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
                                         Doanh thu tháng này
                                     </div>
-                                    <div class="h5 mb-0 font-weight-bold">100.000.000 VNĐ</div>
+                                    <div class="h5 mb-0 font-weight-bold">@Model.DoanhThuThangNay.ToString("N0") VNĐ</div>
                                 </div>
                                 <div class="col-auto">
                                     <i class="fas fa-dollar-sign fa-2x text-success"></i>
@@ -284,7 +287,7 @@
                                     <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
                                         Đơn hàng mới
                                     </div>
-                                    <div class="h5 mb-0 font-weight-bold">1,247</div>
+                                    <div class="h5 mb-0 font-weight-bold">@Model.DonHangMoi.ToString("N0")</div>
                                 </div>
                                 <div class="col-auto">
                                     <i class="fas fa-shopping-cart fa-2x text-primary"></i>
@@ -302,7 +305,7 @@
                                     <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
                                         Khách hàng đăng ký
                                     </div>
-                                    <div class="h5 mb-0 font-weight-bold">20</div>
+                                    <div class="h5 mb-0 font-weight-bold">@Model.SoKhachHangMoi.ToString("N0")</div>
                                 </div>
                                 <div class="col-auto">
                                     <i class="fas fa-users fa-2x text-info"></i>
@@ -320,7 +323,7 @@
                                     <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
                                         Sản phẩm trong kho
                                     </div>
-                                    <div class="h5 mb-0 font-weight-bold">567</div>
+                                    <div class="h5 mb-0 font-weight-bold">@Model.TongSanPhamTrongKho.ToString("N0")</div>
                                 </div>
                                 <div class="col-auto">
                                     <i class="fas fa-shopping-bag fa-2x text-warning"></i>
@@ -438,63 +441,28 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td><strong>#ORD-1247</strong></td>
-                                            <td>Nguyễn Văn A</td>
-                                            <td><span class="fw-bold">1.250.000 VNĐ</span></td>
-                                            <td><span class="badge bg-success">Hoàn thành</span></td>
-                                            <td>
-                                                <div class="d-flex gap-2">
-                                                    <button class="btn btn-outline-primary btn-sm" title="Xem">
-                                                        <i class="fas fa-eye"></i>
-                                                    </button>
-                                                    <button class="btn btn-outline-warning btn-sm" title="Sửa">
-                                                        <i class="fas fa-edit"></i>
-                                                    </button>
-                                                    <button class="btn btn-outline-danger btn-sm" title="Xóa">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>#ORD-1246</strong></td>
-                                            <td>Trần Thị B</td>
-                                            <td><strong>850,000 VNĐ</strong></td>
-                                            <td><span class="badge bg-primary">Đang xử lý</span></td>
-                                            <td>
-                                                <div class="d-flex gap-2">
-                                                    <button class="btn btn-outline-primary btn-sm">
-                                                        <i class="fas fa-eye"></i>
-                                                    </button>
-                                                    <button class="btn btn-outline-warning btn-sm">
-                                                        <i class="fas fa-edit"></i>
-                                                    </button>
-                                                    <button class="btn btn-outline-danger btn-sm">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>#ORD-1245</strong></td>
-                                            <td>Lê Văn C</td>
-                                            <td><strong>450,000 VNĐ</strong></td>
-                                            <td><span class="badge bg-warning">Chờ thanh toán</span></td>
-                                            <td>
-                                                <div class="d-flex gap-2">
-                                                    <button class="btn btn-outline-primary btn-sm">
-                                                        <i class="fas fa-eye"></i>
-                                                    </button>
-                                                    <button class="btn btn-outline-warning btn-sm">
-                                                        <i class="fas fa-edit"></i>
-                                                    </button>
-                                                    <button class="btn btn-outline-danger btn-sm">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
+                                        @foreach (var dh in Model.DonHangGanDay)
+                                        {
+                                            <tr>
+                                                <td><strong>@dh.MaDon</strong></td>
+                                                <td>@dh.TenKhachHang</td>
+                                                <td><strong>@dh.TongTien.ToString("N0") VNĐ</strong></td>
+                                                <td><span class="badge bg-info">@dh.TrangThai</span></td>
+                                                <td>
+                                                    <div class="d-flex gap-2">
+                                                        <button class="btn btn-outline-primary btn-sm" title="Xem">
+                                                            <i class="fas fa-eye"></i>
+                                                        </button>
+                                                        <button class="btn btn-outline-warning btn-sm" title="Sửa">
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
+                                                        <button class="btn btn-outline-danger btn-sm" title="Xóa">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
                                     </tbody>
                                 </table>
                             </div>
@@ -528,48 +496,23 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td><strong>Túi xách da cao cấp</strong></td>
-                                            <td>Túi xách</td>
-                                            <td><strong>156</strong></td>
-                                            <td><strong>19.500 VNĐ</strong></td>
-                                            <td>
-                                                <button class="btn btn-sm btn-outline-primary">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
-                                                <button class="btn btn-sm btn-outline-warning">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>Balo du lịch</strong></td>
-                                            <td>Balo</td>
-                                            <td><strong>134</strong></td>
-                                            <td><strong>20.000 VNĐ</strong></td>
-                                            <td>
-                                                <button class="btn btn-sm btn-outline-primary">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
-                                                <button class="btn btn-sm btn-outline-warning">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>Ví da nam</strong></td>
-                                            <td>Ví</td>
-                                            <td><strong>98</strong></td>
-                                            <td><strong>45.000.000 VNĐ</strong></td>
-                                            <td>
-                                                <button class="btn btn-sm btn-outline-primary">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
-                                                <button class="btn btn-sm btn-outline-warning">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
+                                        @foreach (var sp in Model.SanPhamBanChay)
+                                        {
+                                            <tr>
+                                                <td><strong>@sp.TenSanPham</strong></td>
+                                                <td>@sp.DanhMuc</td>
+                                                <td><strong>@sp.SoLuongBan</strong></td>
+                                                <td><strong>@sp.DoanhThu.ToString("N0") VNĐ</strong></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-outline-warning">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        }
                                     </tbody>
                                 </table>
                             </div>
@@ -601,7 +544,7 @@
             }
         }
         const ctx=document.getElementById('revenueChart').getContext('2d');
-        new Chart(ctx,{type:'line',data:{labels:['T1','T2','T3','T4','T5','T6','T7'],datasets:[{label:'Doanh thu (triệu VNĐ)',data:[85,92,78,105,98,110,125],borderColor:'#ffc107',backgroundColor:'rgba(255,193,7,0.1)',tension:0.4,fill:true},{label:'Đơn hàng',data:[45,52,38,65,58,70,85],borderColor:'#0d6efd',backgroundColor:'rgba(13,110,253,0.1)',tension:0.4,fill:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'}},scales:{y:{beginAtZero:true}}}});
+                                new Chart(ctx,{type:'line',data:{labels: @Html.Raw(Json.Serialize(Model.LabelsDoanhThu)),datasets:[{label:'Doanh thu (triệu VNĐ)',data: @Html.Raw(Json.Serialize(Model.DataDoanhThu.Select(x => Math.Round(x / 1000000M, 2)))),borderColor:'#ffc107',backgroundColor:'rgba(255,193,7,0.1)',tension:0.4,fill:true},{label:'Đơn hàng',data: @Html.Raw(Json.Serialize(Model.DataDonHang)),borderColor:'#0d6efd',backgroundColor:'rgba(13,110,253,0.1)',tension:0.4,fill:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'}},scales:{y:{beginAtZero:true}}}});
     </script>
 </body>
 </html>
