@@ -19,8 +19,10 @@
         <dd class="col-sm-9">@Model.ThanhTien</dd>
     </dl>
 
-    <form asp-action="DeleteConfirmed">
+    <form asp-action="Delete" method="post">
+        @Html.AntiForgeryToken()
         <input type="hidden" asp-for="MaCTDH" />
+        <input type="hidden" asp-for="MaDH" />
         <div class="d-flex justify-content-between">
             <button type="submit" class="btn btn-danger">🗑️ Xoá</button>
             <a asp-action="ByOrder" asp-route-maDH="@Model.MaDH" class="btn btn-secondary">↩️ Huỷ</a>

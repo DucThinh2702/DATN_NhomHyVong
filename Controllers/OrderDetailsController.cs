@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using DATN.Models;
 using DATN.Repositories;
+using System.Reflection;
 
 namespace DATN.Controllers
 {
@@ -74,15 +75,10 @@ namespace DATN.Controllers
         // POST: OrderDetails/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(string id)
+        public async Task<IActionResult> DeleteConfirmed(OrderDetail model)
         {
-            var detail = await _repo.GetByIdAsync(id);
-            if (detail != null)
-            {
-                await _repo.DeleteAsync(id);
-                return RedirectToAction("ByOrder", new { maDH = detail.MaDH });
-            }
-            return NotFound();
+            await _repo.DeleteAsync(model.MaCTDH);
+            return RedirectToAction("ByOrder", new { maDH = model.MaDH });
         }
     }
 }
