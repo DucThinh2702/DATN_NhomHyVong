@@ -1,0 +1,897 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Kho hàng - The Bag Studio Admin</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #ffc107;
+            --sidebar-width: 280px;
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: linear-gradient(135deg, #1a1d29 0%, #2c3142 100%);
+            color: white;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+            .sidebar.collapsed {
+                width: 80px;
+            }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            transition: all 0.3s ease;
+        }
+
+            .main-content.expanded {
+                margin-left: 80px;
+            }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8) !important;
+            border-radius: 8px;
+            margin: 2px 0;
+            transition: all 0.3s ease;
+        }
+
+            .nav-link:hover,
+            .nav-link.active {
+                background: rgba(255, 255, 255, 0.1) !important;
+                color: white !important;
+                transform: translateX(8px);
+            }
+
+        .sidebar.collapsed .nav-link:hover,
+        .sidebar.collapsed .nav-link.active {
+            transform: none;
+        }
+
+        .sidebar.collapsed .nav-text {
+            display: none;
+        }
+
+        .brand-logo {
+            background: linear-gradient(135deg, var(--primary-color), #e0a800);
+            color: #1a1d29;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .stat-card {
+            border-left: 4px solid var(--primary-color);
+            transition: all 0.3s ease;
+        }
+
+            .stat-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            }
+
+        .activity-item {
+            border-left: 3px solid var(--primary-color);
+            padding-left: 15px;
+            margin-bottom: 15px;
+        }
+
+        .inventory-alert {
+            border-left: 4px solid #dc3545;
+        }
+
+        .stock-low {
+            color: #dc3545;
+        }
+
+        .stock-medium {
+            color: #ffc107;
+        }
+
+        .stock-high {
+            color: #28a745;
+        }
+
+        @@media (max-width: 768px) {
+            .sidebar
+
+        {
+            width: 80px;
+        }
+
+        .main-content {
+            margin-left: 80px;
+        }
+
+        .sidebar.collapsed {
+            width: 0;
+            transform: translateX(-100%);
+        }
+
+        .main-content.expanded {
+            margin-left: 0;
+        }
+
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="p-3 border-bottom border-secondary">
+            <div class="d-flex align-items-center justify-content-center mb-3">
+                <div class="d-flex shadow-sm rounded overflow-hidden">
+                    <span class="px-3 py-1 text-warning fw-bold bg-secondary">THE BAG</span>
+                    <span class="px-3 py-1 text-dark fw-bold bg-warning">STUDIO</span>
+                </div>
+            </div>
+            <div class="text-center">
+                <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm overflow-hidden" style="width:60px;height:60px;">
+                    <img src="~/hinh/logo.jpg" alt="Logo" class="img-fluid" style="max-width:100%;max-height:100%;" />
+                </div>
+                <div class="mt-2">
+                    <h6 class="mb-0 text-white">Admin User</h6>
+                    <small class="text-secondary">Quản trị viên</small>
+                </div>
+            </div>
+        </div>
+        <nav class="p-3">
+            <div class="mb-4">
+                <h6 class="text-secondary fw-semibold mb-2">Tổng quan</h6>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" asp-controller="Admin" asp-action="Index">
+                            <i class="fas fa-chart-pie me-2"></i><span class="nav-text">Thống kê</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Admin" asp-action="PhanTich">
+                            <i class="fas fa-chart-line me-2"></i><span class="nav-text">Phân tích</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="mb-4">
+                <h6 class="text-secondary fw-semibold mb-2">Quản lý</h6>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Admin" asp-action="SanPham">
+                            <i class="fas fa-shopping-bag me-2"></i><span class="nav-text">Sản phẩm</span><span class="badge bg-primary ms-auto nav-text">567</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Admin" asp-action="DonHang">
+                            <i class="fas fa-shopping-cart me-2"></i><span class="nav-text">Đơn hàng</span><span class="badge bg-danger ms-auto nav-text">24</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Admin" asp-action="KhachHang">
+                            <i class="fas fa-users me-2"></i><span class="nav-text">Khách hàng</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Admin" asp-action="DanhMuc">
+                            <i class="fas fa-tags me-2"></i><span class="nav-text">Danh mục</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Admin" asp-action="KhoHang">
+                            <i class="fas fa-warehouse me-2"></i><span class="nav-text">Kho hàng</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="mb-4">
+                <h6 class="text-secondary fw-semibold mb-2">Marketing</h6>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Admin" asp-action="ChienDich">
+                            <i class="fas fa-bullhorn me-2"></i><span class="nav-text">Chiến dịch</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Admin" asp-action="MaGiamGia">
+                            <i class="fas fa-ticket-alt me-2"></i><span class="nav-text">Mã giảm giá</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="mb-4">
+                <h6 class="text-secondary fw-semibold mb-2">Hệ thống</h6>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Admin" asp-action="CaiDat">
+                            <i class="fas fa-cog me-2"></i><span class="nav-text">Cài đặt</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-danger" href="#" onclick="logout()">
+                            <i class="fas fa-sign-out-alt me-2"></i><span class="nav-text">Đăng xuất</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <!-- Header -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top">
+            <div class="container-fluid">
+                <button class="btn btn-outline-secondary me-3" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+
+                <div>
+                    <h4 class="mb-0">Quản lý Kho hàng</h4>
+                    <small class="text-muted">Theo dõi và quản lý tồn kho sản phẩm</small>
+                </div>
+
+                <div class="d-flex align-items-center ms-auto">
+                    <div class="input-group me-3" style="width: 300px;">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        <input type="text" class="form-control" placeholder="Tìm kiếm...">
+                    </div>
+
+                    <div class="dropdown me-2">
+                        <button class="btn btn-outline-secondary position-relative" data-bs-toggle="dropdown">
+                            <i class="fas fa-bell"></i>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">5</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#">Sản phẩm sắp hết hàng</a></li>
+                            <li><a class="dropdown-item" href="#">Cần nhập hàng</a></li>
+                            <li><a class="dropdown-item" href="#">Kiểm kê định kỳ</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary d-flex align-items-center" data-bs-toggle="dropdown">
+                            <div class="bg-warning rounded-circle d-flex align-items-center justify-content-center me-2"
+                                 style="width: 32px; height: 32px;">
+                                <i class="fas fa-user text-dark small"></i>
+                            </div>
+                            <div class="text-start d-none d-md-block">
+                                <div class="small fw-bold">Admin User</div>
+                                <div class="small text-muted">Quản trị viên</div>
+                            </div>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Hồ sơ</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Cài đặt</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li>
+                                <a class="dropdown-item text-danger" href="#" onclick="logout()">
+                                    <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Content -->
+        <div class="container-fluid p-4">
+            <!-- Stats Cards -->
+            <div class="row mb-4">
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card stat-card h-100">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                        Tổng sản phẩm
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold">1,234</div>
+
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-boxes fa-2x text-primary"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card stat-card h-100">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                        Còn hàng
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold">987</div>
+
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-check-circle fa-2x text-success"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card stat-card h-100">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                        Sắp hết hàng
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold">23</div>
+
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-exclamation-triangle fa-2x text-warning"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card stat-card h-100">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Hết hàng</div>
+                                    <div class="h5 mb-0 font-weight-bold">12</div>
+
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-times-circle fa-2x text-danger"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Low Stock Alerts -->
+            <div class="card mb-4 inventory-alert">
+                <div class="card-header bg-danger text-white">
+                    <h6 class="m-0 font-weight-bold">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Cảnh báo tồn kho
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="alert alert-warning">
+                                <strong>Túi xách Louis Vuitton</strong><br>
+                                Còn lại: 3 sản phẩm
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="alert alert-danger">
+                                <strong>Balo Adidas Sport</strong><br>
+                                Hết hangf
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="alert alert-warning">
+                                <strong>Ví cầm tay Gucci</strong><br>
+                                Còn lại: 5 sản phẩm
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Inventory Management -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold">Quản lý Tồn kho</h6>
+                    <div>
+                        <button class="btn btn-success btn-sm me-2" data-bs-toggle="modal"
+                                data-bs-target="#importModal">
+                            <i class="fas fa-file-import me-2"></i>Nhập hàng
+                        </button>
+                        <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#adjustModal">
+                            <i class="fas fa-edit me-2"></i>Điều chỉnh
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Search and Filter -->
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                <input type="text" class="form-control" placeholder="Tìm kiếm sản phẩm..."
+                                       id="searchInput">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <select class="form-select" id="categoryFilter">
+                                <option value="">Tất cả danh mục</option>
+                                <option value="handbags">Túi xách</option>
+                                <option value="backpacks">Balo</option>
+                                <option value="wallets">Ví</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <select class="form-select" id="stockFilter">
+                                <option value="">Tất cả</option>
+                                <option value="in-stock">Còn hàng</option>
+                                <option value="low-stock">Sắp hết</option>
+                                <option value="out-of-stock">Hết hàng</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <select class="form-select" id="sortBy">
+                                <option value="name">Tên sản phẩm</option>
+                                <option value="stock">Số lượng tồn</option>
+                                <option value="value">Giá trị tồn kho</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-outline-primary btn-sm w-100" onclick="exportInventory()">
+                                <i class="fas fa-download me-2"></i>Xuất Excel
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Inventory Table -->
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Sản phẩm</th>
+                                    <th>SKU</th>
+                                    <th>Danh mục</th>
+                                    <th>Tồn kho</th>
+                                    <th>Giá nhập</th>
+                                    <th>Giá bán</th>
+                                    <th>Giá trị tồn</th>
+                                    <th>Trạng thái</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventoryTable">
+                                <!-- Inventory data will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Stock Modal -->
+    <div class="modal fade" id="importModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Nhập hàng</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="importForm">
+                        <div class="mb-3">
+                            <label class="form-label">Sản phẩm</label>
+                            <select class="form-select" id="importProduct" required>
+                                <option value="">Chọn sản phẩm</option>
+                                <option value="1">Túi xách Louis Vuitton</option>
+                                <option value="2">Balo Adidas Sport</option>
+                                <option value="3">Ví cầm tay Gucci</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Số lượng nhập</label>
+                            <input type="number" class="form-control" id="importQuantity" min="1" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Giá nhập</label>
+                            <input type="number" class="form-control" id="importPrice" min="0" step="0.01" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Nhà cung cấp</label>
+                            <input type="text" class="form-control" id="supplier">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Ghi chú</label>
+                            <textarea class="form-control" id="importNotes" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-success" onclick="saveImport()">Nhập hàng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Adjust Stock Modal -->
+    <div class="modal fade" id="adjustModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Điều chỉnh tồn kho</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="adjustForm">
+                        <div class="mb-3">
+                            <label class="form-label">Sản phẩm</label>
+                            <select class="form-select" id="adjustProduct" required>
+                                <option value="">Chọn sản phẩm</option>
+                                <option value="1">Túi xách Louis Vuitton</option>
+                                <option value="2">Balo Adidas Sport</option>
+                                <option value="3">Ví cầm tay Gucci</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Tồn kho hiện tại</label>
+                            <input type="number" class="form-control" id="currentStock" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Tồn kho mới</label>
+                            <input type="number" class="form-control" id="newStock" min="0" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Lý do điều chỉnh</label>
+                            <select class="form-select" id="adjustReason" required>
+                                <option value="">Chọn lý do</option>
+                                <option value="damaged">Hàng hỏng</option>
+                                <option value="lost">Mất hàng</option>
+                                <option value="returned">Hàng trả lại</option>
+                                <option value="inventory">Kiểm kê</option>
+                                <option value="other">Khác</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Ghi chú</label>
+                            <textarea class="form-control" id="adjustNotes" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-warning" onclick="saveAdjustment()">Điều chỉnh</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+            // Sample inventory data
+            const inventory = [
+                {
+
+                    id: 1,
+                    name: "Túi xách phong cách sang trọng",
+                    sku: "LV-NF-001",
+                    category: "Túi xách nữ",
+                    stock: 15,
+                    costPrice: 2500000,
+                    salePrice: 3500000,
+                    status: "in-stock",
+                    image: "hinh/hinh1.jpg"
+                },
+
+
+                {
+                    id: 2,
+                    name: "túi xách sang trọng ",
+                    sku: "AD-SP-002",
+                    category: "Balo",
+                    stock: 0,
+                    costPrice: 800000,
+                    salePrice: 1200000,
+                    status: "Tuoi tre",
+                    image: "hinh/hinh2.jpg"
+                },
+                {
+                    id: 3,
+                    name: "Ví cầm tay Gucci Signature",
+                    sku: "GC-SG-003",
+                    category: "Ví",
+                    stock: 5,
+                    costPrice: 1200000,
+                    salePrice: 1800000,
+                    status: "low-stock",
+                    image: "hinh/hinh3.jpg"
+                },
+                {
+                    id: 4,
+                    name: "Túi đeo chéo Chanel Classic",
+                    sku: "CH-CL-004",
+                    category: "Túi xách nữ",
+                    stock: 8,
+                    costPrice: 4000000,
+                    salePrice: 5500000,
+                    status: "low-stock",
+                    image: "hinh/hinh1.jpg"
+                },
+                {
+                    id: 5,
+                    name: "Balo du lịch Samsonite",
+                    sku: "SM-TR-005",
+                    category: "Balo",
+                    stock: 25,
+                    costPrice: 1500000,
+                    salePrice: 2200000,
+                    status: "in-stock",
+                    image: "hinh/hinh5.jpg"
+                }
+            ];
+
+            // Sidebar Toggle
+            document.getElementById('sidebarToggle').addEventListener('click', function () {
+                const sidebar = document.getElementById('sidebar');
+                const mainContent = document.getElementById('mainContent');
+
+                sidebar.classList.toggle('collapsed');
+                mainContent.classList.toggle('expanded');
+
+                // Save state
+                localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+            });
+
+            // Restore sidebar state
+            if (localStorage.getItem('sidebarCollapsed') === 'true') {
+                document.getElementById('sidebar').classList.add('collapsed');
+                document.getElementById('mainContent').classList.add('expanded');
+            }
+
+            // Logout function
+            function logout() {
+                if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+                    alert('Đăng xuất thành công!');
+                    // Redirect to login page
+                    // window.location.href = 'login.html';
+                }
+            }
+
+            // Format currency
+            function formatCurrency(amount) {
+                return new Intl.NumberFormat('vi-VN', {
+                    style: 'currency',
+                    currency: 'VND'
+                }).format(amount);
+            }
+
+            // Get stock status class
+            function getStockStatusClass(status) {
+                switch (status) {
+                    case 'in-stock': return 'stock-high';
+                    case 'low-stock': return 'stock-medium';
+                    case 'out-of-stock': return 'stock-low';
+                    default: return '';
+                }
+            }
+
+            // Get stock status text
+            function getStockStatusText(status) {
+                switch (status) {
+                    case 'in-stock': return 'Còn hàng';
+                    case 'low-stock': return 'Sắp hết';
+                    case 'out-of-stock': return 'Hết hàng';
+                    default: return '';
+                }
+            }
+
+            // Load inventory
+            function loadInventory() {
+                const table = document.getElementById('inventoryTable');
+                const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+                const categoryFilter = document.getElementById('categoryFilter').value;
+                const stockFilter = document.getElementById('stockFilter').value;
+
+                let filteredInventory = inventory.filter(item => {
+                    const matchesSearch = item.name.toLowerCase().includes(searchTerm) ||
+                        item.sku.toLowerCase().includes(searchTerm);
+                    const matchesCategory = !categoryFilter || item.category.includes(categoryFilter);
+                    const matchesStock = !stockFilter || item.status === stockFilter;
+
+                    return matchesSearch && matchesCategory && matchesStock;
+                });
+
+                table.innerHTML = filteredInventory.map(item => `
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="${item.image || 'placeholder.svg'}" alt="${item.name}" class="me-3 rounded" style="width: 40px; height: 40px; object-fit: cover;">
+
+                                <div>
+                                    <div class="fw-bold">${item.name}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><code>${item.sku}</code></td>
+                        <td>${item.category}</td>
+                        <td>
+                            <span class="${getStockStatusClass(item.status)}">
+                                <strong>${item.stock}</strong>
+                            </span>
+                        </td>
+                        <td>${formatCurrency(item.costPrice)}</td>
+                        <td>${formatCurrency(item.salePrice)}</td>
+                        <td>${formatCurrency(item.stock * item.costPrice)}</td>
+                        <td>
+                            <span class="badge ${item.status === 'in-stock' ? 'bg-success' : item.status === 'low-stock' ? 'bg-warning' : 'bg-danger'}">
+                                ${getStockStatusText(item.status)}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <button class="btn btn-outline-primary" onclick="viewHistory(${item.id})" title="Lịch sử">
+                                    <i class="fas fa-history"></i>
+                                </button>
+                                <button class="btn btn-outline-success" onclick="quickImport(${item.id})" title="Nhập nhanh">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                                <button class="btn btn-outline-warning" onclick="quickAdjust(${item.id})" title="Điều chỉnh">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            // Search functionality
+            document.getElementById('searchInput').addEventListener('input', loadInventory);
+            document.getElementById('categoryFilter').addEventListener('change', loadInventory);
+            document.getElementById('stockFilter').addEventListener('change', loadInventory);
+
+            // Save import
+            function saveImport() {
+                const productId = document.getElementById('importProduct').value;
+                const quantity = parseInt(document.getElementById('importQuantity').value);
+                const price = parseFloat(document.getElementById('importPrice').value);
+
+                if (!productId || !quantity || !price) {
+                    alert('Vui lòng điền đầy đủ thông tin');
+                    return;
+                }
+
+                // Update inventory (in real app, this would be an API call)
+                const item = inventory.find(i => i.id == productId);
+                if (item) {
+                    item.stock += quantity;
+                    item.costPrice = price;
+
+                    // Update status based on new stock
+                    if (item.stock > 10) {
+                        item.status = 'in-stock';
+                    } else if (item.stock > 0) {
+                        item.status = 'low-stock';
+                    } else {
+                        item.status = 'out-of-stock';
+                    }
+                }
+
+                loadInventory();
+
+                // Close modal and reset form
+                const modal = bootstrap.Modal.getInstance(document.getElementById('importModal'));
+                modal.hide();
+                document.getElementById('importForm').reset();
+
+                alert('Nhập hàng thành công!');
+            }
+
+            // Save adjustment
+            function saveAdjustment() {
+                const productId = document.getElementById('adjustProduct').value;
+                const newStock = parseInt(document.getElementById('newStock').value);
+                const reason = document.getElementById('adjustReason').value;
+
+                if (!productId || newStock < 0 || !reason) {
+                    alert('Vui lòng điền đầy đủ thông tin');
+                    return;
+                }
+
+                // Update inventory
+                const item = inventory.find(i => i.id == productId);
+                if (item) {
+                    item.stock = newStock;
+
+                    // Update status based on new stock
+                    if (item.stock > 10) {
+                        item.status = 'in-stock';
+                    } else if (item.stock > 0) {
+                        item.status = 'low-stock';
+                    } else {
+                        item.status = 'out-of-stock';
+                    }
+                }
+
+                loadInventory();
+
+                // Close modal and reset form
+                const modal = bootstrap.Modal.getInstance(document.getElementById('adjustModal'));
+                modal.hide();
+                document.getElementById('adjustForm').reset();
+
+                alert('Điều chỉnh tồn kho thành công!');
+            }
+
+            // Quick functions
+            function quickImport(id) {
+                document.getElementById('importProduct').value = id;
+                const modal = new bootstrap.Modal(document.getElementById('importModal'));
+                modal.show();
+            }
+
+            function quickAdjust(id) {
+                const item = inventory.find(i => i.id === id);
+                if (item) {
+                    document.getElementById('adjustProduct').value = id;
+                    document.getElementById('currentStock').value = item.stock;
+                    document.getElementById('newStock').value = item.stock;
+
+                    const modal = new bootstrap.Modal(document.getElementById('adjustModal'));
+                    modal.show();
+                }
+            }
+
+            function viewHistory(id) {
+                alert('Tính năng xem lịch sử sẽ được phát triển trong phiên bản tiếp theo');
+            }
+
+            function exportInventory() {
+                alert('Xuất file Excel thành công!');
+            }
+
+            // Initialize
+            document.addEventListener('DOMContentLoaded', function () {
+                loadInventory();
+            });
+
+            // Search functionality
+            document.querySelector('input[placeholder="Tìm kiếm..."]').addEventListener('input', function (e) {
+                const searchTerm = e.target.value.toLowerCase();
+                if (searchTerm.length > 2) {
+                    console.log('Searching for:', searchTerm);
+                    // Implement search logic here
+                }
+            });
+              document.addEventListener("DOMContentLoaded", function () {
+            const currentPath = window.location.pathname.split("/").pop(); // Lấy tên file cuối
+            const navLinks = document.querySelectorAll(".sidebar .nav-link");
+
+            navLinks.forEach(link => {
+                const href = link.getAttribute("href");
+                if (href && currentPath === href) {
+                    link.classList.add("active");
+                } else {
+                    link.classList.remove("active");
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

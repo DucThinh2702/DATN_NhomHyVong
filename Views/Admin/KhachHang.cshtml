@@ -1,0 +1,590 @@
+﻿@model DATN.Models.User
+@{
+    ViewData["Title"] = "Khách hàng - The Bag Studio Admin";
+
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Khách hàng - The Bag Studio Admin</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #ffc107;
+            --sidebar-width: 280px;
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: linear-gradient(135deg, #1a1d29 0%, #2c3142 100%);
+            color: white;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+            .sidebar.collapsed {
+                width: 80px;
+            }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            transition: all 0.3s ease;
+        }
+
+            .main-content.expanded {
+                margin-left: 80px;
+            }
+
+        .nav-link {
+            color: rgba(255,255,255,0.8) !important;
+            border-radius: 8px;
+            margin: 2px 0;
+            transition: all 0.3s ease;
+        }
+
+            .nav-link:hover, .nav-link.active {
+                background: rgba(255,255,255,0.1) !important;
+                color: white !important;
+                transform: translateX(8px);
+            }
+
+        .sidebar.collapsed .nav-link:hover,
+        .sidebar.collapsed .nav-link.active {
+            transform: none;
+        }
+
+        .sidebar.collapsed .nav-text {
+            display: none;
+        }
+
+        .brand-logo {
+            background: linear-gradient(135deg, var(--primary-color), #e0a800);
+            color: #1a1d29;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .customer-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), #e0a800);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1a1d29;
+            font-weight: bold;
+        }
+
+        @@media (max-width: 768px) {
+            .sidebar {
+                width: 80px;
+            }
+
+            .main-content {
+                margin-left: 80px;
+            }
+
+            .sidebar.collapsed {
+                width: 0;
+                transform: translateX(-100%);
+            }
+
+            .main-content.expanded {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar (same as other pages) -->
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="p-3 border-bottom border-secondary">
+            <div class="d-flex align-items-center justify-content-center mb-3">
+                <div class="d-flex shadow-sm rounded overflow-hidden">
+                    <span class="px-3 py-1 text-warning fw-bold bg-secondary">THE BAG</span>
+                    <span class="px-3 py-1 text-dark fw-bold bg-warning">STUDIO</span>
+                </div>
+            </div>
+            <div class="text-center">
+                <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm overflow-hidden" style="width:60px;height:60px;">
+                    <img src="~/hinh/logo.jpg" alt="Logo" class="img-fluid" style="max-width:100%;max-height:100%;" />
+                </div>
+                <div class="mt-2">
+                    <h6 class="mb-0 text-white">Admin User</h6>
+                    <small class="text-secondary">Quản trị viên</small>
+                </div>
+            </div>
+        </div>
+        <nav class="p-3">
+            <div class="mb-4">
+                <h6 class="text-secondary fw-semibold mb-2">Tổng quan</h6>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" asp-controller="Admin" asp-action="Index">
+                            <i class="fas fa-chart-pie me-2"></i><span class="nav-text">Thống kê</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Admin" asp-action="PhanTich">
+                            <i class="fas fa-chart-line me-2"></i><span class="nav-text">Phân tích</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="mb-4">
+                <h6 class="text-secondary fw-semibold mb-2">Quản lý</h6>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Admin" asp-action="SanPham">
+                            <i class="fas fa-shopping-bag me-2"></i><span class="nav-text">Sản phẩm</span><span class="badge bg-primary ms-auto nav-text">567</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Admin" asp-action="DonHang">
+                            <i class="fas fa-shopping-cart me-2"></i><span class="nav-text">Đơn hàng</span><span class="badge bg-danger ms-auto nav-text">24</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Admin" asp-action="KhachHang">
+                            <i class="fas fa-users me-2"></i><span class="nav-text">Khách hàng</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Admin" asp-action="DanhMuc">
+                            <i class="fas fa-tags me-2"></i><span class="nav-text">Danh mục</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Admin" asp-action="KhoHang">
+                            <i class="fas fa-warehouse me-2"></i><span class="nav-text">Kho hàng</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="mb-4">
+                <h6 class="text-secondary fw-semibold mb-2">Marketing</h6>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Admin" asp-action="ChienDich">
+                            <i class="fas fa-bullhorn me-2"></i><span class="nav-text">Chiến dịch</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Admin" asp-action="MaGiamGia">
+                            <i class="fas fa-ticket-alt me-2"></i><span class="nav-text">Mã giảm giá</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="mb-4">
+                <h6 class="text-secondary fw-semibold mb-2">Hệ thống</h6>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Admin" asp-action="CaiDat">
+                            <i class="fas fa-cog me-2"></i><span class="nav-text">Cài đặt</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-danger" href="#" onclick="logout()">
+                            <i class="fas fa-sign-out-alt me-2"></i><span class="nav-text">Đăng xuất</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <!-- Header -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top">
+            <div class="container-fluid">
+                <button class="btn btn-outline-secondary me-3" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+
+                <div>
+                    <h4 class="mb-0">Khách hàng</h4>
+                    <small class="text-muted">Quản lý thông tin khách hàng</small>
+                </div>
+
+                <div class="d-flex align-items-center ms-auto">
+                    <div class="input-group me-3" style="width: 300px;">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        <input type="text" class="form-control" placeholder="Tìm kiếm khách hàng...">
+                    </div>
+
+                    <div class="dropdown me-2">
+                        <button class="btn btn-outline-secondary position-relative" data-bs-toggle="dropdown">
+                            <i class="fas fa-bell"></i>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">3</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#">Khách hàng mới đăng ký</a></li>
+                            <li><a class="dropdown-item" href="#">Sinh nhật khách hàng VIP</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary d-flex align-items-center" data-bs-toggle="dropdown">
+                            <div class="bg-warning rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
+                                <i class="fas fa-user text-dark small"></i>
+                            </div>
+                            <div class="text-start d-none d-md-block">
+                                <div class="small fw-bold">Admin User</div>
+                                <div class="small text-muted">Quản trị viên</div>
+                            </div>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Hồ sơ</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Cài đặt</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="#" onclick="logout()"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Customers Content -->
+        <div class="container-fluid p-4">
+            <!-- Stats Cards -->
+            <div class="row mb-4">
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-primary h-100">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Tổng khách hàng</div>
+                                    <div class="h5 mb-0 font-weight-bold">3,892</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-users fa-2x text-primary"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-success h-100">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Khách hàng mới</div>
+                                    <div class="h5 mb-0 font-weight-bold">156</div>
+                                    <div class="text-success small">Tháng này</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-user-plus fa-2x text-success"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-warning h-100">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Khách VIP</div>
+                                    <div class="h5 mb-0 font-weight-bold">234</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-crown fa-2x text-warning"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-info h-100">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Đang hoạt động</div>
+                                    <div class="h5 mb-0 font-weight-bold">2,847</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-user-check fa-2x text-info"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customers Table -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold">Danh sách khách hàng</h6>
+                    <div>
+                        <button class="btn btn-outline-secondary btn-sm me-2">
+                            <i class="fas fa-filter"></i> Lọc
+                        </button>
+                        <button class="btn btn-outline-primary btn-sm me-2">
+                            <i class="fas fa-download"></i> Xuất Excel
+                        </button>
+                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addCustomerModal">
+                            <i class="fas fa-plus"></i> Thêm khách hàng
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="customersTable">
+                            <thead>
+                                <tr>
+                                    <th>Khách hàng</th>
+                                    <th>Liên hệ</th>
+                                    <th>Đơn hàng</th>
+                                    <th>Tổng chi tiêu</th>
+                                    <th>Trạng thái</th>
+                                    <th>Ngày tham gia</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var user in (ViewData["User"] as List<DATN.Models.User> ?? new List<DATN.Models.User>()))
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="customer-avatar me-3">
+                                                    @((user.FullName ?? user.Username ?? "NA").Split(' ').Select(w => w[0]).Take(2).Aggregate("", (a, b) => a + b))
+                                                </div>
+                                                <div>
+                                                    <div class="fw-bold">@user.FullName</div>
+                                                    <small class="text-muted">ID: USER-@user.UserId</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div>
+                                                <div>@user.Email</div>
+                                                <small class="text-muted">@user.PhoneNumber</small>
+                                            </div>
+                                        </td>
+                                        <td><strong>@user.Orders?.Count()</strong></td>
+                                        <td>
+                                            <strong>
+                                                @string.Format("{0:C0}", user.Orders?.Sum(o => o.TotalAmount) ?? 0)
+                                            </strong>
+                                        </td>
+                                        <td>
+                                            <span class="badge
+                                            @(user.Orders?.Count >= 10 ? "bg-warning" :
+                                            user.Orders?.Count >= 5 ? "bg-primary" : "bg-success")">
+                                            @(user.Orders?.Count >= 10 ? "VIP" : user.Orders?.Count >= 5 ? "Thường xuyên" : "Mới")
+                                        </span>
+                                    </td>
+                                    <td>@user.CreatedDate?.ToString("dd/MM/yyyy")</td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <button class="btn btn-outline-primary" title="Xem chi tiết" onclick="viewCustomer('USER-@user.UserId')">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <a asp-action="Edit" asp-route-id="@user.UserId" class="btn btn-outline-warning" title="Chỉnh sửa">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="mailto:@user.Email" class="btn btn-outline-info" title="Gửi email">
+                                                <i class="fas fa-envelope"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+
+                    <!-- Pagination -->
+                    <!-- <nav aria-label="Customers pagination">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" tabindex="-1">Trước</a>
+                            </li>
+                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                            <li class="page-item"><a class="page-link" href="#">3</a></li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">Sau</a>
+                            </li>
+                        </ul>
+                    </nav> -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Customer Detail Modal -->
+    <div class="modal fade" id="customerDetailModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Chi tiết khách hàng</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="customerDetailContent">
+                    <!-- Customer details will be loaded here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="button" class="btn btn-primary">Gửi email</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Customer Modal -->
+    <div class="modal fade" id="addCustomerModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Thêm khách hàng mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form asp-action="CreateUser" asp-controller="User" method="post" id="addCustomerForm">
+                        <div class="mb-3">
+                            <label asp-for="FullName" class="form-label"></label>
+                            <input asp-for="FullName" class="form-control" />
+                            <span class="text-danger" asp-validation-for="FullName"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label"></label>
+                            <input asp-for="Email" class="form-control" />
+                            <span class="text-danger" asp-validation-for="Email"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="PhoneNumber" class="form-label"></label>
+                            <input asp-for="PhoneNumber" class="form-control" />
+                            <span class="text-danger" asp-validation-for="PhoneNumber"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Address" class="form-label"></label>
+                            <textarea asp-for="Address" class="form-control" rows="2"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="BirthDate" class="form-label"></label>
+                            <input asp-for="BirthDate" class="form-control" type="date" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Gender" class="form-label"></label>
+                            <select asp-for="Gender" class="form-select">
+                                <option value="">Chọn giới tính</option>
+                                <option value="Nam">Nam</option>
+                                <option value="Nữ">Nữ</option>
+                                <option value="Khác">Khác</option>
+                            </select>
+                        </div>
+                        @section Scripts {
+                            <partial name="_ValidationScriptsPartial" />
+                        }
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                            <button type="submit" class="btn btn-primary">Thêm khách hàng</button>
+                        </div>
+                    </form>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+            // Sidebar Toggle
+            document.getElementById('sidebarToggle').addEventListener('click', function() {
+                const sidebar = document.getElementById('sidebar');
+                const mainContent = document.getElementById('mainContent');
+
+                sidebar.classList.toggle('collapsed');
+                mainContent.classList.toggle('expanded');
+
+                localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+            });
+
+            // Restore sidebar state
+            if (localStorage.getItem('sidebarCollapsed') === 'true') {
+                document.getElementById('sidebar').classList.add('collapsed');
+                document.getElementById('mainContent').classList.add('expanded');
+            }
+
+            // Logout function
+            function logout() {
+                if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+                    alert('Đăng xuất thành công!');
+                }
+            }
+
+            // View customer details
+            function viewCustomer(customerId) {
+                document.getElementById('customerDetailContent').innerHTML = content;
+                const modal = new bootstrap.Modal(document.getElementById('customerDetailModal'));
+                modal.show();
+            }
+
+
+
+            // Search functionality
+            document.querySelector('input[placeholder="Tìm kiếm khách hàng..."]').addEventListener('input', function(e) {
+                const searchTerm = e.target.value.toLowerCase();
+                const rows = document.querySelectorAll('#customersTable tbody tr');
+
+                rows.forEach(row => {
+                    const customerName = row.querySelector('.fw-bold').textContent.toLowerCase();
+                    const email = row.querySelector('td:nth-child(2) div').textContent.toLowerCase();
+                    const customerId = row.querySelector('small').textContent.toLowerCase();
+
+                    if (customerName.includes(searchTerm) || email.includes(searchTerm) || customerId.includes(searchTerm)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+              document.addEventListener("DOMContentLoaded", function () {
+            const currentPath = window.location.pathname.split("/").pop(); // Lấy tên file cuối
+            const navLinks = document.querySelectorAll(".sidebar .nav-link");
+
+            navLinks.forEach(link => {
+                const href = link.getAttribute("href");
+                if (href && currentPath === href) {
+                    link.classList.add("active");
+                } else {
+                    link.classList.remove("active");
+                }
+            });
+        });
+    </script>
+</body>
+</html>
