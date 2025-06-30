@@ -1,0 +1,96 @@
+﻿@model DATN.Models.SanPham
+
+@{
+    ViewData["Title"] = "Cập nhật sản phẩm";
+    ViewBag.PageTitle = "Cập nhật sản phẩm";
+}
+
+<h4>Cập nhật sản phẩm</h4>
+<hr />
+
+<form asp-action="Edit" enctype="multipart/form-data">
+    @* Mã SP ẩn *@
+    <input type="hidden" asp-for="MaSP" />
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label asp-for="TenSP" class="form-label"></label>
+            <input asp-for="TenSP" class="form-control" />
+            <span asp-validation-for="TenSP" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6">
+            <label asp-for="MaDanhMuc" class="form-label"></label>
+            <select asp-for="MaDanhMuc" class="form-select" asp-items="ViewBag.DanhMucList">
+                <option value="">-- Chọn danh mục --</option>
+            </select>
+            <span asp-validation-for="MaDanhMuc" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-12">
+            <label asp-for="MoTa" class="form-label"></label>
+            <textarea asp-for="MoTa" class="form-control"></textarea>
+            <span asp-validation-for="MoTa" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6">
+            <label asp-for="GiaBan" class="form-label"></label>
+            <input asp-for="GiaBan" class="form-control" />
+            <span asp-validation-for="GiaBan" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6">
+            <label asp-for="GiaGoc" class="form-label"></label>
+            <input asp-for="GiaGoc" class="form-control" />
+            <span asp-validation-for="GiaGoc" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6">
+            <label asp-for="SoLuong" class="form-label"></label>
+            <input asp-for="SoLuong" class="form-control" />
+            <span asp-validation-for="SoLuong" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6">
+            <label asp-for="TrangThai" class="form-label"></label>
+            <select asp-for="TrangThai" class="form-select">
+                <option value="Đang bán">Đang bán</option>
+                <option value="Sắp hết">Sắp hết</option>
+                <option value="Ngừng bán">Ngừng bán</option>
+            </select>
+            <span asp-validation-for="TrangThai" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6">
+            <label asp-for="NgayTao" class="form-label"></label>
+            <input asp-for="NgayTao" class="form-control" type="date" />
+            <span asp-validation-for="NgayTao" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Hình ảnh mới (nếu cần cập nhật)</label>
+            <input type="file" name="file" class="form-control" />
+        </div>
+
+        <div class="col-md-6">
+            @if (!string.IsNullOrEmpty(Model.HinhAnh))
+            {
+                <label class="form-label">Hình ảnh hiện tại:</label>
+
+                <br />
+                <img src="~/hinh/@Model.HinhAnh" width="100" style="border-radius:4px;" />
+            }
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <button type="submit" class="btn btn-success">
+            <i class="fas fa-save"></i> Lưu thay đổi
+        </button>
+        <a asp-action="Index" class="btn btn-secondary">Hủy</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

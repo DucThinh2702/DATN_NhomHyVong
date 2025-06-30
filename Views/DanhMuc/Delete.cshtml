@@ -1,0 +1,8 @@
+﻿@model DATN.Models.DanhMuc
+<form asp-action="Delete" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="MaDanhMuc" />
+    <p>Bạn có chắc chắn muốn xoá danh mục "<strong>@Model.TenDanhMuc</strong>"?</p>
+    <button type="submit" class="btn btn-danger">Xoá</button>
+    <a asp-action="Index" class="btn btn-secondary">Huỷ</a>
+</form>

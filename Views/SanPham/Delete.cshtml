@@ -1,0 +1,63 @@
+﻿@model DATN.Models.SanPham
+
+@{
+    ViewData["Title"] = "Xóa sản phẩm";
+    ViewBag.PageTitle = "Xóa sản phẩm";
+}
+
+<h4 class="mb-3">Bạn có chắc chắn muốn xóa sản phẩm này?</h4>
+<hr />
+
+<div class="card mb-4 shadow-sm">
+    <div class="row g-0">
+        <div class="col-md-4 text-center p-3">
+            @if (!string.IsNullOrEmpty(Model.HinhAnh))
+            {
+                <img src="~/hinh/@Model.HinhAnh" class="img-fluid rounded" alt="Ảnh sản phẩm" />
+            }
+            else
+            {
+                <span class="text-muted">Chưa có hình ảnh</span>
+            }
+        </div>
+        <div class="col-md-8">
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-4">Mã sản phẩm</dt>
+                    <dd class="col-sm-8">@Model.MaSP</dd>
+
+                    <dt class="col-sm-4">Tên sản phẩm</dt>
+                    <dd class="col-sm-8">@Model.TenSP</dd>
+
+                    <dt class="col-sm-4">Danh mục</dt>
+                    <dd class="col-sm-8">@Model.DanhMuc?.TenDanhMuc</dd>
+
+                    <dt class="col-sm-4">Giá bán</dt>
+                    <dd class="col-sm-8">@Model.GiaBan.ToString("N0") ₫</dd>
+
+                    <dt class="col-sm-4">Số lượng</dt>
+                    <dd class="col-sm-8">@Model.SoLuong</dd>
+
+                    <dt class="col-sm-4">Trạng thái</dt>
+                    <dd class="col-sm-8">@Model.TrangThai</dd>
+
+                    <dt class="col-sm-4">Ngày tạo</dt>
+                    <dd class="col-sm-8">@Model.NgayTao.ToString("dd/MM/yyyy")</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+
+<form asp-action="Delete" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="MaSP" />
+    <div class="d-flex justify-content-between">
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Quay lại
+        </a>
+        <button type="submit" class="btn btn-danger">
+            <i class="fas fa-trash"></i> Xóa sản phẩm
+        </button>
+    </div>
+</form>
