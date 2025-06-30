@@ -4,7 +4,6 @@
     ViewData["Title"] = "Mã giảm giá";
 }
 
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -251,8 +250,10 @@
 
                 <div class="d-flex align-items-center ms-auto">
                     <div class="input-group me-3" style="width: 300px;">
-                        <span class="input-group-text"><i class="fas fa-search"></i></span>
-                        <input type="text" class="form-control" placeholder="Tìm kiếm mã giảm giá...">
+                        <form id="filterForm" class="d-flex align-items-center ms-auto" method="get">
+                            <input type="text" id="searchInput" name="search" class="form-control me-2" placeholder="Tìm kiếm mã giảm giá..." value="@ViewBag.Search" />
+                            <input type="hidden" id="statusInput" name="status" value="@ViewBag.CurrentStatus" />
+                        </form>
                     </div>
 
                     <div class="dropdown me-2">
@@ -298,8 +299,7 @@
                             <div class="row align-items-center">
                                 <div class="col">
                                     <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Tổng mã giảm giá</div>
-                                    <div class="h5 mb-0 font-weight-bold">24</div>
-
+                                    <div class="h5 mb-0 font-weight-bold">@ViewBag.TongMa</div>
                                 </div>
                                 <div class="col-auto">
                                     <i class="fas fa-ticket-alt fa-2x text-primary"></i>
@@ -315,8 +315,7 @@
                             <div class="row align-items-center">
                                 <div class="col">
                                     <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Đã sử dụng</div>
-                                    <div class="h5 mb-0 font-weight-bold">1,847</div>
-
+                                    <div class="h5 mb-0 font-weight-bold">@ViewBag.DaSuDung.ToString("N0")</div>
                                 </div>
                                 <div class="col-auto">
                                     <i class="fas fa-check-circle fa-2x text-success"></i>
@@ -332,8 +331,7 @@
                             <div class="row align-items-center">
                                 <div class="col">
                                     <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Tiết kiệm khách hàng</div>
-                                    <div class="h5 mb-0 font-weight-bold">₫28.5M</div>
-
+                                    <div class="h5 mb-0 font-weight-bold">₫@ViewBag.TietKiem.ToString("N0")</div>
                                 </div>
                                 <div class="col-auto">
                                     <i class="fas fa-piggy-bank fa-2x text-warning"></i>
@@ -349,8 +347,7 @@
                             <div class="row align-items-center">
                                 <div class="col">
                                     <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Tỷ lệ chuyển đổi</div>
-                                    <div class="h5 mb-0 font-weight-bold">12.8%</div>
-
+                                    <div class="h5 mb-0 font-weight-bold">@ViewBag.ChuyenDoi%</div>
                                 </div>
                                 <div class="col-auto">
                                     <i class="fas fa-percentage fa-2x text-info"></i>
@@ -377,10 +374,14 @@
                             </button>
                         </div>
                         <div class="btn-group">
-                            <button class="btn btn-outline-primary active">Tất cả</button>
-                            <button class="btn btn-outline-primary">Đang hoạt động</button>
-                            <button class="btn btn-outline-primary">Hết hạn</button>
-                            <button class="btn btn-outline-primary">Đã dùng hết</button>
+                            @{
+                                var statuses = new[] { "Tất cả", "Đang hoạt động", "Hết hạn", "Đã dùng hết" };
+                                foreach (var s in statuses)
+                                {
+                                    var active = s == ViewBag.CurrentStatus ? "active" : "";
+                                    <button type="button" class="btn btn-outline-primary @active" onclick="setStatus('@s')">@s</button>
+                                }
+                            }
                         </div>
                     </div>
                 </div>
@@ -476,6 +477,18 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
+        // xử lý tìm + lọc:
+            document.getElementById("searchInput").addEventListener("input", function () {
+            clearTimeout(this.searchTimer);
+            this.searchTimer = setTimeout(() => {
+                document.getElementById("filterForm").submit();
+            }, 300); // debounce
+        });
+
+        function setStatus(status) {
+            document.getElementById("statusInput").value = status;
+            document.getElementById("filterForm").submit();
+        }
             // Sidebar Toggle
             document.getElementById('sidebarToggle').addEventListener('click', function() {
                 const sidebar = document.getElementById('sidebar');
