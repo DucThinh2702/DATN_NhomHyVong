@@ -21,6 +21,12 @@ namespace DATN.Service
             await _context.SaveChangesAsync();
             return user;
         }
+        public async Task<User> RegisterAsync(User user)
+        {
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+            return user;
+        }
         public async Task<User> GetUserById(int id)
         {
             var user = await _context.Users.FindAsync(id) ?? throw new KeyNotFoundException($"User with ID {id} not found.");
@@ -36,10 +42,13 @@ namespace DATN.Service
         {
             ArgumentNullException.ThrowIfNull(user);
 
-            var existingUser = _context.Users.Find(user.UserId) ?? throw new KeyNotFoundException($"User with ID {user.UserId} not found.");
+            var existingUser = await _context.Users.FindAsync(user.UserId)
+                                 ?? throw new KeyNotFoundException($"User with ID {user.UserId} not found.");
+
             _context.Entry(existingUser).CurrentValues.SetValues(user);
             await _context.SaveChangesAsync();
         }
+
 
         public async Task DeleteUser(int id)
         {
@@ -49,12 +58,7 @@ namespace DATN.Service
         }
   
 
-        public async Task<User> RegisterAsync(User user)
-        {
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-            return user;
-        }
+        
 
         public bool EmailExists(string email)
         {

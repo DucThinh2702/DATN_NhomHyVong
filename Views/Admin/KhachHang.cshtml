@@ -1,4 +1,5 @@
 ﻿@model DATN.Models.User
+@using DATN.Models
 @{
     ViewData["Title"] = "Khách hàng - The Bag Studio Admin";
 
@@ -342,9 +343,10 @@
                         <button class="btn btn-outline-primary btn-sm me-2">
                             <i class="fas fa-download"></i> Xuất Excel
                         </button>
-                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addCustomerModal">
+                        <button class="btn btn-success" onclick="openUserModal(false)">
                             <i class="fas fa-plus"></i> Thêm khách hàng
                         </button>
+
                     </div>
                 </div>
                 <div class="card-body">
@@ -363,7 +365,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach (var user in (ViewData["User"] as List<DATN.Models.User> ?? new List<DATN.Models.User>()))
+                                @foreach (var user in (ViewBag.ListKH as List<DATN.Models.User> ?? new List<DATN.Models.User>()))
                                 {
                                     <tr>
                                         <td>
@@ -383,34 +385,36 @@
                                                 <small class="text-muted">@user.PhoneNumber</small>
                                             </div>
                                         </td>
-                                        <td><strong>@user.Orders?.Count()</strong></td>
+                                        <td><strong>@(user.Orders?.Count() ?? 0)</strong></td>
                                         <td>
-                                            <strong>
-                                                @string.Format("{0:C0}", user.Orders?.Sum(o => o.TotalAmount) ?? 0)
-                                            </strong>
+                                            <strong>@string.Format("{0:C0}", user.Orders?.Sum(o => o.TotalAmount) ?? 0)</strong>
                                         </td>
                                         <td>
                                             <span class="badge
-                                            @(user.Orders?.Count >= 10 ? "bg-warning" :
-                                            user.Orders?.Count >= 5 ? "bg-primary" : "bg-success")">
-                                            @(user.Orders?.Count >= 10 ? "VIP" : user.Orders?.Count >= 5 ? "Thường xuyên" : "Mới")
+                                                                @(user.Orders?.Count() >= 10 ? "bg-warning" :
+                                                                                                                                                            user.Orders?.Count() >= 5 ? "bg-primary" : "bg-success")">
+                                                @(user.Orders?.Count() >= 10 ? "VIP" :
+                                                                                            user.Orders?.Count() >= 5 ? "Thường xuyên" : "Mới")
                                         </span>
                                     </td>
-                                    <td>@user.CreatedDate?.ToString("dd/MM/yyyy")</td>
+                                    <td>@user.CreatedDate.ToString("dd/MM/yyyy")</td>
                                     <td>
                                         <div class="btn-group btn-group-sm">
-                                            <button class="btn btn-outline-primary" title="Xem chi tiết" onclick="viewCustomer('USER-@user.UserId')">
+                                            <button class="btn btn-outline-primary" title="Xem chi tiết">
                                                 <i class="fas fa-eye"></i>
                                             </button>
-                                            <a asp-action="Edit" asp-route-id="@user.UserId" class="btn btn-outline-warning" title="Chỉnh sửa">
+                                            <button class="btn btn-warning" onclick='openUserModal(true, @Html.Raw(Json.Serialize(user)))'>
                                                 <i class="fas fa-edit"></i>
-                                            </a>
-                                            <a href="mailto:@user.Email" class="btn btn-outline-info" title="Gửi email">
-                                                <i class="fas fa-envelope"></i>
-                                            </a>
-                                        </div>
-                                    </td>
-                                </tr>
+                                            </button>
+
+
+
+                                                <a href="mailto:@user.Email" class="btn btn-outline-info" title="Gửi email">
+                                                    <i class="fas fa-envelope"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
                                                                 }
                             </tbody>
                         </table>
@@ -436,90 +440,122 @@
         </div>
     </div>
 
-    <!-- Customer Detail Modal -->
-    <div class="modal fade" id="customerDetailModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Chi tiết khách hàng</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body" id="customerDetailContent">
-                    <!-- Customer details will be loaded here -->
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                    <button type="button" class="btn btn-primary">Gửi email</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Add Customer Modal -->
-    <div class="modal fade" id="addCustomerModal" tabindex="-1">
+    <div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Thêm khách hàng mới</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form asp-action="CreateUser" asp-controller="User" method="post" id="addCustomerForm">
+                <form id="userForm" method="post">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="userModalLabel">Thêm khách hàng</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="UserId" id="userId" />
+
                         <div class="mb-3">
-                            <label asp-for="FullName" class="form-label"></label>
-                            <input asp-for="FullName" class="form-control" />
-                            <span class="text-danger" asp-validation-for="FullName"></span>
+                            <label for="fullName" class="form-label">Họ và tên</label>
+                            <input type="text" name="FullName" id="fullName" class="form-control" />
                         </div>
 
                         <div class="mb-3">
-                            <label asp-for="Email" class="form-label"></label>
-                            <input asp-for="Email" class="form-control" />
-                            <span class="text-danger" asp-validation-for="Email"></span>
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" name="Username" id="username" class="form-control" />
                         </div>
 
                         <div class="mb-3">
-                            <label asp-for="PhoneNumber" class="form-label"></label>
-                            <input asp-for="PhoneNumber" class="form-control" />
-                            <span class="text-danger" asp-validation-for="PhoneNumber"></span>
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" name="Email" id="email" class="form-control" />
+                        </div>
+
+                        <div class="mb-3" id="passwordGroup">
+                            <label for="password" class="form-label">Mật khẩu</label>
+                            <input type="password" name="Password" id="password" class="form-control" />
                         </div>
 
                         <div class="mb-3">
-                            <label asp-for="Address" class="form-label"></label>
-                            <textarea asp-for="Address" class="form-control" rows="2"></textarea>
+                            <label for="phoneNumber" class="form-label">Số điện thoại</label>
+                            <input type="tel" name="PhoneNumber" id="phoneNumber" class="form-control" />
                         </div>
 
                         <div class="mb-3">
-                            <label asp-for="BirthDate" class="form-label"></label>
-                            <input asp-for="BirthDate" class="form-control" type="date" />
+                            <label for="address" class="form-label">Địa chỉ</label>
+                            <textarea name="Address" id="address" class="form-control" rows="2"></textarea>
                         </div>
 
                         <div class="mb-3">
-                            <label asp-for="Gender" class="form-label"></label>
-                            <select asp-for="Gender" class="form-select">
+                            <label for="birthDate" class="form-label">Ngày sinh</label>
+                            <input type="date" name="BirthDate" id="birthDate" class="form-control" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="gender" class="form-label">Giới tính</label>
+                            <select name="Gender" id="gender" class="form-select">
                                 <option value="">Chọn giới tính</option>
                                 <option value="Nam">Nam</option>
                                 <option value="Nữ">Nữ</option>
                                 <option value="Khác">Khác</option>
                             </select>
                         </div>
-                        @section Scripts {
-                            <partial name="_ValidationScriptsPartial" />
-                        }
 
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                            <button type="submit" class="btn btn-primary">Thêm khách hàng</button>
+                        <div class="mb-3">
+                            <label for="roleId" class="form-label">Vai trò</label>
+                            <select name="RoleId" id="roleId" class="form-select">
+                                <option value="">Chọn Role</option>
+                                <option value="1">1 - Khách hàng</option>
+                                <option value="2">2 - Nhân viên</option>
+                                <option value="3">3 - Admin</option>
+                            </select>
                         </div>
-                    </form>
-                </div>
-
-
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary" id="submitBtn">Lưu</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 
+
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function openUserModal(isEdit, userData = null) {
+            const form = document.getElementById('userForm');
+            const modalTitle = document.getElementById('userModalLabel');
+            const submitBtn = document.getElementById('submitBtn');
+            const passwordGroup = document.getElementById('passwordGroup');
+
+            form.reset();
+
+            if (isEdit && userData) {
+                modalTitle.textContent = 'Chỉnh sửa khách hàng';
+                submitBtn.textContent = 'Cập nhật';
+                form.action = '/User/UpdateUser';
+
+                // Populate form fields
+               document.getElementById('userId').value = userData.userId ?? '';
+                document.getElementById('fullName').value = userData.fullName;
+                document.getElementById('username').value = userData.username;
+                document.getElementById('email').value = userData.email;
+                document.getElementById('phoneNumber').value = userData.phoneNumber;
+                document.getElementById('address').value = userData.address;
+                document.getElementById('birthDate').value = userData.birthDate?.split('T')[0] || '';
+                document.getElementById('gender').value = userData.gender;
+                document.getElementById('roleId').value = userData.roleId;
+
+                passwordGroup.style.display = 'none';
+            } else {
+                modalTitle.textContent = 'Thêm khách hàng mới';
+                submitBtn.textContent = 'Thêm mới';
+                form.action = '/User/CreateUser';
+                passwordGroup.style.display = 'block';
+            }
+
+            const modal = new bootstrap.Modal(document.getElementById('userModal'));
+            modal.show();
+        }
+    </script>
+
 
     <script>
             // Sidebar Toggle

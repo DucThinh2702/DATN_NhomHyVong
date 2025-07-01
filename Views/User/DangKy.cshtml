@@ -299,20 +299,25 @@
             <!-- Bên phải -->
             <div class="col-md-7 bg-white p-5">
                 <h3 class="text-center text-dark mb-4">Đăng ký tài khoản</h3>
-                <form asp-action="Register" asp-controller="UserController" method="post">
+                <form asp-action="Register" asp-controller="User" method="post">
                     <div class="row">
-                        <div class="col-md-6 form-group">
-                            <label asp-for="FirstName"></label>
-                            <input asp-for="FirstName" class="form-control" />
-                            <span asp-validation-for="FirstName" class="text-danger"></span>
-                        </div>
+                        
                         <div class="col-md-6 form-group">
                             <label asp-for="FullName"></label>
                             <input asp-for="FullName" class="form-control" />
                             <span asp-validation-for="FullName" class="text-danger"></span>
                         </div>
+                        <div class="col-md-6 form-group">
+                            <label asp-for="Username"></label>
+                            <input asp-for="Username" class="form-control" />
+                            <span asp-validation-for="Username" class="text-danger"></span>
+                        </div>
                     </div>
-
+                    <div class="form-group">
+                        <label asp-for="Adddress"></label>
+                        <input asp-for="Adddress" class="form-control" />
+                        <span asp-validation-for="Adddress" class="text-danger"></span>
+                    </div>
                     <div class="form-group">
                         <label asp-for="Email"></label>
                         <input asp-for="Email" class="form-control" />

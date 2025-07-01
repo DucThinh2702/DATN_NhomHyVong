@@ -15,7 +15,7 @@ namespace DATN.Controllers
         {
             return View();
         }
-
+        [HttpGet]
         public async Task<IActionResult> GetAllUsers()
         {
             try
@@ -66,13 +66,27 @@ namespace DATN.Controllers
                 return View("Error");
             }
         }
-
+        [HttpGet]
+        public async Task<IActionResult> DetailUserById(int id)
+        {
+            try
+            {
+                var user = await _usersRepository.GetUserById(id);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+                return View(user);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error fetching user by ID");
+                return View("Error");
+            }
+        }
         [HttpPost]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
-            if (!ModelState.IsValid)
-                return View(model);
-
             if (_usersRepository.EmailExists(model.Email??"Sai email"))
             {
                 ModelState.AddModelError("Email", "Email đã được sử dụng.");
@@ -82,13 +96,14 @@ namespace DATN.Controllers
             var user = new User
             {
                 FullName = model.FullName,
+                Username = model.Username,
                 Email = model.Email,
                 Password = model.Password, // Gợi ý: nên mã hóa
                 Gender = model.Gender,
                 BirthDate = DateOnly.FromDateTime(model.BirthDate),
                 PhoneNumber = model.PhoneNumber,
                 Address = model.Adddress,
-                RoleId = 2, // mặc định User role
+                RoleId = 1, // mặc định User role
                 CreatedDate = DateTime.Now,
                 Status = true
             };
@@ -130,7 +145,16 @@ namespace DATN.Controllers
                 return View("Error");
             }
         }
-
+        [HttpGet]
+        public IActionResult DangNhap()
+        {
+            return View();
+        }
+        [HttpGet]
+        public IActionResult DangKy()
+        {
+            return View();
+        }
         [HttpPost]
         public IActionResult Login(string email, string pass)
         {
@@ -152,12 +176,12 @@ namespace DATN.Controllers
 
                     // Có thể thêm xác thực bằng cookie ở đây nếu cần
 
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Index", "User");
                 }
                 else
                 {
                     ViewBag.ErrorMessage = "Invalid email or password.";
-                    return View("Login");
+                    return View("DangNhap","User");
                 }
             }
             catch (Exception ex)
@@ -170,7 +194,7 @@ namespace DATN.Controllers
         public IActionResult Logout()
         {
             HttpContext.Session.Clear(); // Xoá tất cả session (bao gồm UserId)
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "User");
         }
 
         //public IActionResult GioHang()
@@ -189,14 +213,7 @@ namespace DATN.Controllers
         //{
         //    return View();
         //}
-        //public IActionResult DangNhap()
-        //{
-        //    return View();
-        //}
-        //public IActionResult DangKy()
-        //{
-        //    return View();
-        //}
+        
         //public IActionResult ChiTiet()
         //{
         //    return View();

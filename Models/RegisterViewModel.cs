@@ -4,11 +4,13 @@
 
     public class RegisterViewModel
     {
-        [Required]
-        public string? FirstName { get; set; }
-
-        [Required]
+        [Required(ErrorMessage = "Họ tên không được để trống")]
+        [StringLength(100)]
         public string? FullName { get; set; }
+
+        [Required(ErrorMessage = "Tên đăng nhập không được để trống")]
+        [StringLength(50)]
+        public string? Username { get; set; }
 
         [Required, EmailAddress]
         public string? Email { get; set; }

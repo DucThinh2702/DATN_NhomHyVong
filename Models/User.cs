@@ -37,18 +37,18 @@ public partial class User
     [Required(ErrorMessage = "Địa chỉ không được để trống")]
     public string? Address { get; set; }
 
-    public DateTime? CreatedDate { get; set; } = DateTime.Now;
+    [DataType(DataType.Date)]
+    public DateTime CreatedDate { get; set; } = DateTime.Now;
 
     public bool? Status { get; set; } = true;
 
     [Required(ErrorMessage = "Vai trò không được để trống")]
-    public int? RoleId { get; set; }
-
+    public int? RoleId { get; set; } = 1;
     public virtual Cart? Cart { get; set; }
 
-    public virtual ICollection<News> News { get; set; } = [];
+    public virtual ICollection<News>? News { get; set; } = [];
 
-    public virtual ICollection<Order> Orders { get; set; } = [];
+    public virtual ICollection<Order>? Orders { get; set; } = [];
 
     public virtual Role? Role { get; set; }
 }
