@@ -17,11 +17,15 @@ public partial class Promotion
     [StringLength(50, ErrorMessage = "Loại khuyến mãi không được dài quá 50 ký tự")]
     public string? PromoType { get; set; }
 
+    [Required(ErrorMessage = "Giá trị giảm không được bỏ trống")]
     [Range(0, 1000000, ErrorMessage = "Giá trị giảm phải lớn hơn 0")]
+    [RegularExpression(@"^\d+$", ErrorMessage = "Giá trị giảm chỉ được phép là số và không có ký tự đặc biệt")]
     [DisplayFormat(DataFormatString = "{0:0}", ApplyFormatInEditMode = true)]
     public decimal? DiscountValue { get; set; }
 
+    [Required(ErrorMessage = "Đơn hàng tối thiểu không được bỏ trống")]
     [Range(0, 1000000, ErrorMessage = "Đơn hàng tối thiểu phải lớn hơn 0")]
+    [RegularExpression(@"^\d+$", ErrorMessage = "Giá trị đơn hàng tối thiểu chỉ được phép là số và không có ký tự đặc biệt")]
     [DisplayFormat(DataFormatString = "{0:0}", ApplyFormatInEditMode = true)]
     public decimal? MinOrderAmount { get; set; }
 
@@ -35,6 +39,7 @@ public partial class Promotion
 
     [Required(ErrorMessage = "Số lượng khuyến mãi là bắt buộc")]
     [Range(1, 100000, ErrorMessage = "Số lượng phải từ 1 đến 100000")]
+    [RegularExpression(@"^\d+$", ErrorMessage = "Số lượng phải là số nguyên và không có ký tự đặc biệt")]
     public int? Quantity { get; set; }
 
     [Range(0, 100000, ErrorMessage = "Số lượng đã sử dụng không được âm")]

@@ -1,4 +1,4 @@
-using DATN.Data;
+﻿using DATN.Data;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -6,7 +6,11 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<DatnContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+           .EnableSensitiveDataLogging()); // Kích hoạt Sensitive Data Logging
+builder.Services.AddRazorPages().AddViewOptions(options => {
+    options.HtmlHelperOptions.ClientValidationEnabled = true;
+});
 
 var app = builder.Build();
 
