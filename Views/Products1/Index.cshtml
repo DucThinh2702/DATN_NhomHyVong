@@ -3,6 +3,7 @@
 
 @{
     ViewData["Title"] = "Danh sách sản phẩm";
+
 }
 <div class="main-content" id="mainContent">
     <!-- Header -->
@@ -155,7 +156,7 @@
             <th>Ảnh</th>
             <th>Tên sản phẩm</th>
             <th>Giá bán</th>
-            <th>Tồn kho</th>
+            <th>Sl</th>
             <th>Trạng thái</th>
             <th>Ngày tạo</th>
             <th class="text-center">Hành động</th>
@@ -177,7 +178,7 @@
                 </td>
                 <td>
                     <strong>@item.ProductName</strong><br />
-                    <small class="text-muted">SKU: BAG-@item.ProductID</small>
+                    <small class="text-muted">SKU: BAG-@item.ProductId</small>
                 </td>
                 @* <td>@item.Category?.CategoryName</td> *@
                 <td>@item.SalePrice.ToString("N0") ₫</td>
@@ -201,17 +202,17 @@
                 <td>@item.CreatedDate.ToString("dd/MM/yyyy")</td>
                 <td class="text-center">
                     <div class="d-inline-flex border rounded overflow-hidden">
-                        <a asp-action="Details" asp-route-id="@item.ProductID"
+                        <a asp-action="Details" asp-route-id="@item.ProductId"
                            class="text-primary d-flex align-items-center justify-content-center px-2 py-1 border-end"
                            title="Xem">
                             <i class="fa-solid fa-eye"></i>
                         </a>
-                        <a asp-action="Edit" asp-route-id="@item.ProductID"
+                        <a asp-action="Edit" asp-route-id="@item.ProductId"
                            class="text-warning d-flex align-items-center justify-content-center px-2 py-1 border-end"
                            title="Sửa">
                             <i class="fa-solid fa-pen-to-square"></i>
                         </a>
-                        <a asp-action="Delete" asp-route-id="@item.ProductID"
+                        <a asp-action="Delete" asp-route-id="@item.ProductId"
                            class="text-danger d-flex align-items-center justify-content-center px-2 py-1"
                            title="Xóa">
                             <i class="fa-solid fa-trash"></i>

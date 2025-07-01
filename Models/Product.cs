@@ -4,14 +4,14 @@ namespace DATN.Models
 {
     public class Product
     {
-        public int ProductID { get; set; }
+        public int ProductId { get; set; }
 
         [Required]
         [StringLength(200)]
-        public string ProductName { get; set; }
+        public string? ProductName { get; set; }
 
         [StringLength(225)]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         [Required]
         public decimal SalePrice { get; set; }
@@ -21,7 +21,7 @@ namespace DATN.Models
         public int Stock { get; set; }
 
         [StringLength(50)]
-        public string Size { get; set; }
+        public string? Size { get; set; }
 
         [StringLength(50)]
         public string Color { get; set; }
@@ -29,7 +29,7 @@ namespace DATN.Models
         [StringLength(100)]
         public string Material { get; set; }
 
-        public int CategoryID { get; set; }
+        public int CategoryId { get; set; }
 
         public DateTime CreatedDate { get; set; }
 
@@ -40,9 +40,11 @@ namespace DATN.Models
 
         [StringLength(50)]
         public string Status { get; set; }
+        public virtual ICollection<CartDetail> CartDetails { get; set; } = new List<CartDetail>();
+        public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
 
-        //// Nếu muốn join Category
-        //public Category Category { get; set; }
+        // Nếu muốn join Category
+        public Category Category { get; set; }
     }
 
 }
