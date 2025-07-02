@@ -108,7 +108,29 @@ namespace DATN.Controllers
         {
             var danhSach = await _context.Promotions.ToListAsync();
 
-            // 1. Lọc theo trạng thái
+            // 1. Lọc theo trạng thái/thời gian/số lượng
+            var today = DateTime.Today;
+
+            foreach (var promo in danhSach)
+            {
+                if (promo.EndDate.HasValue && promo.EndDate.Value < today)
+                {
+                    promo.Status = "Hết hạn";
+                }
+                else if (promo.EndDate.HasValue && (promo.EndDate.Value - today).TotalDays <= 5)
+                {
+                    promo.Status = "Sắp hết hạn";
+                }
+                else if (promo.Quantity.HasValue && promo.UsedQuantity.HasValue && promo.Quantity == promo.UsedQuantity)
+                {
+                    promo.Status = "Đã dùng hết";
+                }
+                else
+                {
+                    promo.Status = "Đang hoạt động";
+                }
+            }
+
             if (!string.IsNullOrEmpty(status) && status != "Tất cả")
             {
                 danhSach = danhSach.Where(p => p.Status == status).ToList();

@@ -375,7 +375,7 @@
                         </div>
                         <div class="btn-group">
                             @{
-                                var statuses = new[] { "Tất cả", "Đang hoạt động", "Hết hạn", "Đã dùng hết" };
+                                var statuses = new[] { "Tất cả", "Đang hoạt động", "Sắp hết hạn", "Hết hạn", "Đã dùng hết" };
                                 foreach (var s in statuses)
                                 {
                                     var active = s == ViewBag.CurrentStatus ? "active" : "";
@@ -415,13 +415,13 @@
                                     <span class="badge bg-@badge">@item.Status</span>
                                 </div>
                                 <h5 class="card-title">@item.PromoType</h5>
-                                <p class="card-text text-muted">Áp dụng cho đơn từ ₫@item.MinOrderAmount?.ToString("0")</p>
-                                <div class="row text-center mb-3">
+                                <p class="card-text text-muted">
+                                    Áp dụng cho đơn từ
+                                    <span class="min-order">@item.MinOrderAmount</span>
+                                </p>                                <div class="row text-center mb-3">
                                     <div class="col-4">
                                         <div class="fw-bold text-primary">
-                                            @(item.PromoType == "Phần trăm"
-                                                                                    ? $"{item.DiscountValue?.ToString("0")}%"
-                                                                                    : $"₫{item.DiscountValue?.ToString("0")}")
+                                            <span class="discount-value" data-type="@item.PromoType">@item.DiscountValue</span>
                                         </div>
                                         <small class="text-muted">Giảm giá</small>
                                     </div>
@@ -454,7 +454,7 @@
 
                                 <div class="d-flex gap-2">
                                     <a asp-controller="Promotions" asp-action="Details" asp-route-id="@item.PromoCode" class="btn btn-outline-primary btn-sm flex-fill">
-                                        <i class="fas fa-chart-bar me-1"></i>Thống kê
+                                        <i class="fas fa-chart-bar me-1"></i>Chi tiết mã
                                     </a>
                                     <a asp-controller="Promotions" asp-action="Edit" asp-route-id="@item.PromoCode" class="btn btn-outline-warning btn-sm">
                                         <i class="fas fa-edit"></i>
@@ -477,6 +477,39 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
+        function formatCurrency(amount) {
+               if (amount >= 1000) {
+                   const value = amount / 1000;
+                   return value.toFixed(2) + " triệu";
+               } else {
+                   return amount + "K";
+               }
+           }
+
+           function formatDiscount(value, type) {
+               if (type === "Phần trăm") {
+                   return value + "%";
+               } else {
+                   return formatCurrency(value);
+               }
+           }
+
+           document.addEventListener("DOMContentLoaded", function () {
+               document.querySelectorAll(".discount-value").forEach(function (el) {
+                   const rawValue = parseFloat(el.textContent);
+                   const type = el.dataset.type?.trim();
+                   if (!isNaN(rawValue)) {
+                       el.textContent = formatDiscount(rawValue, type);
+                   }
+               });
+
+               document.querySelectorAll(".min-order").forEach(function (el) {
+                   const rawValue = parseFloat(el.textContent);
+                   if (!isNaN(rawValue)) {
+                       el.textContent = formatCurrency(rawValue);
+                   }
+               });
+           });
         // xử lý tìm + lọc:
             document.getElementById("searchInput").addEventListener("input", function () {
             clearTimeout(this.searchTimer);
