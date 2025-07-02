@@ -10,9 +10,12 @@ builder.Services.AddDbContext<DatnContext>(options =>
     options.UseSqlServer(connectionString));
 
 builder.Services.AddControllersWithViews();
-builder.Services.AddDbContext<DatnContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
+builder.Services.AddSingleton<DapperHelper>();
+builder.Services.AddSingleton<OrderRepository>();
+builder.Services.AddSingleton<OrderDetailRepository>();
+builder.Services.AddScoped<ProductRepository>();
+builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
+builder.Services.AddScoped<PhotoService>();
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
@@ -28,6 +31,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Category}/{action=Index}/{id?}");
+    pattern: "{controller=Orders}/{action=Index}/{id?}");
 
 app.Run();

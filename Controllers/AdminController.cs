@@ -1,13 +1,5 @@
-﻿using DATN.Data;
-using DATN.Models;
-using DATN.Models.ViewModels;
+﻿using DATN.Repositories;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using DATN.Data;
-using DATN.Models;
-using System.Linq;
-using System.Threading.Tasks;
-using DATN.Models.ViewModels;
 
 namespace DATN.Controllers
 {
@@ -231,9 +223,17 @@ namespace DATN.Controllers
         {
             return View();
         }
-        public IActionResult DonHang()
+        private readonly OrderRepository _orderRepo;
+
+        public AdminController(OrderRepository orderRepo) // Inject repository
         {
-            return View();
+            _orderRepo = orderRepo;
+        }
+
+        public async Task<IActionResult> DonHang()
+        {
+            var orders = await _orderRepo.GetAllAsync();
+            return View(orders); // Truyền danh sách đơn hàng sang view
         }
         public IActionResult CaiDat()
         {
