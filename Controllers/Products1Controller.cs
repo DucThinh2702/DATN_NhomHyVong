@@ -1,4 +1,8 @@
-﻿using System;
+﻿
+
+
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -22,46 +26,34 @@ namespace DATN.Controllers
         // GET: Products1
         public async Task<IActionResult> Index(string search)
         {
-            // Truy vấn ban đầu
             var query = _context.Products.AsQueryable();
 
-            // Tìm kiếm nếu có từ khoá
             if (!string.IsNullOrEmpty(search))
             {
                 query = query.Where(p => p.ProductName.Contains(search));
             }
 
-            // Lấy dữ liệu về
             var products = await query.ToListAsync();
 
-            // Tính toán số lượng
             ViewBag.TotalCount = products.Count;
             ViewBag.InStockCount = products.Count(p => p.Stock > 5);
             ViewBag.LowStockCount = products.Count(p => p.Stock > 0 && p.Stock <= 5);
             ViewBag.OutOfStockCount = products.Count(p => p.Stock == 0);
-
-            // Danh sách sản phẩm sắp hết hàng (Stock <=5)
             ViewBag.LowStockProducts = products.Where(p => p.Stock > 0 && p.Stock <= 5).ToList();
 
             return View(products);
         }
 
-
-
         // GET: Products1/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var product = await _context.Products
+                .Include(p => p.Category) // Nếu có navigation property
                 .FirstOrDefaultAsync(m => m.ProductID == id);
-            if (product == null)
-            {
-                return NotFound();
-            }
+
+            if (product == null) return NotFound();
 
             return View(product);
         }
@@ -69,124 +61,92 @@ namespace DATN.Controllers
         // GET: Products1/Create
         public IActionResult Create()
         {
+            LoadCategories();
             return View();
         }
 
-        
+        // POST: Products1/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Product product, IFormFile ImageFile)
         {
-            // Tạo thư mục nếu chưa có
-            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/hinh");
-            if (!Directory.Exists(uploadsFolder))
+            if (ModelState.IsValid)
             {
-                Directory.CreateDirectory(uploadsFolder);
-            }
-
-            // Nếu có file ảnh
-            if (ImageFile != null && ImageFile.Length > 0)
-            {
-                var fileName = Path.GetFileName(ImageFile.FileName);
-                var filePath = Path.Combine(uploadsFolder, fileName);
-
-                using (var stream = new FileStream(filePath, FileMode.Create))
+                // Xử lý ảnh
+                if (ImageFile != null && ImageFile.Length > 0)
                 {
-                    await ImageFile.CopyToAsync(stream);
+                    var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/hinh");
+                    if (!Directory.Exists(uploadsFolder))
+                    {
+                        Directory.CreateDirectory(uploadsFolder);
+                    }
+
+                    var fileName = Path.GetFileName(ImageFile.FileName);
+                    var filePath = Path.Combine(uploadsFolder, fileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await ImageFile.CopyToAsync(stream);
+                    }
+
+                    product.ThumbnailImage = "/hinh/" + fileName;
                 }
 
-                // Lưu đường dẫn
-                product.ThumbnailImage = "/hinh/" + fileName;
+                product.CreatedDate = DateTime.Now;
+
+                _context.Add(product);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
             }
 
-            // Gán ngày tạo
-            product.CreatedDate = DateTime.Now;
-
-            // Lưu vào database
-            _context.Add(product);
-            await _context.SaveChangesAsync();
-
-            return RedirectToAction(nameof(Index));
+            // Nếu ModelState lỗi, load lại danh mục
+            LoadCategories();
+            return View(product);
         }
-        // có model danh mục  mở này ra xóa trên
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Create(Product product, IFormFile ImageFile)
-        //{
-        //    // Validate ModelState trước
-        //    if (ModelState.IsValid)
-        //    {
-        //        var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/hinh");
-        //        if (!Directory.Exists(uploadsFolder))
-        //        {
-        //            Directory.CreateDirectory(uploadsFolder);
-        //        }
-
-        //        if (ImageFile != null && ImageFile.Length > 0)
-        //        {
-        //            var fileName = Path.GetFileName(ImageFile.FileName);
-        //            var filePath = Path.Combine(uploadsFolder, fileName);
-
-        //            using (var stream = new FileStream(filePath, FileMode.Create))
-        //            {
-        //                await ImageFile.CopyToAsync(stream);
-        //            }
-
-        //            product.ThumbnailImage = "/hinh/" + fileName;
-        //        }
-
-        //        product.CreatedDate = DateTime.Now;
-
-        //        _context.Add(product);
-        //        await _context.SaveChangesAsync();
-
-        //        return RedirectToAction(nameof(Index));
-        //    }
-
-        //    ViewBag.Categories = _context.Categories
-        //        .OrderBy(c => c.CategoryName)
-        //        .Select(c => new SelectListItem
-        //        {
-        //            Value = c.CategoryID.ToString(),
-        //            Text = c.CategoryName
-        //        })
-        //        .ToList();
-
-        //    return View(product);
-        //}
 
         // GET: Products1/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var product = await _context.Products.FindAsync(id);
-            if (product == null)
-            {
-                return NotFound();
-            }
+            if (product == null) return NotFound();
+
+            LoadCategories();
             return View(product);
         }
 
         // POST: Products1/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ProductID,ProductName,Description,SalePrice,OriginalPrice,Stock,Size,Color,Material,CategoryID,CreatedDate,ThumbnailImage,Status")] Product product)
+        public async Task<IActionResult> Edit(int id, Product product, IFormFile ImageFile)
         {
-            if (id != product.ProductID)
-            {
-                return NotFound();
-            }
+            if (id != product.ProductID) return NotFound();
 
             if (ModelState.IsValid)
             {
                 try
                 {
+                    // Nếu có file ảnh mới
+                    if (ImageFile != null && ImageFile.Length > 0)
+                    {
+                        var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/hinh");
+                        if (!Directory.Exists(uploadsFolder))
+                        {
+                            Directory.CreateDirectory(uploadsFolder);
+                        }
+
+                        var fileName = Path.GetFileName(ImageFile.FileName);
+                        var filePath = Path.Combine(uploadsFolder, fileName);
+
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await ImageFile.CopyToAsync(stream);
+                        }
+
+                        product.ThumbnailImage = "/hinh/" + fileName;
+                    }
+
                     product.UpdatedDate = DateTime.Now;
 
                     _context.Update(product);
@@ -205,24 +165,21 @@ namespace DATN.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+
+            LoadCategories();
             return View(product);
         }
-
 
         // GET: Products1/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var product = await _context.Products
+                .Include(p => p.Category) // nếu có navigation property
                 .FirstOrDefaultAsync(m => m.ProductID == id);
-            if (product == null)
-            {
-                return NotFound();
-            }
+
+            if (product == null) return NotFound();
 
             return View(product);
         }
@@ -236,15 +193,30 @@ namespace DATN.Controllers
             if (product != null)
             {
                 _context.Products.Remove(product);
+                await _context.SaveChangesAsync();
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool ProductExists(int id)
         {
             return _context.Products.Any(e => e.ProductID == id);
+        }
+
+        /// <summary>
+        /// Load danh sách danh mục vào ViewBag.Categories
+        /// </summary>
+        private void LoadCategories()
+        {
+            ViewBag.Categories = _context.Categories
+                .OrderBy(c => c.CategoryName)
+                .Select(c => new SelectListItem
+                {
+                    Value = c.CategoryID.ToString(),
+                    Text = c.CategoryName
+                })
+                .ToList();
         }
     }
 }

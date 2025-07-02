@@ -1,0 +1,44 @@
+﻿@model DATN.Models.ProductVariant
+
+@{
+    ViewData["Title"] = "Xóa biến thể sản phẩm";
+}
+
+<div class="main-content" id="mainContent">
+    <h1 class="mb-4 text-danger">Xóa biến thể sản phẩm</h1>
+
+    <div class="alert alert-warning">
+        <strong>Bạn có chắc chắn muốn xóa biến thể này?</strong> Thao tác này không thể hoàn tác.
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <p><strong>Sản phẩm:</strong> @Model.Product?.ProductName</p>
+            <p><strong>Mã SKU:</strong> @Model.SKU</p>
+            <p><strong>Màu sắc:</strong> @Model.Color?.ColorName</p>
+            <p><strong>Kích thước:</strong> @Model.Size?.SizeName</p>
+            <p><strong>Tồn kho:</strong> @Model.Stock</p>
+            <p><strong>Trạng thái:</strong> @Model.Status</p>
+            <p><strong>Giá bán:</strong> @Model.SalePrice?.ToString("N0") ₫</p>
+            <p>
+                <strong>Ảnh:</strong>
+                @if (!string.IsNullOrEmpty(Model.ThumbnailImage))
+                {
+                    <img src="@Model.ThumbnailImage" style="height:60px;" class="ms-2" />
+                }
+                else
+                {
+                    <span class="text-muted">Chưa có</span>
+                }
+            </p>
+        </div>
+    </div>
+
+    <form asp-action="DeleteConfirmed">
+        <input type="hidden" asp-for="VariantID" />
+        <button type="submit" class="btn btn-danger">
+            <i class="bi bi-trash"></i> Xóa biến thể
+        </button>
+        <a asp-action="Index" class="btn btn-secondary">Hủy</a>
+    </form>
+</div>
