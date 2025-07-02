@@ -3,8 +3,9 @@
 @{
     ViewData["Title"] = "Danh sách danh mục";
     var totalCount = Model?.Count() ?? 0;
+    
 }
-
+<div class="main-content" id="mainContent">
 <div class="container mt-4">
     <h2 class="mb-4">@ViewData["Title"]</h2>
 
@@ -53,4 +54,5 @@
             }
         </tbody>
     </table>
+</div>
 </div>
