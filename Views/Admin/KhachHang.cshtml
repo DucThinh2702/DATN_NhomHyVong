@@ -2,8 +2,16 @@
 @using DATN.Models
 @{
     ViewData["Title"] = "Khách hàng - The Bag Studio Admin";
-
 }
+@{
+    var users = ViewBag.ListCombinedKH as List<DATN.Models.User>
+             ?? ViewBag.ListSearchKH as List<DATN.Models.User>
+             ?? ViewBag.ListFilterKH as List<DATN.Models.User>
+             ?? ViewBag.ListKH as List<DATN.Models.User>
+             ?? new List<DATN.Models.User>();
+}
+
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -225,11 +233,16 @@
                 </div>
 
                 <div class="d-flex align-items-center ms-auto">
-                    <div class="input-group me-3" style="width: 300px;">
-                        <span class="input-group-text"><i class="fas fa-search"></i></span>
-                        <input type="text" class="form-control" placeholder="Tìm kiếm khách hàng...">
-                    </div>
-
+                    @* Tìm kiếm khách hàng (SEARCH) *@
+                    <form method="get" asp-action="KhachHang" asp-controller="Admin">
+                        <div class="input-group" style="width: 300px;">
+                            <input type="text" name="searchName" class="form-control" placeholder="Tìm kiếm khách hàng..." value="@ViewBag.ListSearchKH" />
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </form>
+                    @* END Tìm kiếm khách hàng (SEARCH) *@
                     <div class="dropdown me-2">
                         <button class="btn btn-outline-secondary position-relative" data-bs-toggle="dropdown">
                             <i class="fas fa-bell"></i>
@@ -336,14 +349,26 @@
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h6 class="m-0 font-weight-bold">Danh sách khách hàng</h6>
-                    <div>
-                        <button class="btn btn-outline-secondary btn-sm me-2">
-                            <i class="fas fa-filter"></i> Lọc
-                        </button>
+                    <div class="d-flex">
+
+                        @* Form filter *@
+                        <form method="get" asp-action="KhachHang" class="d-flex me-2">
+                            <select name="filterBy" class="form-select me-2" style="width: 150px;">
+                                <option value="">-- Bộ lọc --</option>
+                                <option value="money" selected="@(ViewBag.CurrentFilter == "money")">Theo tiền</option>
+                                <option value="date" selected="@(ViewBag.CurrentFilter == "date")">Theo ngày</option>
+                            </select>
+                            <button class="btn btn-outline-secondary btn-sm me-2" type="submit">
+                                <i class="fas fa-filter"></i> Lọc
+                            </button>
+                        </form>
+                        @* END Form filter *@
+
                         <button class="btn btn-outline-primary btn-sm me-2">
                             <i class="fas fa-download"></i> Xuất Excel
                         </button>
-                        <button class="btn btn-success" onclick="openUserModal(false)">
+                        <!-- Thêm -->
+                        <button class="btn btn-success" onclick='openUserModal("create")'>
                             <i class="fas fa-plus"></i> Thêm khách hàng
                         </button>
 
@@ -365,7 +390,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach (var user in (ViewBag.ListKH as List<DATN.Models.User> ?? new List<DATN.Models.User>()))
+                                @foreach (var user in users)
                                 {
                                     <tr>
                                         <td>
@@ -391,8 +416,8 @@
                                         </td>
                                         <td>
                                             <span class="badge
-                                                                @(user.Orders?.Count() >= 10 ? "bg-warning" :
-                                                                                                                                                            user.Orders?.Count() >= 5 ? "bg-primary" : "bg-success")">
+                                                                                        @(user.Orders?.Count() >= 10 ? "bg-warning" :
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                        user.Orders?.Count() >= 5 ? "bg-primary" : "bg-success")">
                                                 @(user.Orders?.Count() >= 10 ? "VIP" :
                                                                                             user.Orders?.Count() >= 5 ? "Thường xuyên" : "Mới")
                                         </span>
@@ -400,29 +425,26 @@
                                     <td>@user.CreatedDate.ToString("dd/MM/yyyy")</td>
                                     <td>
                                         <div class="btn-group btn-group-sm">
-                                            <button class="btn btn-outline-primary" title="Xem chi tiết">
+                                            <!-- Xem chi tiết -->
+                                            <button class="btn btn-outline-primary" onclick='openUserModal("view", @Html.Raw(Json.Serialize(user)))'>
                                                 <i class="fas fa-eye"></i>
                                             </button>
-                                            <button class="btn btn-warning" onclick='openUserModal(true, @Html.Raw(Json.Serialize(user)))'>
+                                            <!-- Sửa -->
+                                            <button class="btn btn-warning" onclick='openUserModal("edit", @Html.Raw(Json.Serialize(user)))'>
                                                 <i class="fas fa-edit"></i>
-                                            </button>
-
-
-
-                                                <a href="mailto:@user.Email" class="btn btn-outline-info" title="Gửi email">
-                                                    <i class="fas fa-envelope"></i>
-                                                </a>
-                                            </div>
-                                        </td>
-                                    </tr>
+                                            </button>                                           
+                                            <a href="mailto:@user.Email" class="btn btn-outline-info" title="Gửi email">
+                                                <i class="fas fa-envelope"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
                                                                 }
                             </tbody>
                         </table>
                     </div>
-
-
                     <!-- Pagination -->
-                    <!-- <nav aria-label="Customers pagination">
+                    <nav aria-label="Customers pagination">
                         <ul class="pagination justify-content-center">
                             <li class="page-item disabled">
                                 <a class="page-link" href="#" tabindex="-1">Trước</a>
@@ -434,7 +456,8 @@
                                 <a class="page-link" href="#">Sau</a>
                             </li>
                         </ul>
-                    </nav> -->
+                    </nav>
+                    <!-- End-Pagination -->
                 </div>
             </div>
         </div>
@@ -449,53 +472,62 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
                     </div>
                     <div class="modal-body">
-                        <input type="hidden" name="UserId" id="userId" />
+                        <input type="hidden" id="userId" name="UserId" />
+                        <input type="hidden" id="createdDate" name="CreatedDate" />
 
                         <div class="mb-3">
                             <label for="fullName" class="form-label">Họ và tên</label>
                             <input type="text" name="FullName" id="fullName" class="form-control" />
+                          
                         </div>
 
                         <div class="mb-3">
                             <label for="username" class="form-label">Username</label>
                             <input type="text" name="Username" id="username" class="form-control" />
+                        
                         </div>
 
                         <div class="mb-3">
                             <label for="email" class="form-label">Email</label>
                             <input type="email" name="Email" id="email" class="form-control" />
+                           
                         </div>
 
                         <div class="mb-3" id="passwordGroup">
-                            <label for="password" class="form-label">Mật khẩu</label>
-                            <input type="password" name="Password" id="password" class="form-control" />
+                            <label for="password">Mật khẩu</label>
+                            <input type="password" id="password" name="Password" class="form-control" />
+                            
                         </div>
 
                         <div class="mb-3">
                             <label for="phoneNumber" class="form-label">Số điện thoại</label>
                             <input type="tel" name="PhoneNumber" id="phoneNumber" class="form-control" />
+                            
                         </div>
 
                         <div class="mb-3">
                             <label for="address" class="form-label">Địa chỉ</label>
                             <textarea name="Address" id="address" class="form-control" rows="2"></textarea>
+                           
                         </div>
 
                         <div class="mb-3">
                             <label for="birthDate" class="form-label">Ngày sinh</label>
                             <input type="date" name="BirthDate" id="birthDate" class="form-control" />
+                            
                         </div>
 
                         <div class="mb-3">
                             <label for="gender" class="form-label">Giới tính</label>
+
                             <select name="Gender" id="gender" class="form-select">
                                 <option value="">Chọn giới tính</option>
                                 <option value="Nam">Nam</option>
                                 <option value="Nữ">Nữ</option>
                                 <option value="Khác">Khác</option>
-                            </select>
-                        </div>
 
+                            </select>                           
+                        </div>
                         <div class="mb-3">
                             <label for="roleId" class="form-label">Vai trò</label>
                             <select name="RoleId" id="roleId" class="form-select">
@@ -504,59 +536,79 @@
                                 <option value="2">2 - Nhân viên</option>
                                 <option value="3">3 - Admin</option>
                             </select>
+                          
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
                         <button type="submit" class="btn btn-primary" id="submitBtn">Lưu</button>
                     </div>
+                    @* Thêm phần xác thực *@
+                    @* @section Scripts {
+                        <partial name="_ValidationScriptsPartial" />
+                    } *@
                 </form>
             </div>
         </div>
     </div>
 
-
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        function openUserModal(isEdit, userData = null) {
-            const form = document.getElementById('userForm');
-            const modalTitle = document.getElementById('userModalLabel');
-            const submitBtn = document.getElementById('submitBtn');
-            const passwordGroup = document.getElementById('passwordGroup');
+        function openUserModal(mode, userData = null) {
+        const isEdit = mode === "edit";
+        const isView = mode === "view";
+        const form = document.getElementById('userForm');
+        const modalTitle = document.getElementById('userModalLabel');
+        const submitBtn = document.getElementById('submitBtn');
+        const passwordGroup = document.getElementById('passwordGroup');
 
-            form.reset();
+        form.reset();
 
-            if (isEdit && userData) {
-                modalTitle.textContent = 'Chỉnh sửa khách hàng';
-                submitBtn.textContent = 'Cập nhật';
-                form.action = '/User/UpdateUser';
+        if ((isEdit || isView) && userData) {
+        modalTitle.textContent = isView ? 'Chi tiết khách hàng' : 'Chỉnh sửa khách hàng';
+        submitBtn.textContent = isView ? '' : 'Cập nhật';
+        form.action = isEdit ? `/User/UpdateUser/${userData.userId}` : '#';
 
-                // Populate form fields
-               document.getElementById('userId').value = userData.userId ?? '';
-                document.getElementById('fullName').value = userData.fullName;
-                document.getElementById('username').value = userData.username;
-                document.getElementById('email').value = userData.email;
-                document.getElementById('phoneNumber').value = userData.phoneNumber;
-                document.getElementById('address').value = userData.address;
-                document.getElementById('birthDate').value = userData.birthDate?.split('T')[0] || '';
-                document.getElementById('gender').value = userData.gender;
-                document.getElementById('roleId').value = userData.roleId;
+        document.getElementById('userId').value = userData.userId ?? '';
+        document.getElementById('fullName').value = userData.fullName ?? '';
+        document.getElementById('username').value = userData.username ?? '';
+        document.getElementById('email').value = userData.email ?? '';
+        document.getElementById('phoneNumber').value = userData.phoneNumber ?? '';
+        document.getElementById('address').value = userData.address ?? '';
+        document.getElementById('birthDate').value = userData.birthDate?.split('T')[0] || '';
+        document.getElementById('gender').value = userData.gender ?? '';
+        document.getElementById('roleId').value = userData.roleId ?? '';
+        document.getElementById('createdDate').value = userData.createdDate?.split('T')[0] || '';
+        document.getElementById('password').value = userData.password ?? '';
 
-                passwordGroup.style.display = 'none';
-            } else {
-                modalTitle.textContent = 'Thêm khách hàng mới';
-                submitBtn.textContent = 'Thêm mới';
-                form.action = '/User/CreateUser';
-                passwordGroup.style.display = 'block';
-            }
+        passwordGroup.style.display = 'none';
+        submitBtn.style.display = isView ? 'none' : 'inline-block';
+        toggleReadOnly(isView);
+        } else {
+        modalTitle.textContent = 'Thêm khách hàng mới';
+        submitBtn.textContent = 'Thêm mới';
+        form.action = '/User/CreateUser';
+        passwordGroup.style.display = 'block';
+        submitBtn.style.display = 'inline-block';
+        toggleReadOnly(false);
 
-            const modal = new bootstrap.Modal(document.getElementById('userModal'));
-            modal.show();
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('createdDate').value = today;
+        }
+
+        const modal = new bootstrap.Modal(document.getElementById('userModal'));
+        modal.show();
+        }
+
+        function toggleReadOnly(readonly) {
+        const inputs = document.querySelectorAll("#userForm input, #userForm select, #userForm textarea");
+        inputs.forEach(input => {
+        input.readOnly = readonly;
+        input.disabled = readonly;
+        });
         }
     </script>
-
-
     <script>
             // Sidebar Toggle
             document.getElementById('sidebarToggle').addEventListener('click', function() {

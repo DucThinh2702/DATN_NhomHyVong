@@ -2,8 +2,8 @@
 {
     public class PromotionDashboardViewModel
     {
-        public List<Promotion> Promotions { get; set; }
-        public Promotion NewPromotion { get; set; }
+        public List<Promotion>? Promotions { get; set; }
+        public Promotion? NewPromotion { get; set; }
     }
 
 }

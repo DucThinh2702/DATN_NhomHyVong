@@ -8,6 +8,8 @@ namespace DATN.IRepository
         Task<IEnumerable<User>> GetAllUsers();
         Task<User> CreateUser(User user);
         Task<User> GetUserById(int id);
+        Task<User> DetailUserById(int id);
+        User GetUserBySearchFullname(string fullname);
         User GetUserByEmail(string email, string pass);
         Task UpdateUser(User user);
         Task DeleteUser(int id);

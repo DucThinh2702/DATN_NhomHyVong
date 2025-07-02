@@ -1,9 +1,10 @@
-﻿using DATN.Models;
+﻿using DATN.IRepository;
+using DATN.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 using System;
-using DATN.IRepository;
+using System.Diagnostics;
 using System.Security.Claims;
+using System.Threading.Tasks;
 namespace DATN.Controllers
 {
     public class UserController(ILogger<UserController> logger, IUsersRepository usersRepository) : Controller
@@ -40,7 +41,7 @@ namespace DATN.Controllers
                     return BadRequest("User cannot be null");
                 }
                 var createdUser = await _usersRepository.CreateUser(user);
-                return RedirectToAction("Index","Admin");
+                return RedirectToAction("Index", "Admin");
             }
             catch (Exception ex)
             {
@@ -87,7 +88,7 @@ namespace DATN.Controllers
         [HttpPost]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
-            if (_usersRepository.EmailExists(model.Email??"Sai email"))
+            if (_usersRepository.EmailExists(model.Email ?? "Sai email"))
             {
                 ModelState.AddModelError("Email", "Email đã được sử dụng.");
                 return View(model);
@@ -112,24 +113,21 @@ namespace DATN.Controllers
 
             return RedirectToAction("Index", "Admin");
         }
+
         [HttpPost]
         public async Task<IActionResult> UpdateUser(User user)
         {
-            try
+
+            if (user == null)
             {
-                if (user == null)
-                {
-                    return BadRequest("User cannot be null");
-                }
-                await _usersRepository.UpdateUser(user);
-                return RedirectToAction("Index", "Admin");
+                return BadRequest("User cannot be null");
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error updating user");
-                return View("Error");
-            }
+
+            await _usersRepository.UpdateUser( user);
+
+            return RedirectToAction("Index", "Admin");
         }
+
         [HttpPost]
         public async Task<IActionResult> DeleteUser(int id)
         {
@@ -181,7 +179,7 @@ namespace DATN.Controllers
                 else
                 {
                     ViewBag.ErrorMessage = "Invalid email or password.";
-                    return View("DangNhap","User");
+                    return View("DangNhap", "User");
                 }
             }
             catch (Exception ex)
@@ -213,7 +211,7 @@ namespace DATN.Controllers
         //{
         //    return View();
         //}
-        
+
         //public IActionResult ChiTiet()
         //{
         //    return View();
