@@ -1,17 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace DATN.Models;
-
-public partial class Category
+﻿namespace DATN.Models
 {
-    public int CategoryId { get; set; }
+    public class Category
+    {
+        public int CategoryID { get; set; }
+        public string CategoryName { get; set; }
+        public string? CategoryDescription { get; set; }
+        public string? CategoryImage { get; set; }
 
-    public string? CategoryName { get; set; }
-
-    public string? CategoryDescription { get; set; }
-
-    public string? CategoryImage { get; set; }
-
-    public virtual ICollection<Product> Products { get; set; } = new List<Product>();
+        // Navigation property
+        public ICollection<Product>? Products { get; set; }
+    }
 }

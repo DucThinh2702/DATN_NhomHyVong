@@ -1,5 +1,4 @@
-﻿
-@model DATN.Models.Product
+﻿@model DATN.Models.Product
 
 @{
     ViewData["Title"] = "Chi tiết sản phẩm";
@@ -7,8 +6,9 @@
 
 <h1 class="mb-4">Chi tiết sản phẩm</h1>
 
-<div class="card mb-3">
+<div class="card mb-3 shadow-sm">
     <div class="row g-0">
+        <!-- Cột ảnh sản phẩm -->
         <div class="col-md-4">
             @if (!string.IsNullOrEmpty(Model.ThumbnailImage))
             {
@@ -19,22 +19,27 @@
                 <div class="text-muted text-center p-4">Chưa có ảnh</div>
             }
         </div>
+
+        <!-- Cột thông tin sản phẩm -->
         <div class="col-md-8">
             <div class="card-body">
                 <h5 class="card-title">@Model.ProductName</h5>
+
                 <p class="card-text"><strong>Mô tả:</strong> @Model.Description</p>
 
                 <p class="card-text">
-                    <strong>Giá bán:</strong> @Model.SalePrice.ToString("N0") ₫ <br />
-                    <strong>Giá gốc:</strong> @Model.OriginalPrice.ToString("N0") ₫
+                    <strong>Giá bán:</strong>
+                    @(Model.SalePrice.HasValue ? Model.SalePrice.Value.ToString("N0") + " ₫" : "Chưa có") <br />
+                    <strong>Giá gốc:</strong>
+                    @(Model.OriginalPrice.HasValue ? Model.OriginalPrice.Value.ToString("N0") + " ₫" : "Chưa có")
                 </p>
 
                 <p class="card-text">
                     <strong>Tồn kho:</strong> @Model.Stock <br />
-                    <strong>Kích thước:</strong> @Model.Size <br />
-                    <strong>Màu sắc:</strong> @Model.Color <br />
-                    <strong>Chất liệu:</strong> @Model.Material <br />
-                    <strong>Danh mục (ID):</strong> @Model.CategoryId
+                    <strong>Kích thước:</strong> @(string.IsNullOrEmpty(Model.Size) ? "Chưa có" : Model.Size) <br />
+                    <strong>Màu sắc:</strong> @(string.IsNullOrEmpty(Model.Color) ? "Chưa có" : Model.Color) <br />
+                    <strong>Chất liệu:</strong> @(string.IsNullOrEmpty(Model.Material) ? "Chưa có" : Model.Material) <br />
+                    <strong>Danh mục (ID):</strong> @Model.CategoryID
                 </p>
 
                 <p class="card-text">
@@ -43,8 +48,11 @@
 
                 <p class="card-text">
                     <small class="text-muted">
-                        Ngày tạo: @Model.CreatedDate.ToString("dd/MM/yyyy")<br />
-                        Ngày cập nhật: @(Model.UpdatedDate.HasValue ? Model.UpdatedDate.Value.ToString("dd/MM/yyyy") : "Chưa cập nhật")
+                        Ngày tạo: @Model.CreatedDate.ToString("dd/MM/yyyy") <br />
+                        Ngày cập nhật:
+                        @(Model.UpdatedDate.HasValue
+                            ? Model.UpdatedDate.Value.ToString("dd/MM/yyyy")
+                            : "Chưa cập nhật")
                     </small>
                 </p>
 

@@ -130,8 +130,6 @@
     </style>
 </head>
 <body>
-    <!-- Sidebar -->
-    <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
         <div class="p-3 border-bottom border-secondary">
             <div class="d-flex align-items-center justify-content-center mb-3">
@@ -160,8 +158,8 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" asp-controller="Admin" asp-action="PhanTich">
-                            <i class="fas fa-chart-line me-2"></i><span class="nav-text">Phân tích</span>
+                        <a class="nav-link" asp-controller="ProductVariants" asp-action="Index">
+                            <i class="fas fa-chart-line me-2"></i><span class="nav-text">Biến thể</span>
                         </a>
                     </li>
                 </ul>
@@ -170,13 +168,13 @@
                 <h6 class="text-secondary fw-semibold mb-2">Quản lý</h6>
                 <ul class="nav flex-column">
                     <li class="nav-item">
-                        <a class="nav-link" asp-controller="Products1" asp-action="Index">
-                            <i class="fas fa-shopping-bag me-2"></i><span class="nav-text">Sản phẩm</span><span class="badge bg-primary ms-auto nav-text">567</span>
+                        <a class="nav-link" asp-controller="Admin" asp-action="SanPham">
+                            <i class="fas fa-shopping-bag me-2"></i><span class="nav-text">Sản phẩm</span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" asp-controller="Admin" asp-action="DonHang">
-                            <i class="fas fa-shopping-cart me-2"></i><span class="nav-text">Đơn hàng</span><span class="badge bg-danger ms-auto nav-text">24</span>
+                            <i class="fas fa-shopping-cart me-2"></i><span class="nav-text">Đơn hàng</span>
                         </a>
                     </li>
                     <li class="nav-item">
@@ -187,11 +185,6 @@
                     <li class="nav-item">
                         <a class="nav-link" asp-controller="Admin" asp-action="DanhMuc">
                             <i class="fas fa-tags me-2"></i><span class="nav-text">Danh mục</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-controller="Admin" asp-action="KhoHang">
-                            <i class="fas fa-warehouse me-2"></i><span class="nav-text">Kho hàng</span>
                         </a>
                     </li>
                 </ul>
@@ -228,7 +221,6 @@
             </div>
         </nav>
     </div>
-
         <!-- Nội dung chính -->
         <main class="flex-grow-1 p-4">
             @RenderBody()
@@ -291,3 +283,31 @@
     @RenderSection("Scripts", required: false)
 </body>
 </html>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const navLinks = document.querySelectorAll(".sidebar .nav-link");
+        const currentPath = window.location.pathname.toLowerCase();
+
+        // Khi load, gán active đúng đường dẫn
+        navLinks.forEach(link => {
+            const href = link.getAttribute("href");
+            if (href) {
+                const linkPath = new URL(href, window.location.origin).pathname.toLowerCase();
+                if (currentPath === linkPath) {
+                    link.classList.add("active");
+                } else {
+                    link.classList.remove("active");
+                }
+            }
+
+            // Khi click, active ngay lập tức
+            link.addEventListener("click", function () {
+                navLinks.forEach(l => l.classList.remove("active"));
+                this.classList.add("active");
+                // Không preventDefault, vẫn load trang
+            });
+        });
+    });
+</script>
+
+

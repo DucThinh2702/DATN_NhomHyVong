@@ -29,9 +29,13 @@
                 <h5 class="card-title">@Model.ProductName</h5>
                 <p class="card-text"><strong>Mô tả:</strong> @Model.Description</p>
                 <p class="card-text">
-                    <strong>Giá bán:</strong> @Model.SalePrice.ToString("N0") ₫ |
-                    <strong>Giá gốc:</strong> @Model.OriginalPrice.ToString("N0") ₫
+                    <strong>Giá bán:</strong>
+                    @(Model.SalePrice.HasValue ? Model.SalePrice.Value.ToString("N0") + " ₫" : "Chưa có")
+                    |
+                    <strong>Giá gốc:</strong>
+                    @(Model.OriginalPrice.HasValue ? Model.OriginalPrice.Value.ToString("N0") + " ₫" : "Chưa có")
                 </p>
+
                 <p class="card-text">
                     <strong>Tồn kho:</strong> @Model.Stock |
                     <strong>Trạng thái:</strong> @Model.Status

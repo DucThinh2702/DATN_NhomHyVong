@@ -1,0 +1,96 @@
+﻿@model DATN.Models.ProductVariant
+
+@{
+    ViewData["Title"] = "Sửa biến thể sản phẩm";
+}
+
+<div class="main-content" id="mainContent">
+    <h1 class="mb-4">Sửa biến thể sản phẩm</h1>
+
+    <form asp-action="Edit" class="row g-3">
+        <input type="hidden" asp-for="VariantID" />
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+        <!-- Sản phẩm -->
+        <div class="col-md-4 mb-3">
+            <label class="form-label">Sản phẩm</label>
+            @Html.DropDownListFor(m => m.ProductID,
+                     (IEnumerable<SelectListItem>)ViewBag.Products,
+                     "-- Chọn sản phẩm --",
+                     new { @class = "form-select" })
+        </div>
+
+        <!-- Màu sắc -->
+        <div class="col-md-4 mb-3">
+            <label class="form-label">Màu sắc</label>
+            @Html.DropDownListFor(m => m.ColorID,
+                     (IEnumerable<SelectListItem>)ViewBag.Colors,
+                     "-- Chọn màu sắc --",
+                     new { @class = "form-select" })
+        </div>
+
+        <!-- Kích thước -->
+        <div class="col-md-4 mb-3">
+            <label class="form-label">Kích thước</label>
+            @Html.DropDownListFor(m => m.SizeID,
+                     (IEnumerable<SelectListItem>)ViewBag.Sizes,
+                     "-- Chọn kích thước --",
+                     new { @class = "form-select" })
+        </div>
+
+        <!-- Mã SKU -->
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Mã SKU</label>
+            <input asp-for="SKU" class="form-control" placeholder="Nhập mã SKU..." />
+            <span asp-validation-for="SKU" class="text-danger"></span>
+        </div>
+
+        <!-- Tồn kho -->
+        <div class="col-md-3 mb-3">
+            <label class="form-label">Tồn kho</label>
+            <input asp-for="Stock" class="form-control" placeholder="Số lượng tồn..." />
+            <span asp-validation-for="Stock" class="text-danger"></span>
+        </div>
+
+        <!-- Trạng thái -->
+        <div class="col-md-3 mb-3">
+            <label class="form-label">Trạng thái</label>
+            <input asp-for="Status" class="form-control" placeholder="VD: Active, Ngừng bán..." />
+            <span asp-validation-for="Status" class="text-danger"></span>
+        </div>
+
+        <!-- Giá bán -->
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Giá bán (VNĐ)</label>
+            <input asp-for="SalePrice" class="form-control" placeholder="Giá bán..." />
+            <span asp-validation-for="SalePrice" class="text-danger"></span>
+        </div>
+
+        <!-- Giá gốc -->
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Giá gốc (VNĐ)</label>
+            <input asp-for="OriginalPrice" class="form-control" placeholder="Giá gốc..." />
+            <span asp-validation-for="OriginalPrice" class="text-danger"></span>
+        </div>
+
+        <!-- Ảnh -->
+        <div class="mb-3">
+            <label class="form-label">Đường dẫn ảnh</label>
+            <input asp-for="ThumbnailImage" class="form-control" placeholder="VD: /images/ten-anh.jpg" />
+            <span asp-validation-for="ThumbnailImage" class="text-danger"></span>
+        </div>
+
+        <div class="mt-3">
+            <button type="submit" class="btn btn-success">
+                <i class="bi bi-save"></i> Lưu thay đổi
+            </button>
+            <a asp-action="Index" class="btn btn-secondary">Quay lại danh sách</a>
+        </div>
+    </form>
+
+    @section Scripts {
+        @{
+            await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        }
+    }
+</div>

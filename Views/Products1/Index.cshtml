@@ -181,7 +181,10 @@
                     <small class="text-muted">SKU: BAG-@item.ProductId</small>
                 </td>
                 @* <td>@item.Category?.CategoryName</td> *@
-                <td>@item.SalePrice.ToString("N0") ₫</td>
+                    <td>
+                        @(item.SalePrice.HasValue ? item.SalePrice.Value.ToString("N0") + " ₫" : "Chưa có")
+                    </td>
+
                 <td>
                     @item.Stock
                 </td>
