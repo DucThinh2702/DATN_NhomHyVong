@@ -1,0 +1,56 @@
+﻿@model IEnumerable<DATN.Models.Category>
+
+@{
+    ViewData["Title"] = "Danh sách danh mục";
+    var totalCount = Model?.Count() ?? 0;
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">@ViewData["Title"]</h2>
+
+    <div class="mb-3">
+        <span class="badge bg-primary">Tổng danh mục: @totalCount</span>
+    </div>
+
+    <p>
+        <a class="btn btn-success" asp-action="Create">
+            <i class="bi bi-plus-circle"></i> Tạo mới danh mục
+        </a>
+    </p>
+
+    <table class="table table-bordered table-hover align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th scope="col">Hình ảnh</th>
+                <th scope="col">Tên danh mục</th>
+                <th scope="col" style="width:160px">Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @if (!string.IsNullOrEmpty(item.CategoryImage))
+                        {
+                            <img src="~/hinh/@item.CategoryImage" class="img-thumbnail" style="max-height:80px;" />
+                        }
+                        else
+                        {
+                            <span class="text-muted fst-italic">Chưa có hình</span>
+                        }
+                    </td>
+                    <td class="fw-semibold">@item.CategoryName</td>
+                    <td>
+                        <a class="btn btn-sm btn-warning" asp-action="Edit" asp-route-id="@item.CategoryId">
+                            <i class="bi bi-pencil-square"></i> Sửa
+                        </a>
+                        <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@item.CategoryId">
+                            <i class="bi bi-trash"></i> Xóa
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
