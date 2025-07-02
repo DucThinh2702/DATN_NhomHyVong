@@ -1,92 +1,138 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
-using DATN.Models;
 using DATN.Repositories;
+using DATN.Models;
 
 namespace DATN.Controllers
 {
     public class OrdersController : Controller
     {
-        private readonly OrderRepository _repo;
+        private readonly OrderRepository _orderRepo;
+        private readonly OrderDetailRepository _orderDetailRepo;
 
-        public OrdersController(OrderRepository repo)
+        public OrdersController(OrderRepository orderRepo, OrderDetailRepository orderDetailRepo)
         {
-            _repo = repo;
+            _orderRepo = orderRepo;
+            _orderDetailRepo = orderDetailRepo;
         }
 
-        // GET: Orders
+        // GET: /Orders
         public async Task<IActionResult> Index()
         {
-            var orders = await _repo.GetAllAsync();
+            var orders = await _orderRepo.GetAllAsync();
             return View(orders);
         }
 
-        // GET: Orders/Details/5
-        public async Task<IActionResult> Details(string id)
+        // GET: /Orders/Details/5
+        public async Task<IActionResult> Details(int id)
         {
-            if (id == null) return NotFound();
-            var order = await _repo.GetByIdAsync(id);
+            var order = await _orderRepo.GetByIdAsync(id);
+            if (order == null)
+                return NotFound();
+
+            var details = await _orderDetailRepo.GetByOrderIdAsync(id);
+            ViewBag.Order = order;
+            return View(details);
+        }
+
+        //// GET: /Orders/Delete/5
+        //public async Task<IActionResult> Delete(int id)
+        //{
+        //    var order = await _orderRepo.GetByIdAsync(id);
+        //    if (order == null)
+        //        return NotFound();
+        //    return View(order);
+        //}
+
+        //// POST: /Orders/Delete/5
+        //[HttpPost, ActionName("Delete")]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> DeleteConfirmed(int id)
+        //{
+        //    // Xoá chi tiết đơn hàng trước
+        //    await _orderDetailRepo.DeleteByOrderIdAsync(id);  
+
+        //    // Xoá đơn hàng
+        //    await _orderRepo.DeleteAsync(id);
+
+        //    return RedirectToAction(nameof(Index));
+        //}
+
+
+        //// GET: /Orders/Create
+        //public IActionResult Create()
+        //{
+        //    var model = new OrderCreateViewModel
+        //    {
+        //        Order = new Order(),
+        //        OrderDetails = new List<OrderDetail>()
+        //    };
+        //    return View(model);
+        //}
+
+        //// POST: /Orders/Create
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> Create(OrderCreateViewModel model)
+        //{
+        //    if (ModelState.IsValid)
+        //    {
+        //        await _orderRepo.CreateAsync(model.Order);
+        //        foreach (var detail in model.OrderDetails)
+        //        {
+        //            detail.OrderID = model.Order.OrderID;
+        //            await _orderDetailRepo.CreateAsync(detail);
+        //        }
+        //        return RedirectToAction(nameof(Index));
+        //    }
+        //    return View(model);
+        //}
+
+        // GET: /Orders/Edit/5
+        public async Task<IActionResult> Edit(int id)
+        {
+            var order = await _orderRepo.GetByIdAsync(id);
+            var details = await _orderDetailRepo.GetByOrderIdAsync(id);
             if (order == null) return NotFound();
-            return View(order);
+
+            var model = new OrderCreateViewModel
+            {
+                Order = order,
+                OrderDetails = details.ToList()
+            };
+            return View(model);
         }
 
-        // GET: Orders/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: Orders/Create
+        // POST: /Orders/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Order order)
+        public async Task<IActionResult> Edit(OrderCreateViewModel model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                await _repo.CreateAsync(order);
-                return RedirectToAction(nameof(Index));
+                return View(model); // giữ nguyên nếu lỗi
             }
-            return View(order);
-        }
 
-        // GET: Orders/Edit/5
-        public async Task<IActionResult> Edit(string id)
-        {
-            if (id == null) return NotFound();
-            var order = await _repo.GetByIdAsync(id);
-            if (order == null) return NotFound();
-            return View(order);
-        }
-
-        // POST: Orders/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Order order)
-        {
-            if (ModelState.IsValid)
+            // lấy đơn hàng gốc từ database
+            var existingOrder = await _orderRepo.GetByIdAsync(model.Order.OrderID);
+            if (existingOrder == null)
             {
-                await _repo.UpdateAsync(order);
-                return RedirectToAction(nameof(Index));
+                return NotFound();
             }
-            return View(order);
-        }
 
-        // GET: Orders/Delete/5
-        public async Task<IActionResult> Delete(string id)
-        {
-            if (id == null) return NotFound();
-            var order = await _repo.GetByIdAsync(id);
-            if (order == null) return NotFound();
-            return View(order);
-        }
+            // chỉ cập nhật các trường cho phép sửa
+            existingOrder.RecipientName = model.Order.RecipientName;
+            existingOrder.RecipientPhone = model.Order.RecipientPhone;
+            existingOrder.DeliveryAddress = model.Order.DeliveryAddress;
+            existingOrder.OrderStatus = model.Order.OrderStatus;
+            existingOrder.PaymentStatus = model.Order.PaymentStatus;
+            existingOrder.Note = model.Order.Note;
 
-        // POST: Orders/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(string id)
-        {
-            await _repo.DeleteAsync(id);
+            await _orderRepo.UpdateAsync(existingOrder);
             return RedirectToAction(nameof(Index));
         }
+
+
+
     }
 }

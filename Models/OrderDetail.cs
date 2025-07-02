@@ -5,24 +5,24 @@ namespace DATN.Models
     public class OrderDetail
     {
         [Key]
-        public string MaCTDH { get; set; }
+        public int OrderDetailID { get; set; } 
 
         [Required]
-        public string MaDH { get; set; }
+        public int OrderID { get; set; }      
 
         [Required]
-        public string MaSP { get; set; }
+        public int ProductID { get; set; }     
 
         [Required]
         [Range(1, int.MaxValue, ErrorMessage = "Số lượng phải lớn hơn 0")]
-        public int SoLuong { get; set; }
+        public int Quantity { get; set; }
 
         [Required]
         [DataType(DataType.Currency)]
-        public decimal DonGia { get; set; }
+        public decimal UnitPrice { get; set; }
 
         [Required]
         [DataType(DataType.Currency)]
-        public decimal ThanhTien { get; set; }
+        public decimal TotalPrice { get; set; }
     }
 }

@@ -1,26 +1,22 @@
-﻿@model DATN.Models.Order
-
+﻿@* @model DATN.Models.Order
 @{
-    ViewData["Title"] = "Xóa đơn hàng";
+    ViewData["Title"] = "Xoá đơn hàng";
+    // Layout = "~/Views/Admin/_Layout.cshtml";
 }
 
-<h2>Xóa đơn hàng</h2>
+<h2>Xoá đơn hàng</h2>
 
-<h4>Bạn có chắc chắn muốn xóa đơn hàng này?</h4>
-<hr />
-<dl class="row">
-    <dt class="col-sm-3">Mã đơn hàng</dt>
-    <dd class="col-sm-9">@Model.MaDH</dd>
+<p>Bạn có chắc chắn muốn xoá đơn hàng <strong>#@Model.OrderID</strong> không?</p>
 
-    <dt class="col-sm-3">Tên người nhận</dt>
-    <dd class="col-sm-9">@Model.TenNguoiNhan</dd>
-
-    <dt class="col-sm-3">Tổng tiền</dt>
-    <dd class="col-sm-9">@Model.TongTien.ToString("N0") đ</dd>
-</dl>
+<p>
+    <strong>Người nhận:</strong> @Model.RecipientName<br />
+    <strong>SĐT:</strong> @Model.RecipientPhone<br />
+    <strong>Địa chỉ:</strong> @Model.DeliveryAddress
+</p>
 
 <form asp-action="Delete">
-    <input type="hidden" asp-for="MaDH" />
-    <button type="submit" class="btn btn-danger">Xóa</button>
+    <input type="hidden" asp-for="OrderID" />
+    <button type="submit" class="btn btn-danger">Xoá</button>
     <a asp-action="Index" class="btn btn-secondary">Huỷ</a>
 </form>
+ *@

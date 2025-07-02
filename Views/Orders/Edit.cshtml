@@ -1,81 +1,81 @@
-﻿@model DATN.Models.Order
+﻿@model DATN.Models.OrderCreateViewModel
 
 @{
-    ViewData["Title"] = "Cập nhật đơn hàng";
+    ViewData["Title"] = "Sửa đơn hàng";
+    // Layout = "~/Views/Admin/_Layout.cshtml";
 }
 
-<h2>Cập nhật đơn hàng</h2>
+<h2>@ViewData["Title"]</h2>
 
-<form asp-action="Edit" method="post">
-    <input type="hidden" asp-for="MaDH" />
+<<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="Order.OrderID" />
 
-    <div class="mb-3">
-        <label asp-for="MaKH" class="form-label"></label>
-        <input asp-for="MaKH" class="form-control" readonly />
+    <div class="form-group">
+        <label asp-for="Order.UserID"></label>
+        <input asp-for="Order.UserID" class="form-control" readonly />
     </div>
 
-    <div class="mb-3">
-        <label asp-for="SoLuong" class="form-label"></label>
-        <input asp-for="SoLuong" class="form-control" />
-        <span asp-validation-for="SoLuong" class="text-danger"></span>
+    <div class="form-group">
+        <label asp-for="Order.OrderDate"></label>
+        <input asp-for="Order.OrderDate" class="form-control" readonly />
     </div>
 
-    <div class="mb-3">
-        <label asp-for="TongTien" class="form-label"></label>
-        <input asp-for="TongTien" class="form-control" />
-        <span asp-validation-for="TongTien" class="text-danger"></span>
+    <div class="form-group">
+        <label asp-for="Order.Quantity"></label>
+        <input asp-for="Order.Quantity" class="form-control" readonly />
     </div>
 
-    <div class="mb-3">
-        <label asp-for="MaPTTT" class="form-label"></label>
-        <input asp-for="MaPTTT" class="form-control" />
-        <span asp-validation-for="MaPTTT" class="text-danger"></span>
+    <div class="form-group">
+        <label asp-for="Order.TotalAmount"></label>
+        <input asp-for="Order.TotalAmount" class="form-control" readonly />
     </div>
 
-    <div class="mb-3">
-        <label asp-for="TrangThaiThanhToan" class="form-label"></label>
-        <input asp-for="TrangThaiThanhToan" class="form-control" />
+    <div class="form-group">
+        <label asp-for="Order.PaymentMethodID"></label>
+        <input asp-for="Order.PaymentMethodID" class="form-control" readonly />
     </div>
 
-    <div class="mb-3">
-        <label asp-for="TrangThaiDonHang" class="form-label"></label>
-        <input asp-for="TrangThaiDonHang" class="form-control" />
+    <div class="form-group">
+        <label asp-for="Order.DiscountCode"></label>
+        <input asp-for="Order.DiscountCode" class="form-control" readonly />
     </div>
 
-    <div class="mb-3">
-        <label asp-for="TenNguoiNhan" class="form-label"></label>
-        <input asp-for="TenNguoiNhan" class="form-control" />
+    <div class="form-group">
+        <label asp-for="Order.ShippingFee"></label>
+        <input asp-for="Order.ShippingFee" class="form-control" readonly />
     </div>
 
-    <div class="mb-3">
-        <label asp-for="SoDienThoaiNguoiNhan" class="form-label"></label>
-        <input asp-for="SoDienThoaiNguoiNhan" class="form-control" />
+    <div class="form-group">
+        <label asp-for="Order.RecipientName"></label>
+        <input asp-for="Order.RecipientName" class="form-control" />
     </div>
 
-    <div class="mb-3">
-        <label asp-for="DiaChiGiaoHang" class="form-label"></label>
-        <input asp-for="DiaChiGiaoHang" class="form-control" />
+    <div class="form-group">
+        <label asp-for="Order.RecipientPhone"></label>
+        <input asp-for="Order.RecipientPhone" class="form-control" />
     </div>
 
-    <div class="mb-3">
-        <label asp-for="GhiChu" class="form-label"></label>
-        <textarea asp-for="GhiChu" class="form-control"></textarea>
+    <div class="form-group">
+        <label asp-for="Order.DeliveryAddress"></label>
+        <input asp-for="Order.DeliveryAddress" class="form-control" />
     </div>
 
-    <div class="mb-3">
-        <label asp-for="MaGiamGia" class="form-label"></label>
-        <input asp-for="MaGiamGia" class="form-control" />
+    <div class="form-group">
+        <label asp-for="Order.OrderStatus"></label>
+        <input asp-for="Order.OrderStatus" class="form-control" />
     </div>
 
-    <div class="mb-3">
-        <label asp-for="PhiVanChuyen" class="form-label"></label>
-        <input asp-for="PhiVanChuyen" class="form-control" />
+    <div class="form-group">
+        <label asp-for="Order.PaymentStatus"></label>
+        <input asp-for="Order.PaymentStatus" class="form-control" />
     </div>
 
-    <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
-    <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+    <div class="form-group">
+        <label asp-for="Order.Note"></label>
+        <textarea asp-for="Order.Note" class="form-control"></textarea>
+    </div>
+
+
+    <button type="submit" class="btn btn-success">Lưu thay đổi</button>
+    <a asp-action="Index" class="btn btn-secondary">Huỷ</a>
 </form>
-
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}

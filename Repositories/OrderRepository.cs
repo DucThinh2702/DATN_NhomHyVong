@@ -24,19 +24,27 @@ namespace DATN.Repositories
             return await conn.QueryAsync<Order>(sql);
         }
 
-        public async Task<Order> GetByIdAsync(string maDH)
+        public async Task<Order> GetByIdAsync(int orderId)
         {
-            var sql = "SELECT * FROM Orders WHERE MaDH = @MaDH";
+            var sql = "SELECT * FROM Orders WHERE OrderID = @OrderID";
             using var conn = _dapper.CreateConnection();
-            return await conn.QueryFirstOrDefaultAsync<Order>(sql, new { MaDH = maDH });
+            return await conn.QueryFirstOrDefaultAsync<Order>(sql, new { OrderID = orderId });
         }
 
         public async Task<int> CreateAsync(Order order)
         {
             var sql = @"
-                INSERT INTO Orders (MaDH, MaKH, NgayDatHang, SoLuong, TongTien, MaPTTT, TrangThaiThanhToan, TrangThaiDonHang, TenNguoiNhan, SoDienThoaiNguoiNhan, DiaChiGiaoHang, GhiChu, MaGiamGia, PhiVanChuyen)
-                VALUES (@MaDH, @MaKH, @NgayDatHang, @SoLuong, @TongTien, @MaPTTT, @TrangThaiThanhToan, @TrangThaiDonHang, @TenNguoiNhan, @SoDienThoaiNguoiNhan, @DiaChiGiaoHang, @GhiChu, @MaGiamGia, @PhiVanChuyen)
-            ";
+                INSERT INTO Orders (
+                    UserID, OrderDate, Quantity, TotalAmount, PaymentMethodID, 
+                    PaymentStatus, OrderStatus, RecipientName, RecipientPhone, 
+                    DeliveryAddress, Note, DiscountCode, ShippingFee
+                )
+                VALUES (
+                    @UserID, @OrderDate, @Quantity, @TotalAmount, @PaymentMethodID, 
+                    @PaymentStatus, @OrderStatus, @RecipientName, @RecipientPhone, 
+                    @DeliveryAddress, @Note, @DiscountCode, @ShippingFee
+                )";
+
             using var conn = _dapper.CreateConnection();
             return await conn.ExecuteAsync(sql, order);
         }
@@ -44,30 +52,25 @@ namespace DATN.Repositories
         public async Task<int> UpdateAsync(Order order)
         {
             var sql = @"
-                UPDATE Orders SET 
-                    MaKH = @MaKH,
-                    SoLuong = @SoLuong,
-                    TongTien = @TongTien,
-                    MaPTTT = @MaPTTT,
-                    TrangThaiThanhToan = @TrangThaiThanhToan,
-                    TrangThaiDonHang = @TrangThaiDonHang,
-                    TenNguoiNhan = @TenNguoiNhan,
-                    SoDienThoaiNguoiNhan = @SoDienThoaiNguoiNhan,
-                    DiaChiGiaoHang = @DiaChiGiaoHang,
-                    GhiChu = @GhiChu,
-                    MaGiamGia = @MaGiamGia,
-                    PhiVanChuyen = @PhiVanChuyen
-                WHERE MaDH = @MaDH
-            ";
+        UPDATE Orders SET 
+            RecipientName = @RecipientName,
+            RecipientPhone = @RecipientPhone,
+            DeliveryAddress = @DeliveryAddress,
+            OrderStatus = @OrderStatus,
+            PaymentStatus = @PaymentStatus,
+            Note = @Note
+        WHERE OrderID = @OrderID";
+
             using var conn = _dapper.CreateConnection();
             return await conn.ExecuteAsync(sql, order);
         }
 
-        public async Task<int> DeleteAsync(string maDH)
+
+        public async Task<int> DeleteAsync(int orderId)
         {
-            var sql = "DELETE FROM Orders WHERE MaDH = @MaDH";
+            var sql = "DELETE FROM Orders WHERE OrderID = @OrderID";
             using var conn = _dapper.CreateConnection();
-            return await conn.ExecuteAsync(sql, new { MaDH = maDH });
+            return await conn.ExecuteAsync(sql, new { OrderID = orderId });
         }
     }
 }

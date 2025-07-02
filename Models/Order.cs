@@ -6,47 +6,36 @@ namespace DATN.Models
     public class Order
     {
         [Key]
-        public string MaDH { get; set; }
+        public int OrderID { get; set; }
 
         [Required]
-        public string MaKH { get; set; }
+        public int UserID { get; set; }
 
-        [Display(Name = "Ngày đặt hàng")]
-        public DateTime NgayDatHang { get; set; } = DateTime.Now;
-
-        [Required]
-        [Range(1, int.MaxValue, ErrorMessage = "Số lượng phải lớn hơn 0")]
-        public int SoLuong { get; set; }
+        public DateTime OrderDate { get; set; } = DateTime.Now;
 
         [Required]
-        [Display(Name = "Tổng tiền")]
-        [DataType(DataType.Currency)]
-        public decimal TongTien { get; set; }
+        public int Quantity { get; set; }
 
         [Required]
-        [Display(Name = "Phương thức thanh toán")]
-        public string MaPTTT { get; set; }
+        public decimal TotalAmount { get; set; }
 
-        [Display(Name = "Trạng thái thanh toán")]
-        public string TrangThaiThanhToan { get; set; }
+        [Required]
+        public int PaymentMethodID { get; set; }
 
-        [Display(Name = "Trạng thái đơn hàng")]
-        public string TrangThaiDonHang { get; set; }
+        public string PaymentStatus { get; set; }
 
-        [Display(Name = "Tên người nhận")]
-        public string TenNguoiNhan { get; set; }
+        public string OrderStatus { get; set; }
 
-        [Display(Name = "SĐT người nhận")]
-        public string SoDienThoaiNguoiNhan { get; set; }
+        public string RecipientName { get; set; }
 
-        [Display(Name = "Địa chỉ giao hàng")]
-        public string DiaChiGiaoHang { get; set; }
+        public string RecipientPhone { get; set; }
 
-        public string GhiChu { get; set; }
+        public string DeliveryAddress { get; set; }
 
-        public string MaGiamGia { get; set; }
+        public string Note { get; set; }
 
-        [Display(Name = "Phí vận chuyển")]
-        public decimal PhiVanChuyen { get; set; } = 0;
+        public int? DiscountCode { get; set; }
+
+        public decimal ShippingFee { get; set; } = 0;
     }
 }

@@ -1,9 +1,8 @@
-﻿    using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Dapper;
 using DATN.Data;
 using DATN.Models;
-using System.Data;
 
 namespace DATN.Repositories
 {
@@ -16,25 +15,25 @@ namespace DATN.Repositories
             _dapper = dapper;
         }
 
-        public async Task<IEnumerable<OrderDetail>> GetByOrderIdAsync(string maDH)
+        public async Task<IEnumerable<OrderDetail>> GetByOrderIdAsync(int orderId)
         {
-            var sql = "SELECT * FROM OrderDetails WHERE MaDH = @MaDH";
+            var sql = "SELECT * FROM OrderDetails WHERE OrderID = @OrderID";
             using var conn = _dapper.CreateConnection();
-            return await conn.QueryAsync<OrderDetail>(sql, new { MaDH = maDH });
+            return await conn.QueryAsync<OrderDetail>(sql, new { OrderID = orderId });
         }
 
-        public async Task<OrderDetail> GetByIdAsync(string maCTDH)
+        public async Task<OrderDetail> GetByIdAsync(int orderDetailId)
         {
-            var sql = "SELECT * FROM OrderDetails WHERE MaCTDH = @MaCTDH";
+            var sql = "SELECT * FROM OrderDetails WHERE OrderDetailID = @OrderDetailID";
             using var conn = _dapper.CreateConnection();
-            return await conn.QueryFirstOrDefaultAsync<OrderDetail>(sql, new { MaCTDH = maCTDH });
+            return await conn.QueryFirstOrDefaultAsync<OrderDetail>(sql, new { OrderDetailID = orderDetailId });
         }
 
         public async Task<int> CreateAsync(OrderDetail detail)
         {
             var sql = @"
-                INSERT INTO OrderDetails (MaCTDH, MaDH, MaSP, SoLuong, DonGia, ThanhTien)
-                VALUES (@MaCTDH, @MaDH, @MaSP, @SoLuong, @DonGia, @ThanhTien)
+                INSERT INTO OrderDetails (OrderID, ProductID, Quantity, UnitPrice, TotalPrice)
+                VALUES (@OrderID, @ProductID, @Quantity, @UnitPrice, @TotalPrice)
             ";
             using var conn = _dapper.CreateConnection();
             return await conn.ExecuteAsync(sql, detail);
@@ -44,21 +43,27 @@ namespace DATN.Repositories
         {
             var sql = @"
                 UPDATE OrderDetails SET 
-                    MaSP = @MaSP,
-                    SoLuong = @SoLuong,
-                    DonGia = @DonGia,
-                    ThanhTien = @ThanhTien
-                WHERE MaCTDH = @MaCTDH
+                    ProductID = @ProductID,
+                    Quantity = @Quantity,
+                    UnitPrice = @UnitPrice,
+                    TotalPrice = @TotalPrice
+                WHERE OrderDetailID = @OrderDetailID
             ";
             using var conn = _dapper.CreateConnection();
             return await conn.ExecuteAsync(sql, detail);
         }
-
-        public async Task<int> DeleteAsync(string maCTDH)
+        public async Task<int> DeleteByOrderIdAsync(int orderId)
         {
-            var sql = "DELETE FROM OrderDetails WHERE MaCTDH = @MaCTDH";
             using var conn = _dapper.CreateConnection();
-            return await conn.ExecuteAsync(sql, new { MaCTDH = maCTDH });
+            string sql = "DELETE FROM OrderDetails WHERE OrderID = @OrderID";
+            return await conn.ExecuteAsync(sql, new { OrderID = orderId });
+        }
+
+        public async Task<int> DeleteAsync(int orderDetailId)
+        {
+            var sql = "DELETE FROM OrderDetails WHERE OrderDetailID = @OrderDetailID";
+            using var conn = _dapper.CreateConnection();
+            return await conn.ExecuteAsync(sql, new { OrderDetailID = orderDetailId });
         }
     }
 }

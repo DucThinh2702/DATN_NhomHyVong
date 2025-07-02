@@ -1,47 +1,106 @@
-﻿@model List<DATN.Models.Order>
-
+﻿@model IEnumerable<DATN.Models.Order>
 @{
-    ViewData["Title"] = "Danh sách đơn hàng";
+    ViewData["Title"] = "Đơn hàng";
+    // Layout = "~/Views/Admin/_Layout.cshtml";
 }
 
-<h2>Danh sách đơn hàng</h2>
-<a asp-action="Create" class="btn btn-primary mb-3">Thêm đơn hàng</a>
+<!-- Giữ nguyên phần thống kê, filter và các box bên trên như ảnh -->
+<h2>Đơn hàng</h2>
 
-<table class="table table-bordered">
-    <thead class="table-dark">
+<div class="row mb-3">
+    <div class="col">
+        <div class="card text-center">
+            <div class="card-body">
+                <h6 class="text-muted">TỔNG ĐƠN HÀNG</h6>
+                <h4>@Model.Count()</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card text-center">
+            <div class="card-body">
+                <h6 class="text-muted">CHỜ XỬ LÝ</h6>
+                <h4>@Model.Count(x => x.OrderStatus?.ToLower() == "đang xử lý")</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card text-center">
+            <div class="card-body">
+                <h6 class="text-muted">HOÀN THÀNH</h6>
+                <h4>@Model.Count(x => x.OrderStatus?.ToLower() == "hoàn thành")</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card text-center">
+            <div class="card-body">
+                <h6 class="text-muted">ĐÃ HUỶ</h6>
+                <h4>@Model.Count(x => x.OrderStatus?.ToLower() == "đã huỷ")</h4>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bảng danh sách đơn hàng -->
+<table class="table table-bordered table-hover">
+    <thead class="table-light">
         <tr>
-            <th>Mã ĐH</th>
-            <th>Mã KH</th>
+            <th>Mã đơn</th>
+            <th>Khách hàng</th>
             <th>Ngày đặt</th>
-            <th>Số lượng</th>
+            <th>Sản phẩm</th>
             <th>Tổng tiền</th>
-            <th>Thanh toán</th>
             <th>Trạng thái</th>
-            <th>Tên nhận</th>
-            <th>SĐT</th>
-            <th>Địa chỉ</th>
             <th>Thao tác</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var order in Model)
+        @foreach (var item in Model)
         {
             <tr>
-                <td>@order.MaDH</td>
-                <td>@order.MaKH</td>
-                <td>@order.NgayDatHang.ToString("dd/MM/yyyy")</td>
-                <td>@order.SoLuong</td>
-                <td>@order.TongTien.ToString("N0") đ</td>
-                <td>@order.TrangThaiThanhToan</td>
-                <td>@order.TrangThaiDonHang</td>
-                <td>@order.TenNguoiNhan</td>
-                <td>@order.SoDienThoaiNguoiNhan</td>
-                <td>@order.DiaChiGiaoHang</td>
+                <td>#ORD-@item.OrderID</td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@order.MaDH" class="btn btn-sm btn-warning">Sửa</a>
-                    <a asp-action="Delete" asp-route-id="@order.MaDH" class="btn btn-sm btn-danger">Xóa</a>
-                    <a asp-controller="OrderDetails" asp-action="ByOrder" asp-route-maDH="@order.MaDH" class="btn btn-info btn-sm">  <i class="bi bi-eye"> </i> Chi tiết</a>
-                      
+                    @item.RecipientName<br />
+                    <small>@item.RecipientPhone</small>
+                </td>
+                <td>@item.OrderDate.ToString("dd/MM/yyyy")</td>
+                <td>@item.Quantity sản phẩm</td>
+                <td>@string.Format("{0:#,##0}₫", item.TotalAmount)</td>
+                <td>
+                    @switch (item.OrderStatus?.ToLower())
+                    {
+                        case "hoàn thành":
+                            <span class="badge bg-success">Hoàn thành</span>
+                            ; break;
+                        case "đang xử lý":
+                            <span class="badge bg-primary">Đang xử lý</span>
+                            ; break;
+                        case "chờ thanh toán":
+                            <span class="badge bg-warning text-dark">Chờ thanh toán</span>
+                            ; break;
+                        case "đã huỷ":
+                            <span class="badge bg-danger">Đã huỷ</span>
+                            ; break;
+                        case "đã giao":
+                            <span class="badge bg-info text-dark">Đã giao</span>
+                            ; break;
+                        default:
+                            <span class="badge bg-secondary">@item.OrderStatus</span>
+                            ; break;
+                    }
+                </td>
+                <td>
+                    <a href="@Url.Action("Details", "Orders", new { id = item.OrderID })" class="btn btn-sm btn-info">
+                        <i class="fas fa-eye"></i> Xem
+                    </a>
+                    <a href="@Url.Action("Edit", "Orders", new { id = item.OrderID })" class="btn btn-sm btn-warning">
+                        <i class="fas fa-edit"></i> Sửa
+                    </a>
+                    @* <a href="@Url.Action("Delete", "Orders", new { id = item.OrderID })" class="btn btn-sm btn-danger" onclick="return confirm('Bạn có chắc muốn xoá đơn hàng này không?');">
+                        <i class="fas fa-trash"></i> Xoá
+                    </a> *@
+
                 </td>
             </tr>
         }

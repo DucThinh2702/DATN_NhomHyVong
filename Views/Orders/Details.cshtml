@@ -1,0 +1,39 @@
+﻿@model IEnumerable<DATN.Models.OrderDetail>
+@{
+    var order = ViewBag.Order as DATN.Models.Order;
+    // Layout = "~/Views/Admin/_Layout.cshtml";
+    ViewData["Title"] = "Chi tiết đơn hàng";
+}
+
+<h3>Chi tiết đơn hàng #@order.OrderID</h3>
+
+<p>
+    <strong>Người nhận:</strong> @order.RecipientName<br />
+    <strong>SĐT:</strong> @order.RecipientPhone<br />
+    <strong>Địa chỉ:</strong> @order.DeliveryAddress<br />
+    <strong>Trạng thái:</strong> @order.OrderStatus
+</p>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Mã SP</th>
+            <th>Số lượng</th>
+            <th>Đơn giá</th>
+            <th>Thành tiền</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var d in Model)
+        {
+            <tr>
+                <td>@d.ProductID</td>
+                <td>@d.Quantity</td>
+                <td>@string.Format("{0:#,##0}₫", d.UnitPrice)</td>
+                <td>@string.Format("{0:#,##0}₫", d.TotalPrice)</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-action="Index" class="btn btn-secondary">Quay lại</a>
