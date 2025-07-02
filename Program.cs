@@ -8,7 +8,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddSingleton<DapperHelper>();
 builder.Services.AddSingleton<OrderRepository>();
-builder.Services.AddScoped<OrderDetailRepository>();
+builder.Services.AddSingleton<OrderDetailRepository>();
+builder.Services.AddScoped<ProductRepository>();
 builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
 builder.Services.AddScoped<PhotoService>();
 var app = builder.Build();
@@ -30,6 +31,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Admin}/{action=Index}/{id?}");
+    pattern: "{controller=Orders}/{action=Index}/{id?}");
 
 app.Run();

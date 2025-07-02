@@ -2,12 +2,12 @@
 
 @{
     ViewData["Title"] = "Sửa đơn hàng";
-    // Layout = "~/Views/Admin/_Layout.cshtml";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <h2>@ViewData["Title"]</h2>
 
-<<form asp-action="Edit" method="post">
+<form asp-action="Edit" method="post">
     <input type="hidden" asp-for="Order.OrderID" />
 
     <div class="form-group">

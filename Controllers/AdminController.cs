@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using DATN.Repositories;
+using Microsoft.AspNetCore.Mvc;
 
 namespace DATN.Controllers
 {
@@ -33,9 +34,17 @@ namespace DATN.Controllers
         {
             return View();
         }
-        public IActionResult DonHang()
+        private readonly OrderRepository _orderRepo;
+
+        public AdminController(OrderRepository orderRepo) // Inject repository
         {
-            return View();
+            _orderRepo = orderRepo;
+        }
+
+        public async Task<IActionResult> DonHang()
+        {
+            var orders = await _orderRepo.GetAllAsync();
+            return View(orders); // Truyền danh sách đơn hàng sang view
         }
         public IActionResult SanPham()
         {
