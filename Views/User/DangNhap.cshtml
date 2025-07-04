@@ -1,4 +1,4 @@
-﻿@model DATN.Models.User
+﻿@model DATN.Models.RegisterViewModel
 
 <!DOCTYPE html>
 <html lang="vi">
@@ -290,7 +290,7 @@
             <div class="col-md-7 bg-white p-5">
                 <h3 class="text-center text-dark mb-4">Đăng nhập</h3>
 
-                <form asp-action="Login" method="post" id="loginForm">
+                <form asp-action="Login" asp-controller="User" method="post" >
                     <div class="form-group">
                         <label asp-for="Email"></label>
                         <input asp-for="Email" class="form-control" placeholder="Nhập email của bạn" />
@@ -423,9 +423,7 @@
                         </form>
 
 
-                        @section Scripts {
-                            <partial name="_ValidationScriptsPartial" />
-                        }
+                      
 
                         <h6 class="footer-white-text text-uppercase mt-4 mb-3">Theo đổi chúng tôi</h6>
                         <div class="d-flex">

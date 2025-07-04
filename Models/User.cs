@@ -28,6 +28,7 @@ public partial class User
     public string? Gender { get; set; }
 
     [Required(ErrorMessage = "Ngày sinh không được để trống")]
+    [Range(typeof(DateTime), "01/01/1900", "01/01/2010", ErrorMessage = "Ngày sinh phải từ 1900 đến 2010")]
     public DateOnly? BirthDate { get; set; }
 
     [Required(ErrorMessage = "Số điện thoại không được để trống")]

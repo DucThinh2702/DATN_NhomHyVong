@@ -1,5 +1,6 @@
 ﻿using DATN.IRepository;
 using DATN.Models;
+using DATN.Service;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Diagnostics;
@@ -34,21 +35,22 @@ namespace DATN.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateUser(User user)
         {
+            if (!ModelState.IsValid)
+                return View("KhachHang", user); // Nếu bạn dùng View chung để hiển thị lại form
+
             try
             {
-                if (user == null)
-                {
-                    return BadRequest("User cannot be null");
-                }
-                var createdUser = await _usersRepository.CreateUser(user);
-                return RedirectToAction("Index", "Admin");
+                await _usersRepository.CreateUser(user);
+                return RedirectToAction("KhachHang");
             }
-            catch (Exception ex)
+            catch (InvalidOperationException ex)
             {
-                _logger.LogError(ex, "Error creating user");
-                return View("Error");
+                // Thêm lỗi vào ModelState để hiển thị trên View
+                ModelState.AddModelError(string.Empty, ex.Message);
+                return View("KhachHang", user);
             }
         }
+
         [HttpGet]
         public async Task<IActionResult> GetUserById(int id)
         {
@@ -123,7 +125,7 @@ namespace DATN.Controllers
                 return BadRequest("User cannot be null");
             }
 
-            await _usersRepository.UpdateUser( user);
+            await _usersRepository.UpdateUser(user);
 
             return RedirectToAction("Index", "Admin");
         }
@@ -148,46 +150,31 @@ namespace DATN.Controllers
         {
             return View();
         }
+
         [HttpGet]
         public IActionResult DangKy()
         {
             return View();
         }
+
         [HttpPost]
-        public IActionResult Login(string email, string pass)
+        public IActionResult Login([Bind("Email,Password")] User user)
         {
             try
             {
-                var user = _usersRepository.GetUserByEmail(email, pass);
-                if (user != null)
-                {
-                    // Lưu UserId vào Session
-                    HttpContext.Session.SetInt32("UserId", user.UserId); // Assumes UserId is int
+                var matchedUser = _usersRepository.GetUserByEmail(user.Email ?? "", user.Password ?? "");
 
-                    // Tạo Claims (tuỳ chọn nếu dùng Claims-based Authentication)
-                    var claims = new List<Claim>
-            {
-                new(ClaimTypes.Name, user.FullName ?? user.Username ?? "Unknown"),
-                new(ClaimTypes.Email, user.Email ?? "Unknown"),
-                new(ClaimTypes.Role, user.Role?.RoleName ?? "User")
-            };
-
-                    // Có thể thêm xác thực bằng cookie ở đây nếu cần
-
-                    return RedirectToAction("Index", "User");
-                }
-                else
-                {
-                    ViewBag.ErrorMessage = "Invalid email or password.";
-                    return View("DangNhap", "User");
-                }
+                HttpContext.Session.SetInt32("UserId", matchedUser.UserId);
+                return RedirectToAction("Index", "Home");
             }
-            catch (Exception ex)
+            catch (KeyNotFoundException)
             {
-                _logger.LogError(ex, "Error during login");
-                return View("Error");
+                ModelState.AddModelError("", "Email hoặc mật khẩu không đúng.");
+                return View(user);
             }
         }
+
+
         [HttpPost]
         public IActionResult Logout()
         {

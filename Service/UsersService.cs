@@ -3,6 +3,8 @@ using DATN.IRepository;
 using DATN.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace DATN.Service
@@ -68,17 +70,19 @@ namespace DATN.Service
         }
         public async Task<User> GetUserById(int id)
         {
-            var user = await _context.Users.FindAsync(id) ?? throw new KeyNotFoundException($"User with ID {id} not found.");
+            var user = await _context.Users.FindAsync(id) 
+                ?? throw new KeyNotFoundException($"User with ID {id} not found.");
             return user;
         }
         public async Task<User> DetailUserById(int id)
         {
-            var user = await _context.Users.FindAsync(id) ?? throw new KeyNotFoundException($"User with ID {id} not found.");
+            var user = await _context.Users.FindAsync(id) 
+                ?? throw new KeyNotFoundException($"User with ID {id} not found.");
             return user;
         }
         public User GetUserBySearchFullname(string fullname)
         {
-            var user = _context.Users.Find(fullname)
+            var user = _context.Users.Find(fullname) 
                 ?? throw new KeyNotFoundException($"User with fullname {fullname} not found.");
             return user;
         }
@@ -86,7 +90,7 @@ namespace DATN.Service
         {
             string hashedPassword = HmacSHA256(pass);
 
-            var user = _context.Users.FirstOrDefault(u => u.Email == email && u.Password == hashedPassword)
+            var user = _context.Users.FirstOrDefault(u => u.Email == email && u.Password == hashedPassword) 
                 ?? throw new KeyNotFoundException($"Email hoặc mật khẩu không đúng.");
 
             return user;
@@ -94,8 +98,8 @@ namespace DATN.Service
 
         private static string HmacSHA256(string input)
         {
-            var bytes = System.Text.Encoding.UTF8.GetBytes(input);
-            var hash = System.Security.Cryptography.SHA256.HashData(bytes);
+            var bytes = Encoding.UTF8.GetBytes(input);
+            var hash = SHA256.HashData(bytes); // .NET 6+
             return Convert.ToBase64String(hash);
         }
 

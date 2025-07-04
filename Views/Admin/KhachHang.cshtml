@@ -23,7 +23,66 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Custom CSS for enhanced modal appearance */
+        .modal-dialog {
+            max-width: 800px; /* Adjust max-width as needed for wider screens */
+            margin-top: 50px; /* Add some top margin to center it better */
+        }
 
+        .modal-content {
+            border-radius: 10px; /* Slightly rounded corners for a softer look */
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+        }
+
+        .modal-header {
+            background-color: #f8f9fa; /* Light background for the header */
+            border-bottom: 1px solid #dee2e6; /* Separator line */
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+
+        .modal-title {
+            font-weight: 600; /* Slightly bolder title */
+            color: #343a40; /* Darker text color */
+        }
+
+        .modal-body {
+            padding: 2rem; /* Increase padding for more breathing room */
+        }
+
+        .form-label {
+            font-weight: 500; /* Make labels a bit more prominent */
+            color: #495057; /* Slightly darker label color */
+        }
+
+        .form-control, .form-select {
+            border-radius: 5px; /* Slightly rounded input fields */
+            border: 1px solid #ced4da;
+        }
+
+        .btn-primary {
+            background-color: #007bff; /* Standard Bootstrap primary blue */
+            border-color: #007bff;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+
+            .btn-primary:hover {
+                background-color: #0056b3;
+                border-color: #0056b3;
+            }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+
+            .btn-secondary:hover {
+                background-color: #5a6268;
+                border-color: #545b62;
+            }
+    </style>
     <style>
         :root {
             --primary-color: #ffc107;
@@ -276,7 +335,7 @@
         </nav>
 
         <!-- Customers Content -->
-        <div class="container-fluid p-4">
+        <div class="container-fluid">
             <!-- Stats Cards -->
             <div class="row mb-4">
                 <div class="col-xl-3 col-md-6 mb-4">
@@ -416,8 +475,8 @@
                                         </td>
                                         <td>
                                             <span class="badge
-                                                                                        @(user.Orders?.Count() >= 10 ? "bg-warning" :
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                        user.Orders?.Count() >= 5 ? "bg-primary" : "bg-success")">
+                                                                                            @(user.Orders?.Count() >= 10 ? "bg-warning" :
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          user.Orders?.Count() >= 5 ? "bg-primary" : "bg-success")">
                                                 @(user.Orders?.Count() >= 10 ? "VIP" :
                                                                                             user.Orders?.Count() >= 5 ? "Thường xuyên" : "Mới")
                                         </span>
@@ -432,7 +491,7 @@
                                             <!-- Sửa -->
                                             <button class="btn btn-warning" onclick='openUserModal("edit", @Html.Raw(Json.Serialize(user)))'>
                                                 <i class="fas fa-edit"></i>
-                                            </button>                                           
+                                            </button>
                                             <a href="mailto:@user.Email" class="btn btn-outline-info" title="Gửi email">
                                                 <i class="fas fa-envelope"></i>
                                             </a>
@@ -461,99 +520,116 @@
                 </div>
             </div>
         </div>
-    </div>
-
-    <div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form id="userForm" method="post">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="userModalLabel">Thêm khách hàng</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
-                    </div>
-                    <div class="modal-body">
-                        <input type="hidden" id="userId" name="UserId" />
-                        <input type="hidden" id="createdDate" name="CreatedDate" />
-
-                        <div class="mb-3">
-                            <label for="fullName" class="form-label">Họ và tên</label>
-                            <input type="text" name="FullName" id="fullName" class="form-control" />
-                          
+        <div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="alert alert-danger">
+                            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                            {
+                                <div>@error.ErrorMessage</div>
+                            }
                         </div>
-
-                        <div class="mb-3">
-                            <label for="username" class="form-label">Username</label>
-                            <input type="text" name="Username" id="username" class="form-control" />
-                        
+                    }
+                    <form id="userForm" method="post">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="userModalLabel">Thêm khách hàng</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
                         </div>
+                        <div class="modal-body">
+                            <input type="hidden" id="userId" name="UserId" />
+                            <input type="hidden" id="createdDate" name="CreatedDate" />
 
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" name="Email" id="email" class="form-control" />
-                           
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="fullName" class="form-label">Họ và tên</label>
+                                        <input type="text" name="FullName" id="fullName" class="form-control" />
+                                        <span id="fullNameError" class="text-danger"></span>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="username" class="form-label">Username</label>
+                                        <input type="text" name="Username" id="username" class="form-control" />
+                                        <span id="usernameError" class="text-danger"></span>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="email" class="form-label">Email</label>
+                                        <input type="email" name="Email" id="email" class="form-control" />                                       
+                                        <span id="emailError" class="text-danger"></span>
+                                    </div>
+                                    <div class="mb-3" id="passwordGroup">
+                                        <label for="password">Mật khẩu</label>
+                                        <input type="password" id="password" name="Password" class="form-control" />
+                                        <span id="passwordError" class="text-danger"></span>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="phoneNumber" class="form-label">Số điện thoại</label>
+                                        <input type="tel" name="PhoneNumber" id="phoneNumber" class="form-control" />
+                                        <span id="phoneNumberError" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="address" class="form-label">Địa chỉ</label>
+                                        <textarea name="Address" id="address" class="form-control" rows="3"></textarea>
+                                        <span id="addressError" class="text-danger"></span>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="birthDate" class="form-label">Ngày sinh</label>
+                                        <input type="date" name="BirthDate" id="birthDate" class="form-control" />
+                                        <span id="birthDateError" class="text-danger"></span>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="gender" class="form-label">Giới tính</label>
+                                        <select name="Gender" id="gender" class="form-select">
+                                            <option value="">Chọn giới tính</option>
+                                            <option value="Nam">Nam</option>
+                                            <option value="Nữ">Nữ</option>
+                                            <option value="Khác">Khác</option>
+                                        </select>
+                                        <span id="genderError" class="text-danger"></span>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="roleId" class="form-label">Vai trò</label>
+                                        <select name="RoleId" id="roleId" class="form-select">
+                                            <option value="">Chọn Role</option>
+                                            <option value="1">1 - Khách hàng</option>
+                                            <option value="2">2 - Nhân viên</option>
+                                            <option value="3">3 - Admin</option>
+                                        </select>
+                                        <span id="roleIdError" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-
-                        <div class="mb-3" id="passwordGroup">
-                            <label for="password">Mật khẩu</label>
-                            <input type="password" id="password" name="Password" class="form-control" />
-                            
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                            <button type="submit" class="btn btn-primary" id="submitBtn">Lưu</button>
                         </div>
+                    </form>
 
-                        <div class="mb-3">
-                            <label for="phoneNumber" class="form-label">Số điện thoại</label>
-                            <input type="tel" name="PhoneNumber" id="phoneNumber" class="form-control" />
-                            
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="address" class="form-label">Địa chỉ</label>
-                            <textarea name="Address" id="address" class="form-control" rows="2"></textarea>
-                           
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="birthDate" class="form-label">Ngày sinh</label>
-                            <input type="date" name="BirthDate" id="birthDate" class="form-control" />
-                            
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="gender" class="form-label">Giới tính</label>
-
-                            <select name="Gender" id="gender" class="form-select">
-                                <option value="">Chọn giới tính</option>
-                                <option value="Nam">Nam</option>
-                                <option value="Nữ">Nữ</option>
-                                <option value="Khác">Khác</option>
-
-                            </select>                           
-                        </div>
-                        <div class="mb-3">
-                            <label for="roleId" class="form-label">Vai trò</label>
-                            <select name="RoleId" id="roleId" class="form-select">
-                                <option value="">Chọn Role</option>
-                                <option value="1">1 - Khách hàng</option>
-                                <option value="2">2 - Nhân viên</option>
-                                <option value="3">3 - Admin</option>
-                            </select>
-                          
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                        <button type="submit" class="btn btn-primary" id="submitBtn">Lưu</button>
-                    </div>
-                    @* Thêm phần xác thực *@
-                    @* @section Scripts {
-                        <partial name="_ValidationScriptsPartial" />
-                    } *@
-                </form>
+                    <script>
+                        // Gắn sự kiện submit vào form
+                        document.addEventListener("DOMContentLoaded", function () {
+                            const form = document.getElementById("userForm");
+                            form.addEventListener("submit", function (e) {
+                                if (!validateUserForm()) {
+                                    e.preventDefault();
+                                }
+                            });
+                        });
+                    </script>
+                </div>
             </div>
         </div>
     </div>
 
+
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/ValidUser.js"></script>
+
     <script>
         function openUserModal(mode, userData = null) {
         const isEdit = mode === "edit";
