@@ -2,7 +2,7 @@
 {
     public class Color
     {
-        public int ColorID { get; set; }
+        public int ColorId { get; set; }
         public string ColorName { get; set; }
 
         // Navigation

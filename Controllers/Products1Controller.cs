@@ -16,9 +16,9 @@ namespace DATN.Controllers
 {
     public class Products1Controller : Controller
     {
-        private readonly AppDbContext _context;
+        private readonly DatnContext _context;
 
-        public Products1Controller(AppDbContext context)
+        public Products1Controller(DatnContext context)
         {
             _context = context;
         }
@@ -51,7 +51,7 @@ namespace DATN.Controllers
 
             var product = await _context.Products
                 .Include(p => p.Category) // Nếu có navigation property
-                .FirstOrDefaultAsync(m => m.ProductID == id);
+                .FirstOrDefaultAsync(m => m.ProductId == id);
 
             if (product == null) return NotFound();
 
@@ -121,7 +121,7 @@ namespace DATN.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Product product, IFormFile ImageFile)
         {
-            if (id != product.ProductID) return NotFound();
+            if (id != product.ProductId) return NotFound();
 
             if (ModelState.IsValid)
             {
@@ -177,7 +177,7 @@ namespace DATN.Controllers
 
             var product = await _context.Products
                 .Include(p => p.Category) // nếu có navigation property
-                .FirstOrDefaultAsync(m => m.ProductID == id);
+                .FirstOrDefaultAsync(m => m.ProductId == id);
 
             if (product == null) return NotFound();
 
@@ -213,7 +213,7 @@ namespace DATN.Controllers
                 .OrderBy(c => c.CategoryName)
                 .Select(c => new SelectListItem
                 {
-                    Value = c.CategoryID.ToString(),
+                    Value = c.CategoryId.ToString(),
                     Text = c.CategoryName
                 })
                 .ToList();

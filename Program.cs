@@ -6,7 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 // ✅ Đăng ký DbContext cho Entity Framework Core
-builder.Services.AddDbContext<AppDbContext>(options =>
+builder.Services.AddDbContext<DatnContext>(options =>
     options.UseSqlServer(connectionString));
 
 // ✅ Đăng ký MVC

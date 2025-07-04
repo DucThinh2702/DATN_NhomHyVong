@@ -19,7 +19,7 @@
             <p><strong>Kích thước:</strong> @Model.Size?.SizeName</p>
             <p><strong>Tồn kho:</strong> @Model.Stock</p>
             <p><strong>Trạng thái:</strong> @Model.Status</p>
-            <p><strong>Giá bán:</strong> @Model.SalePrice?.ToString("N0") ₫</p>
+            <p><strong>Giá bán:</strong> @Model.SalePrice.ToString("N0") ₫</p>
             <p>
                 <strong>Ảnh:</strong>
                 @if (!string.IsNullOrEmpty(Model.ThumbnailImage))
@@ -35,7 +35,7 @@
     </div>
 
     <form asp-action="DeleteConfirmed">
-        <input type="hidden" asp-for="VariantID" />
+        <input type="hidden" asp-for="VariantId" />
         <button type="submit" class="btn btn-danger">
             <i class="bi bi-trash"></i> Xóa biến thể
         </button>

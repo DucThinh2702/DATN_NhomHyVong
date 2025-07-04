@@ -51,12 +51,12 @@
         <div class="row">
             <!-- Danh mục -->
             <div class="col-md-6 mb-3">
-                <label asp-for="CategoryID" class="form-label">Danh mục</label>
-                @Html.DropDownListFor(model => model.CategoryID,
+                <label asp-for="CategoryId" class="form-label">Danh mục</label>
+                @Html.DropDownListFor(model => model.CategoryId,
                          new SelectList(ViewBag.Categories, "Value", "Text"),
                          "-- Chọn danh mục --",
                          new { @class = "form-select" })
-                <span asp-validation-for="CategoryID" class="text-danger"></span>
+                <span asp-validation-for="CategoryId" class="text-danger"></span>
             </div>
 
             <div class="row">

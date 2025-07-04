@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = "Chi tiết sản phẩm";
 }
+<div class="main-content" id="mainContent">
 
 <h1 class="mb-4">Chi tiết sản phẩm</h1>
 
@@ -39,7 +40,7 @@
                     <strong>Kích thước:</strong> @(string.IsNullOrEmpty(Model.Size) ? "Chưa có" : Model.Size) <br />
                     <strong>Màu sắc:</strong> @(string.IsNullOrEmpty(Model.Color) ? "Chưa có" : Model.Color) <br />
                     <strong>Chất liệu:</strong> @(string.IsNullOrEmpty(Model.Material) ? "Chưa có" : Model.Material) <br />
-                    <strong>Danh mục (ID):</strong> @Model.CategoryID
+                    <strong>Danh mục (ID):</strong> @Model.CategoryId
                 </p>
 
                 <p class="card-text">
@@ -67,4 +68,5 @@
             </div>
         </div>
     </div>
+</div>
 </div>

@@ -4,14 +4,15 @@ using DATN.Data;
 using DATN.Models;
 using System.Linq;
 using System.Threading.Tasks;
+using DATN.Models.ViewModels;
 
 namespace DATN.Controllers
 {
     public class AdminController : Controller
     {
-        private readonly AppDbContext _context;
+        private readonly DatnContext _context;
 
-        public AdminController(AppDbContext context)
+        public AdminController(DatnContext context)
         {
             _context = context;
         }
@@ -42,10 +43,7 @@ namespace DATN.Controllers
             return View(products);
         }
 
-        public IActionResult Index()
-        {
-            _context = context;
-        }
+        
         public async Task<IActionResult> Index()
         {
             var now = DateTime.Now;
@@ -79,19 +77,25 @@ namespace DATN.Controllers
                         TrangThai = o.OrderStatus
                     }).ToListAsync(),
 
-                SanPhamBanChay = await _context.OrderDetails
-                    .Include(od => od.Product).ThenInclude(p => p.Category)
-                    .GroupBy(od => new { od.Product.ProductName, od.Product.Category.CategoryName })
-                    .Select(g => new SanPhamBanChayDto
-                    {
-                        TenSanPham = g.Key.ProductName,
-                        DanhMuc = g.Key.CategoryName,
-                        SoLuongBan = g.Sum(x => (int?)x.Quantity) ?? 0,
-                        DoanhThu = g.Sum(x => (decimal?)x.TotalPrice) ?? 0
-                    })
-                    .OrderByDescending(x => x.SoLuongBan)
-                    .Take(5)
-                    .ToListAsync(),
+                SanPhamBanChay = await (
+    from od in _context.OrderDetails
+    join v in _context.ProductVariants on od.VariantId equals v.VariantId
+    join p in _context.Products on v.ProductId equals p.ProductId
+    join c in _context.Categories on p.CategoryId equals c.CategoryId into cat
+    from c in cat.DefaultIfEmpty()
+    group od by new { p.ProductName, c.CategoryName } into g
+    select new SanPhamBanChayDto
+    {
+        TenSanPham = g.Key.ProductName,
+        DanhMuc = g.Key.CategoryName,
+        SoLuongBan = g.Sum(x => (int?)x.Quantity) ?? 0,
+        DoanhThu = g.Sum(x => (decimal?)x.TotalPrice) ?? 0
+    }
+)
+.OrderByDescending(x => x.SoLuongBan)
+.Take(5)
+.ToListAsync(),
+
 
                 LabelsDoanhThu = Enumerable.Range(0, 7)
                     .Select(i => DateTime.Today.AddDays(-6 + i).ToString("dd/MM"))

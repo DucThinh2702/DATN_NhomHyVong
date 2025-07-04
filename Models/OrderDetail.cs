@@ -20,4 +20,7 @@ public partial class OrderDetail
     public virtual Order? Order { get; set; }
 
     public virtual Product? Product { get; set; }
+    public virtual ProductVariant? Variant { get; set; }
+    public int? VariantId { get; set; }
+
 }

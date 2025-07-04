@@ -43,7 +43,7 @@
                             @foreach (var p in ViewBag.LowStockProducts)
                             {
                                 <li>
-                                    <a class="dropdown-item" href="@Url.Action("Edit", new { id = p.ProductID })">
+                                    <a class="dropdown-item" href="@Url.Action("Edit", new { id = p.ProductId })">
                                         @p.ProductName - còn @p.Stock
                                     </a>
                                 </li>

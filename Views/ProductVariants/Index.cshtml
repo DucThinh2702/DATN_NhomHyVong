@@ -54,7 +54,7 @@
                                 foreach (var item in lowStockList)
                                 {
                                     <li>
-                                        <a class="dropdown-item low-stock-item" href="@Url.Action("Edit", new { id = item.VariantID })" data-product="@item.Product?.ProductName" data-stock="@item.Stock">
+                                        <a class="dropdown-item low-stock-item" href="@Url.Action("Edit", new { id = item.VariantId })" data-product="@item.Product?.ProductName" data-stock="@item.Stock">
                                             @item.Product?.ProductName - còn @item.Stock
                                         </a>
                                     </li>
@@ -163,12 +163,12 @@
                                     <tr>
                                         <td>
                                             <strong>@item.Product?.ProductName</strong><br />
-                                            <small class="text-muted">ID: @item.VariantID</small>
+                                            <small class="text-muted">ID: @item.VariantId</small>
                                         </td>
                                         <td>@item.SKU</td>
                                         <td>@item.Color?.ColorName</td>
                                         <td>@item.Size?.SizeName</td>
-                                        <td>@item.SalePrice?.ToString("N0") ₫</td>
+                                        <td>@item.SalePrice.ToString("N0") ₫</td>
                                         <td>@item.Stock</td>
                                         <td>
                                             @if (item.Stock == 0)
@@ -187,12 +187,12 @@
                                         </td>
                                         <td class="text-center">
                                             <div class="d-inline-flex border rounded overflow-hidden">
-                                                <a asp-action="Edit" asp-route-id="@item.VariantID"
+                                                <a asp-action="Edit" asp-route-id="@item.VariantId"
                                                    class="text-warning d-flex align-items-center justify-content-center px-2 py-1 border-end"
                                                    title="Sửa">
                                                     <i class="fa-solid fa-pen-to-square"></i>
                                                 </a>
-                                                <a asp-action="Delete" asp-route-id="@item.VariantID"
+                                                <a asp-action="Delete" asp-route-id="@item.VariantId"
                                                    class="text-danger d-flex align-items-center justify-content-center px-2 py-1"
                                                    title="Xóa">
                                                     <i class="fa-solid fa-trash"></i>

@@ -39,10 +39,12 @@ public partial class DatnContext : DbContext
     public virtual DbSet<Role> Roles { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
-
+    public virtual DbSet<Size> Sizes { get; set; }
+    public virtual DbSet<Color> Colors { get; set; }
+    public virtual DbSet<ProductVariant> ProductVariants { get; set; }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Data Source=DUCTHINH;Initial Catalog=DATN;Integrated Security=True;TrustServerCertificate=True");
+        => optionsBuilder.UseSqlServer("Data Source=DUCTHINH;Initial Catalog=DATN1;Integrated Security=True;TrustServerCertificate=True");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -277,6 +279,51 @@ public partial class DatnContext : DbContext
             entity.HasOne(d => d.Role).WithMany(p => p.Users)
                 .HasForeignKey(d => d.RoleId)
                 .HasConstraintName("FK__Users__RoleID__3D5E1FD2");
+
+
+
+
+            modelBuilder.Entity<Color>(entity =>
+            {
+                entity.HasKey(e => e.ColorId);  // Khóa chính
+                entity.Property(e => e.ColorName).HasMaxLength(50).IsRequired();  // Tên màu
+            });
+
+            modelBuilder.Entity<Size>(entity =>
+            {
+                entity.HasKey(e => e.SizeId);  // Khóa chính
+                entity.Property(e => e.SizeName).HasMaxLength(50).IsRequired();  // Tên kích thước
+            });
+
+            modelBuilder.Entity<ProductVariant>(entity =>
+            {
+                entity.HasKey(e => e.VariantId);  // Khóa chính
+                entity.Property(e => e.SKU).HasMaxLength(100);  // SKU sản phẩm
+                entity.Property(e => e.Stock).HasColumnType("int");  // Số lượng tồn kho
+                entity.Property(e => e.SalePrice).HasColumnType("decimal(18, 2)");  // Giá bán
+                entity.Property(e => e.OriginalPrice).HasColumnType("decimal(18, 2)");  // Giá gốc
+                entity.Property(e => e.ThumbnailImage).HasMaxLength(225);  // Hình ảnh sản phẩm
+                entity.Property(e => e.Status).HasMaxLength(50);  // Trạng thái
+
+                // Mối quan hệ với các bảng khác
+                entity.HasOne(d => d.Product)
+                    .WithMany(p => p.ProductVariants)
+                    .HasForeignKey(d => d.ProductId)
+                    .HasConstraintName("FK_ProductVariants_Products");
+
+                entity.HasOne(d => d.Color)
+                    .WithMany(p => p.ProductVariants)
+                    .HasForeignKey(d => d.ColorId)
+                    .HasConstraintName("FK_ProductVariants_Colors");
+
+                entity.HasOne(d => d.Size)
+                    .WithMany(p => p.ProductVariants)
+                    .HasForeignKey(d => d.SizeId)
+                    .HasConstraintName("FK_ProductVariants_Sizes");
+
+                // Thêm chỉ mục duy nhất cho Product, Color, Size
+                entity.HasIndex(e => new { e.ProductId, e.ColorId, e.SizeId }).IsUnique();
+            });
         });
 
         OnModelCreatingPartial(modelBuilder);

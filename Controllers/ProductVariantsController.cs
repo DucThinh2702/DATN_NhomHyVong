@@ -8,9 +8,9 @@ namespace DATN.Controllers
 {
     public class ProductVariantsController : Controller
     {
-        private readonly AppDbContext _context;
+        private readonly DatnContext _context;
 
-        public ProductVariantsController(AppDbContext context)
+        public ProductVariantsController(DatnContext context)
         {
             _context = context;
         }
@@ -58,7 +58,7 @@ namespace DATN.Controllers
                 .Include(v => v.Product)
                 .Include(v => v.Color)
                 .Include(v => v.Size)
-                .FirstOrDefaultAsync(m => m.VariantID == id);
+                .FirstOrDefaultAsync(m => m.VariantId == id);
 
             if (variant == null) return NotFound();
 
@@ -106,7 +106,7 @@ namespace DATN.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, ProductVariant variant)
         {
-            if (id != variant.VariantID) return NotFound();
+            if (id != variant.VariantId) return NotFound();
 
             if (ModelState.IsValid)
             {
@@ -117,9 +117,9 @@ namespace DATN.Controllers
                     if (existingVariant == null) return NotFound();
 
                     // Cập nhật các trường
-                    existingVariant.ProductID = variant.ProductID;
-                    existingVariant.ColorID = variant.ColorID;
-                    existingVariant.SizeID = variant.SizeID;
+                    existingVariant.ProductId = variant.ProductId;
+                    existingVariant.ColorId = variant.ColorId;
+                    existingVariant.SizeId = variant.SizeId;
                     existingVariant.SKU = variant.SKU;
                     existingVariant.Stock = variant.Stock;
                     existingVariant.SalePrice = variant.SalePrice;
@@ -135,7 +135,7 @@ namespace DATN.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!VariantExists(variant.VariantID)) return NotFound();
+                    if (!VariantExists(variant.VariantId)) return NotFound();
                     else throw;
                 }
                 return RedirectToAction(nameof(Index));
@@ -155,7 +155,7 @@ namespace DATN.Controllers
                 .Include(v => v.Product)
                 .Include(v => v.Color)
                 .Include(v => v.Size)
-                .FirstOrDefaultAsync(m => m.VariantID == id);
+                .FirstOrDefaultAsync(m => m.VariantId == id);
 
             if (variant == null) return NotFound();
 
@@ -179,7 +179,7 @@ namespace DATN.Controllers
 
         private bool VariantExists(int id)
         {
-            return _context.ProductVariants.Any(e => e.VariantID == id);
+            return _context.ProductVariants.Any(e => e.VariantId == id);
         }
 
         /// <summary>
@@ -190,21 +190,21 @@ namespace DATN.Controllers
             ViewBag.Products = _context.Products
                 .Select(p => new SelectListItem
                 {
-                    Value = p.ProductID.ToString(),
+                    Value = p.ProductId.ToString(),
                     Text = p.ProductName
                 }).ToList();
 
             ViewBag.Colors = _context.Colors
                 .Select(c => new SelectListItem
                 {
-                    Value = c.ColorID.ToString(),
+                    Value = c.ColorId.ToString(),
                     Text = c.ColorName
                 }).ToList();
 
             ViewBag.Sizes = _context.Sizes
                 .Select(s => new SelectListItem
                 {
-                    Value = s.SizeID.ToString(),
+                    Value = s.SizeId.ToString(),
                     Text = s.SizeName
                 }).ToList();
         }

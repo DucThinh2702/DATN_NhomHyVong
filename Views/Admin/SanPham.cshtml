@@ -56,7 +56,7 @@
                                 @foreach (var p in ViewBag.LowStockProducts)
                                 {
                                     <li>
-                                        <a class="dropdown-item" href="@Url.Action("Edit", new { id = p.ProductID })">
+                                        <a class="dropdown-item" href="@Url.Action("Edit", new { id = p.ProductId })">
                                             @p.ProductName - còn @p.Stock
                                         </a>
                                     </li>
@@ -203,7 +203,7 @@
                                         </td>
                                         <td>
                                             <strong>@item.ProductName</strong><br />
-                                            <small class="text-muted">SKU: BAG-@item.ProductID</small>
+                                            <small class="text-muted">SKU: BAG-@item.ProductId</small>
                                         </td>
                                         @* <td>@item.Category?.CategoryName</td> *@
                                         <td>@item.SalePrice.ToString("N0") ₫</td>
@@ -227,17 +227,17 @@
                                         <td>@item.CreatedDate.ToString("dd/MM/yyyy")</td>
                                         <td class="text-center">
                                             <div class="d-inline-flex border rounded overflow-hidden">
-                                                <a asp-controller="Products1" asp-action="Details" asp-route-id="@item.ProductID"
+                                                <a asp-controller="Products1" asp-action="Details" asp-route-id="@item.ProductId"
                                                    class="text-primary d-flex align-items-center justify-content-center px-2 py-1 border-end"
                                                    title="Xem">
                                                     <i class="fa-solid fa-eye"></i>
                                                 </a>
-                                                <a asp-controller="Products1" asp-action="Edit" asp-route-id="@item.ProductID"
+                                                <a asp-controller="Products1" asp-action="Edit" asp-route-id="@item.ProductId"
                                                    class="text-warning d-flex align-items-center justify-content-center px-2 py-1 border-end"
                                                    title="Sửa">
                                                     <i class="fa-solid fa-pen-to-square"></i>
                                                 </a>
-                                                <a asp-controller="Products1" asp-action="Delete" asp-route-id="@item.ProductID"
+                                                <a asp-controller="Products1" asp-action="Delete" asp-route-id="@item.ProductId"
                                                    class="text-danger d-flex align-items-center justify-content-center px-2 py-1"
                                                    title="Xóa">
                                                     <i class="fa-solid fa-trash"></i>
