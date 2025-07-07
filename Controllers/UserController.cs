@@ -2,7 +2,9 @@
 using DATN.Models;
 using DATN.Service;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -33,23 +35,42 @@ namespace DATN.Controllers
             }
         }
         [HttpPost]
-        public async Task<IActionResult> CreateUser(User user)
+        public async Task<IActionResult> CreateUser([Bind("FullName,Username,Email,Password,Gender,BirthDate,PhoneNumber,Address")] User user)
         {
-            if (!ModelState.IsValid)
-                return View("KhachHang", user); // Nếu bạn dùng View chung để hiển thị lại form
+            // Kiểm tra thủ công và gom lỗi
+            var errorMessages = new List<string>();
+
+            if (!string.IsNullOrEmpty(user.Email) && await _usersRepository.IsEmailExistsAsync(user.Email))
+                errorMessages.Add("Email đã tồn tại");
+
+            if (!string.IsNullOrEmpty(user.Username) && await _usersRepository.IsUsernameExistsAsync(user.Username))
+                errorMessages.Add("Username đã tồn tại");
+
+            if (!string.IsNullOrEmpty(user.PhoneNumber) && await _usersRepository.IsPhoneNumberExistsAsync(user.PhoneNumber))
+                errorMessages.Add("Số điện thoại đã tồn tại");
+
+            if (errorMessages.Count > 0)
+            {
+                ViewBag.FormSubmitted = true;
+                ViewBag.HasErrors = true;
+                ViewBag.ErrorMessages = errorMessages;
+                return View("~/Views/Admin/KhachHang.cshtml", user);
+            }
 
             try
             {
                 await _usersRepository.CreateUser(user);
-                return RedirectToAction("KhachHang");
+                return RedirectToAction("KhachHang", "Admin");
             }
             catch (InvalidOperationException ex)
             {
-                // Thêm lỗi vào ModelState để hiển thị trên View
-                ModelState.AddModelError(string.Empty, ex.Message);
-                return View("KhachHang", user);
+                ViewBag.FormSubmitted = true;
+                ViewBag.HasErrors = true;
+                ViewBag.ErrorMessages = new List<string> { ex.Message };
+                return View("~/Views/Admin/KhachHang.cshtml", user);
             }
         }
+
 
         [HttpGet]
         public async Task<IActionResult> GetUserById(int id)
@@ -90,10 +111,24 @@ namespace DATN.Controllers
         [HttpPost]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
-            if (_usersRepository.EmailExists(model.Email ?? "Sai email"))
+            // Kiểm tra thủ công và gom lỗi
+            var errorMessages = new List<string>();
+
+            if (!string.IsNullOrEmpty(model.Email) && await _usersRepository.IsEmailExistsAsync(model.Email))
+                errorMessages.Add("Email đã tồn tại");
+
+            if (!string.IsNullOrEmpty(model.Username) && await _usersRepository.IsUsernameExistsAsync(model.Username))
+                errorMessages.Add("Username đã tồn tại");
+
+            if (!string.IsNullOrEmpty(model.PhoneNumber) && await _usersRepository.IsPhoneNumberExistsAsync(model.PhoneNumber))
+                errorMessages.Add("Số điện thoại đã tồn tại");
+
+            if (errorMessages.Count > 0)
             {
-                ModelState.AddModelError("Email", "Email đã được sử dụng.");
-                return View(model);
+                ViewBag.FormSubmitted = true;
+                ViewBag.HasErrors = true;
+                ViewBag.ErrorMessages = errorMessages;
+                return View("~/Views/User/DangKy.cshtml", model);
             }
 
             var user = new User
@@ -110,24 +145,59 @@ namespace DATN.Controllers
                 CreatedDate = DateTime.Now,
                 Status = true
             };
+            try
+            {
+                await _usersRepository.RegisterAsync(user);
+                return RedirectToAction("DangKy", "User");
+            }
+            catch (InvalidOperationException ex)
+            {
 
-            await _usersRepository.RegisterAsync(user);
-
-            return RedirectToAction("Index", "Admin");
+                ViewBag.FormSubmitted = true;
+                ViewBag.HasErrors = true;
+                 ViewBag.ErrorMessages = new List<string> { ex.Message };
+                return View("~/Views/User/DangKy.cshtml", model);
+            }
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateUser(User user)
+        public async Task<IActionResult> UpdateUser([Bind("UserId,FullName,Username,Email,Gender,BirthDate,PhoneNumber,Address,RoleId,Status")] User user)
         {
-
             if (user == null)
             {
                 return BadRequest("User cannot be null");
             }
+            var errorMessagesUpdate = new List<string>();
+            //Isemailexistasync có id
+            if (!string.IsNullOrEmpty(user.Email) && await _usersRepository.IsEmailExistsAsync(user.Email, user.UserId))
+                errorMessagesUpdate.Add("Email đã tồn tại");
 
-            await _usersRepository.UpdateUser(user);
+            if (!string.IsNullOrEmpty(user.Username) && await _usersRepository.IsUsernameExistsAsync(user.Username, user.UserId))
+                errorMessagesUpdate.Add("Username đã tồn tại");
 
-            return RedirectToAction("Index", "Admin");
+            if (!string.IsNullOrEmpty(user.PhoneNumber) && await _usersRepository.IsPhoneNumberExistsAsync(user.PhoneNumber, user.UserId))
+                errorMessagesUpdate.Add("Số điện thoại đã tồn tại");
+
+
+            if (errorMessagesUpdate.Count > 0)
+            {
+                ViewBag.FormSubmitted = true;
+                ViewBag.HasErrors = true;
+                ViewBag.ErrorMessages = errorMessagesUpdate;
+                return View("~/Views/Admin/KhachHang.cshtml", user);
+            }
+            try
+            {
+                await _usersRepository.UpdateUser(user);
+                return RedirectToAction("KhachHang", "Admin");
+            }
+            catch (ValidationException ex)
+            {
+                ViewBag.FormSubmitted = true;
+                ViewBag.HasErrors = true;
+                ViewBag.ErrorMessages = new List<string> { ex.Message};
+                return View("~/Views/Admin/KhachHang.cshtml", user);
+            }
         }
 
         [HttpPost]

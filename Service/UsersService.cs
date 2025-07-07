@@ -16,7 +16,13 @@ namespace DATN.Service
 
         public async Task<IEnumerable<User>> GetAllUsers()
         {
-            return await _context.Users.AsNoTracking().ToListAsync();
+            return await _context.Users
+                .Include(u => u.Orders!)
+                .ToListAsync();
+        }
+        public async Task<int> CountUsersAsync()
+        {
+            return await _context.Users.CountAsync();
         }
 
         public async Task<User> CreateUser(User user)
@@ -31,7 +37,12 @@ namespace DATN.Service
 
             if (existingUser != null)
             {
-                throw new InvalidOperationException("Email, Username hoặc Số điện thoại đã tồn tại.");
+                if (existingUser.Email == user.Email)
+                    throw new InvalidOperationException("Email đã tồn tại");
+                if (existingUser.Username == user.Username)
+                    throw new InvalidOperationException("Username đã tồn tại");
+                if (existingUser.PhoneNumber == user.PhoneNumber)
+                    throw new InvalidOperationException("Số điện thoại đã tồn tại");
             }
 
             // Bắt buộc phải có Password
@@ -86,6 +97,20 @@ namespace DATN.Service
                 ?? throw new KeyNotFoundException($"User with fullname {fullname} not found.");
             return user;
         }
+        public async Task<bool> IsEmailExistsAsync(string email)
+        {
+            return await _context.Users.AnyAsync(u => u.Email == email);
+        }
+
+        public async Task<bool> IsUsernameExistsAsync(string username)
+        {
+            return await _context.Users.AnyAsync(u => u.Username == username);
+        }
+
+        public async Task<bool> IsPhoneNumberExistsAsync(string phoneNumber)
+        {
+            return await _context.Users.AnyAsync(u => u.PhoneNumber == phoneNumber);
+        }
         public User GetUserByEmail(string email, string pass)
         {
             string hashedPassword = HmacSHA256(pass);
@@ -133,6 +158,20 @@ namespace DATN.Service
             _context.Entry(existingUser).CurrentValues.SetValues(updatedUser);
             await _context.SaveChangesAsync();
         }
+        public async Task<bool> IsEmailExistsAsync(string email, int excludeUserId)
+        {
+            return await _context.Users.AnyAsync(u => u.Email == email && u.UserId != excludeUserId);
+        }
+
+        public async Task<bool> IsUsernameExistsAsync(string username, int excludeUserId)
+        {
+            return await _context.Users.AnyAsync(u => u.Username == username && u.UserId != excludeUserId);
+        }
+
+        public async Task<bool> IsPhoneNumberExistsAsync(string phone, int excludeUserId)
+        {
+            return await _context.Users.AnyAsync(u => u.PhoneNumber == phone && u.UserId != excludeUserId);
+        }
 
         public async Task DeleteUser(int id)
         {
@@ -145,5 +184,6 @@ namespace DATN.Service
         {
             return _context.Users.Any(u => u.Email == email);
         }
+       
     }
 }

@@ -15,5 +15,13 @@ namespace DATN.IRepository
         Task DeleteUser(int id);
         Task<User> RegisterAsync(User user);
         bool EmailExists(string email);
+        Task<bool> IsEmailExistsAsync(string email);
+        Task<bool> IsUsernameExistsAsync(string username);
+        Task<bool> IsPhoneNumberExistsAsync(string phoneNumber);
+        Task<bool> IsEmailExistsAsync(string email,int id);
+        Task<bool> IsUsernameExistsAsync(string username, int id);
+        Task<bool> IsPhoneNumberExistsAsync(string phoneNumber, int id);
+        Task<int> CountUsersAsync();
+
     }
 }

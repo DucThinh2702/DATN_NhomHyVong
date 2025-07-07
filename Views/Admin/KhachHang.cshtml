@@ -1,19 +1,22 @@
 ﻿@model DATN.Models.User
+@using Azure.Core
 @using DATN.Models
 @{
     ViewData["Title"] = "Khách hàng - The Bag Studio Admin";
 }
 @{
-    var users = ViewBag.ListCombinedKH as List<DATN.Models.User>
-             ?? ViewBag.ListSearchKH as List<DATN.Models.User>
-             ?? ViewBag.ListFilterKH as List<DATN.Models.User>
-             ?? ViewBag.ListKH as List<DATN.Models.User>
-             ?? new List<DATN.Models.User>();
+
+    var users = ViewBag.Users as List<User> ?? new();
+    int currentPage = string.IsNullOrEmpty(Context.Request.Query["page"])
+        ? 1
+        : int.Parse(Context.Request.Query["page"]!);
+
+    int totalPages = ViewBag.TotalPages ?? 1;
+    string searchKeyword = ViewBag.SearchKeyword as string ?? "";
+    string currentFilter = ViewBag.CurrentFilter as string ?? "";
+
 }
 
-
-<!DOCTYPE html>
-<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -280,6 +283,7 @@
     <!-- Main Content -->
     <div class="main-content" id="mainContent">
         <!-- Header -->
+
         <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top">
             <div class="container-fluid">
                 <button class="btn btn-outline-secondary me-3" id="sidebarToggle">
@@ -337,7 +341,9 @@
         <!-- Customers Content -->
         <div class="container-fluid">
             <!-- Stats Cards -->
+
             <div class="row mb-4">
+
                 <div class="col-xl-3 col-md-6 mb-4">
                     <div class="card border-left-primary h-100">
                         <div class="card-body">
@@ -475,8 +481,8 @@
                                         </td>
                                         <td>
                                             <span class="badge
-                                                                                            @(user.Orders?.Count() >= 10 ? "bg-warning" :
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          user.Orders?.Count() >= 5 ? "bg-primary" : "bg-success")">
+                                                                                                        @(user.Orders?.Count() >= 10 ? "bg-warning" :
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    user.Orders?.Count() >= 5 ? "bg-primary" : "bg-success")">
                                                 @(user.Orders?.Count() >= 10 ? "VIP" :
                                                                                             user.Orders?.Count() >= 5 ? "Thường xuyên" : "Mới")
                                         </span>
@@ -499,21 +505,19 @@
                                     </td>
                                 </tr>
                                                                 }
+
                             </tbody>
                         </table>
                     </div>
                     <!-- Pagination -->
-                    <nav aria-label="Customers pagination">
+                    <nav>
                         <ul class="pagination justify-content-center">
-                            <li class="page-item disabled">
-                                <a class="page-link" href="#" tabindex="-1">Trước</a>
-                            </li>
-                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                            <li class="page-item"><a class="page-link" href="#">2</a></li>
-                            <li class="page-item"><a class="page-link" href="#">3</a></li>
-                            <li class="page-item">
-                                <a class="page-link" href="#">Sau</a>
-                            </li>
+                            @for (int i = 1; i <= totalPages; i++)
+                            {
+                                <li class="page-item @(i == currentPage ? "active" : "")">
+                                    <a class="page-link" href="?page=@i&searchName=@searchKeyword&filterBy=@currentFilter">@i</a>
+                                </li>
+                            }
                         </ul>
                     </nav>
                     <!-- End-Pagination -->
@@ -523,21 +527,23 @@
         <div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
-                    @if (!ViewData.ModelState.IsValid)
-                    {
-                        <div class="alert alert-danger">
-                            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
-                            {
-                                <div>@error.ErrorMessage</div>
-                            }
-                        </div>
-                    }
                     <form id="userForm" method="post">
                         <div class="modal-header">
                             <h5 class="modal-title" id="userModalLabel">Thêm khách hàng</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
                         </div>
                         <div class="modal-body">
+                            @if (ViewBag.HasErrors == true && ViewBag.ErrorMessages != null)
+                            {
+                                <div class="alert alert-danger">
+                                    <ul>
+                                        @foreach (var err in (List<string>)ViewBag.ErrorMessages)
+                                        {
+                                            <li>@err</li>
+                                        }
+                                    </ul>
+                                </div>
+                            }
                             <input type="hidden" id="userId" name="UserId" />
                             <input type="hidden" id="createdDate" name="CreatedDate" />
 
@@ -555,7 +561,7 @@
                                     </div>
                                     <div class="mb-3">
                                         <label for="email" class="form-label">Email</label>
-                                        <input type="email" name="Email" id="email" class="form-control" />                                       
+                                        <input type="email" name="Email" id="email" class="form-control" />
                                         <span id="emailError" class="text-danger"></span>
                                     </div>
                                     <div class="mb-3" id="passwordGroup">
@@ -622,6 +628,24 @@
                     </script>
                 </div>
             </div>
+            @section Scripts {
+                <script>
+                    $(document).ready(function () {
+                        var showModal = '@(ViewBag.FormSubmitted ?? false)'.toLowerCase() === 'true' &&
+                                        '@(ViewBag.HasErrors ?? false)'.toLowerCase() === 'true';
+
+                        if (showModal) {
+                            $('#userModal').modal('show');
+
+                            // Hiển thị hộp thoại xác nhận sau khi modal hiện ra
+                            setTimeout(function () {
+                                    window.location.href = "/Admin/KhachHang";
+                                
+                            }, 2000); // đợi 2 giây để modal hiển thị xong
+                        }
+                    });
+                </script>
+            }
         </div>
     </div>
 
@@ -630,61 +654,66 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/js/ValidUser.js"></script>
 
+
     <script>
         function openUserModal(mode, userData = null) {
-        const isEdit = mode === "edit";
-        const isView = mode === "view";
-        const form = document.getElementById('userForm');
-        const modalTitle = document.getElementById('userModalLabel');
-        const submitBtn = document.getElementById('submitBtn');
-        const passwordGroup = document.getElementById('passwordGroup');
+            const isEdit = mode === "edit";
+            const isView = mode === "view";
+            const form = document.getElementById('userForm');
+            const modalTitle = document.getElementById('userModalLabel');
+            const submitBtn = document.getElementById('submitBtn');
+            const passwordGroup = document.getElementById('passwordGroup');
 
-        form.reset();
+            if (!form) return;
+            form.reset();
 
-        if ((isEdit || isView) && userData) {
-        modalTitle.textContent = isView ? 'Chi tiết khách hàng' : 'Chỉnh sửa khách hàng';
-        submitBtn.textContent = isView ? '' : 'Cập nhật';
-        form.action = isEdit ? `/User/UpdateUser/${userData.userId}` : '#';
+            if ((isEdit || isView) && userData) {
+                modalTitle.textContent = isView ? 'Chi tiết khách hàng' : 'Chỉnh sửa khách hàng';
+                submitBtn.textContent = isView ? '' : 'Cập nhật';
+                form.action = isEdit ? `/User/UpdateUser/${userData.userId}` : '#';
 
-        document.getElementById('userId').value = userData.userId ?? '';
-        document.getElementById('fullName').value = userData.fullName ?? '';
-        document.getElementById('username').value = userData.username ?? '';
-        document.getElementById('email').value = userData.email ?? '';
-        document.getElementById('phoneNumber').value = userData.phoneNumber ?? '';
-        document.getElementById('address').value = userData.address ?? '';
-        document.getElementById('birthDate').value = userData.birthDate?.split('T')[0] || '';
-        document.getElementById('gender').value = userData.gender ?? '';
-        document.getElementById('roleId').value = userData.roleId ?? '';
-        document.getElementById('createdDate').value = userData.createdDate?.split('T')[0] || '';
-        document.getElementById('password').value = userData.password ?? '';
+                document.getElementById('userId').value = userData.userId ?? '';
+                document.getElementById('fullName').value = userData.fullName ?? '';
+                document.getElementById('username').value = userData.username ?? '';
+                document.getElementById('email').value = userData.email ?? '';
+                document.getElementById('phoneNumber').value = userData.phoneNumber ?? '';
+                document.getElementById('address').value = userData.address ?? '';
+                document.getElementById('birthDate').value = userData.birthDate?.split('T')[0] || '';
+                document.getElementById('gender').value = userData.gender ?? '';
+                document.getElementById('roleId').value = userData.roleId ?? '';
+                document.getElementById('createdDate').value = userData.createdDate?.split('T')[0] || '';
+                document.getElementById('password').value = userData.password ?? '';
 
-        passwordGroup.style.display = 'none';
-        submitBtn.style.display = isView ? 'none' : 'inline-block';
-        toggleReadOnly(isView);
-        } else {
-        modalTitle.textContent = 'Thêm khách hàng mới';
-        submitBtn.textContent = 'Thêm mới';
-        form.action = '/User/CreateUser';
-        passwordGroup.style.display = 'block';
-        submitBtn.style.display = 'inline-block';
-        toggleReadOnly(false);
+                passwordGroup.style.display = 'none';
+                submitBtn.style.display = isView ? 'none' : 'inline-block';
+                toggleReadOnly(isView);
+            } else {
+                modalTitle.textContent = 'Thêm khách hàng mới';
+                submitBtn.textContent = 'Thêm mới';
+                form.action = '/User/CreateUser';
+                passwordGroup.style.display = 'block';
+                submitBtn.style.display = 'inline-block';
+                toggleReadOnly(false);
 
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('createdDate').value = today;
-        }
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('createdDate').value = today;
+            }
 
-        const modal = new bootstrap.Modal(document.getElementById('userModal'));
-        modal.show();
+            const modal = new bootstrap.Modal(document.getElementById('userModal'));
+            modal.show();
         }
 
         function toggleReadOnly(readonly) {
-        const inputs = document.querySelectorAll("#userForm input, #userForm select, #userForm textarea");
-        inputs.forEach(input => {
-        input.readOnly = readonly;
-        input.disabled = readonly;
-        });
+            const inputs = document.querySelectorAll("#userForm input, #userForm select, #userForm textarea");
+            inputs.forEach(input => {
+                input.readOnly = readonly;
+                input.disabled = readonly;
+            });
         }
     </script>
+
+
+
     <script>
             // Sidebar Toggle
             document.getElementById('sidebarToggle').addEventListener('click', function() {
@@ -701,20 +730,6 @@
             if (localStorage.getItem('sidebarCollapsed') === 'true') {
                 document.getElementById('sidebar').classList.add('collapsed');
                 document.getElementById('mainContent').classList.add('expanded');
-            }
-
-            // Logout function
-            function logout() {
-                if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
-                    alert('Đăng xuất thành công!');
-                }
-            }
-
-            // View customer details
-            function viewCustomer(customerId) {
-                document.getElementById('customerDetailContent').innerHTML = content;
-                const modal = new bootstrap.Modal(document.getElementById('customerDetailModal'));
-                modal.show();
             }
 
 
@@ -736,19 +751,19 @@
                     }
                 });
             });
-              document.addEventListener("DOMContentLoaded", function () {
-            const currentPath = window.location.pathname.split("/").pop(); // Lấy tên file cuối
+                   document.addEventListener("DOMContentLoaded", function () {
+            const currentPath = window.location.pathname.toLowerCase();
             const navLinks = document.querySelectorAll(".sidebar .nav-link");
 
             navLinks.forEach(link => {
-                const href = link.getAttribute("href");
-                if (href && currentPath === href) {
+                const href = link.getAttribute("href")?.toLowerCase();
+                if (href && currentPath.startsWith(href)) {
                     link.classList.add("active");
                 } else {
                     link.classList.remove("active");
                 }
             });
         });
+
     </script>
 </body>
-</html>

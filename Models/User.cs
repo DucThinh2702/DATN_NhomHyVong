@@ -45,6 +45,7 @@ public partial class User
 
     [Required(ErrorMessage = "Vai trò không được để trống")]
     public int? RoleId { get; set; } = 1;
+    //public int? CartId {get;set; }
     public virtual Cart? Cart { get; set; }
 
     public virtual ICollection<News>? News { get; set; } = [];

@@ -3,6 +3,7 @@ using DATN.IRepository;
 using DATN.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace DATN.Controllers
 {
@@ -38,54 +39,61 @@ namespace DATN.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> KhachHang(string searchName, string filterBy)
+        public async Task<IActionResult> KhachHang(string? searchName, string? filterBy, int page = 1, int pageSize = 6)
         {
             var listUsers = await _context.GetAllUsers();
-            var result = listUsers;
 
-            // Tìm kiếm
+            // 1. Tìm kiếm
             if (!string.IsNullOrEmpty(searchName))
             {
-                result = result
+                listUsers = listUsers
                     .Where(u => !string.IsNullOrEmpty(u.FullName) &&
                                 u.FullName.Contains(searchName, StringComparison.OrdinalIgnoreCase))
                     .ToList();
 
-                ViewBag.ListSearchKH = result;
             }
+            
 
-            // Lọc
+            // 2. Lọc theo điều kiện
             if (!string.IsNullOrEmpty(filterBy))
             {
                 switch (filterBy.ToLower())
                 {
                     case "money":
-                        result = result.OrderByDescending(u => u.Orders?.Sum(o => o.TotalAmount) ?? 0).ToList();
+                        listUsers = listUsers
+                            .OrderByDescending(u => u.Orders?.Sum(o => o.TotalAmount) ?? 0)
+                            .ToList();
                         break;
                     case "date":
-                        result = result.OrderByDescending(u => u.CreatedDate).ToList();
+                        listUsers = listUsers
+                            .OrderByDescending(u => u.CreatedDate)
+                            .ToList();
                         break;
                 }
-                ViewBag.ListFilterKH = result;
             }
 
-            // Ưu tiên hiển thị danh sách đã xử lý
-            ViewBag.ListCombinedKH = result;
+            // 3. Tổng số bản ghi sau tìm & lọc
+            int totalUsers = listUsers.Count(); // dùng LINQ
+            int totalPages = (int)Math.Ceiling((double)totalUsers / pageSize);
 
-            // Dữ liệu gốc nếu không search/lọc
-            if (string.IsNullOrEmpty(searchName) && string.IsNullOrEmpty(filterBy))
-            {
-                ViewBag.ListKH = listUsers;
-            }
+            // 4. Phân trang
+            var usersPaged = listUsers
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
 
-            // Gửi lại keyword & filter để giữ giao diện
+            // 5. Truyền dữ liệu sang View
+            ViewBag.Users = usersPaged;
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
             ViewBag.SearchKeyword = searchName;
             ViewBag.CurrentFilter = filterBy;
 
             return View();
         }
 
-      
+
+
         public IActionResult KhoHang()
         {
             return View();
