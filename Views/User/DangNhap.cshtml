@@ -1,4 +1,4 @@
-﻿@model DATN.Models.RegisterViewModel
+﻿@model DATN.Models.User
 
 <!DOCTYPE html>
 <html lang="vi">
@@ -27,10 +27,14 @@
     <style>
         /* Màu sắc chủ đạo */
         :root {
-            --primary-color: #F1C40F; /* Vàng chính */
-            --primary-dark: #D4AC0D; /* Vàng đậm cho hover */
-            --dark-color: #343a40; /* Xám đậm cho background */
-            --text-on-yellow: #343a40; /* Chữ trên nền vàng */
+            --primary-color: #F1C40F;
+            /* Vàng chính */
+            --primary-dark: #D4AC0D;
+            /* Vàng đậm cho hover */
+            --dark-color: #343a40;
+            /* Xám đậm cho background */
+            --text-on-yellow: #343a40;
+            /* Chữ trên nền vàng */
         }
 
         /* Phần auth-left (bên trái) */
@@ -64,16 +68,16 @@
             color: var(--text-on-yellow);
             font-weight: 600;
             transition: all 0.3s ease;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
-            .btn-primary:hover {
-                background-color: var(--primary-dark);
-                border-color: var(--primary-dark);
-                color: var(--text-on-yellow);
-                transform: translateY(-2px);
-                box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-            }
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
+            color: var(--text-on-yellow);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
 
         /* Các nút social */
         .btn-facebook {
@@ -82,11 +86,11 @@
             color: white;
         }
 
-            .btn-facebook:hover {
-                background-color: #2d4373;
-                border-color: #2d4373;
-                color: white;
-            }
+        .btn-facebook:hover {
+            background-color: #2d4373;
+            border-color: #2d4373;
+            color: white;
+        }
 
         .btn-google {
             background-color: #db4437;
@@ -94,11 +98,11 @@
             color: white;
         }
 
-            .btn-google:hover {
-                background-color: #c23321;
-                border-color: #c23321;
-                color: white;
-            }
+        .btn-google:hover {
+            background-color: #c23321;
+            border-color: #c23321;
+            color: white;
+        }
 
         /* Focus input */
         .form-control:focus {
@@ -136,13 +140,13 @@
             font-size: 14px;
         }
 
-            .password-toggle:hover {
-                color: var(--primary-color);
-            }
+        .password-toggle:hover {
+            color: var(--primary-color);
+        }
 
-            .password-toggle:focus {
-                outline: none;
-            }
+        .password-toggle:focus {
+            outline: none;
+        }
 
         /* Đảm bảo input có padding phải để không bị che bởi icon */
         .form-group.position-relative .form-control {
@@ -160,31 +164,31 @@
             color: var(--primary-color);
         }
 
-            a:hover {
-                color: var(--primary-dark);
-                text-decoration: none;
-            }
+        a:hover {
+            color: var(--primary-dark);
+            text-decoration: none;
+        }
 
         /* Footer styling */
         .footer-white-text {
             color: white !important;
         }
 
-            .footer-white-text h5 {
-                color: white !important;
-            }
+        .footer-white-text h5 {
+            color: white !important;
+        }
 
-            .footer-white-text p {
-                color: white !important;
-            }
+        .footer-white-text p {
+            color: white !important;
+        }
 
-            .footer-white-text a {
-                color: white !important;
-            }
+        .footer-white-text a {
+            color: white !important;
+        }
 
-                .footer-white-text a:hover {
-                    color: var(--primary-color) !important;
-                }
+        .footer-white-text a:hover {
+            color: var(--primary-color) !important;
+        }
 
         /* Header top bar */
         .bg-secondary {
@@ -196,6 +200,7 @@
 <body>
     <!-- Header Start -->
     <div class="container-fluid">
+       
         <div class="row bg-secondary py-1 px-xl-5">
             <div class="col-lg-6 d-none d-lg-block">
                 <div class="d-inline-flex align-items-center h-100">
@@ -205,16 +210,31 @@
             </div>
             <div class="col-lg-6 text-center text-lg-right">
                 <div class="d-inline-flex align-items-center">
+                    @* TÀI KHOẢN *@
                     <div class="btn-group">
                         <button type="button" class="btn btn-sm btn-light dropdown-toggle" data-toggle="dropdown">
-                            Tài
-                            khoản
+                            Tài khoản
                         </button>
                         <div class="dropdown-menu dropdown-menu-right">
-                            <a class="dropdown-item" href="login.html">Đăng nhập</a>
-                            <a class="dropdown-item" href="register.html">Đăng ký</a>
+                            @if (User.Identity!.IsAuthenticated)
+                            {
+                                <span class="dropdown-item-text">
+                                    Xin chào, @User.Identity.Name
+                                </span>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" asp-controller="User" asp-action="Profile">Hồ sơ</a>
+                                <form method="post" asp-controller="User" asp-action="Logout">
+                                    <button type="submit" class="dropdown-item">Đăng xuất</button>
+                                </form>
+                            }
+                            else
+                            {
+                                <a class="dropdown-item" asp-controller="User" asp-action="DangNhap">Đăng nhập</a>
+                                <a class="dropdown-item" asp-controller="User" asp-action="DangKy">Đăng ký</a>
+                            }
                         </div>
                     </div>
+                    @* END TK *@
                     <div class="btn-group mx-2">
                         <button type="button" class="btn btn-sm btn-light dropdown-toggle" data-toggle="dropdown">
                             Ngôn
@@ -289,8 +309,11 @@
             <!-- Bên phải -->
             <div class="col-md-7 bg-white p-5">
                 <h3 class="text-center text-dark mb-4">Đăng nhập</h3>
-
-                <form asp-action="Login" asp-controller="User" method="post" >
+                @if (!string.IsNullOrEmpty(ViewBag.Message))
+                {
+                    <div class="alert alert-danger">@ViewBag.Message</div>
+                }
+                <form asp-action="Login" asp-controller="User" method="post">
                     <div class="form-group">
                         <label asp-for="Email"></label>
                         <input asp-for="Email" class="form-control" placeholder="Nhập email của bạn" />
@@ -299,20 +322,37 @@
 
                     <div class="form-group position-relative">
                         <label asp-for="Password"></label>
-                        <input asp-for="Password" class="form-control" placeholder="Nhập mật khẩu" />
+                        <input type="password" asp-for="Password" class="form-control" placeholder="Nhập mật khẩu" />
                         <button type="button" class="password-toggle" id="togglePassword">
                             <i class="fas fa-eye"></i>
                         </button>
                         <span class="text-danger" asp-validation-for="Password"></span>
                     </div>
+                    @if (ViewBag.ShowCaptcha == true)
+                    {
+                        <div class="form-group">
+                            <label for="Captcha">Mã xác nhận</label>
+                            <div class="d-flex align-items-center">
+                                <input name="Captcha" class="form-control" placeholder="Nhập mã" style="max-width: 150px;" />
+                                <img src="/Captcha/Generate" alt="CAPTCHA" class="ml-2"
+                                     style="height:40px; cursor:pointer;"
+                                     onclick="this.src='/Captcha/Generate?' + Math.random();"
+                                     title="Bấm để làm mới" />
+                            </div>
+                            <span class="text-danger">
+                                @Html.ValidationMessage("Captcha", "", new { @class = "text-danger" })
+                            </span>
+                        </div>
+                    }
 
-                   @*  <div class="d-flex justify-content-between align-items-center mb-3">
-                        <div class="form-check">
+
+                     <div class="d-flex justify-content-between align-items-center mb-3">
+                        @* <div class="form-check">
                             <input asp-for="RememberMe" class="form-check-input" />
                             <label asp-for="RememberMe" class="form-check-label">Ghi nhớ đăng nhập</label>
-                        </div>
-                        <a href="forgot-password.html" class="text-primary">Quên mật khẩu?</a>
-                    </div> *@
+                        </div> *@
+                        <a href="/User/QuenMatKhau" class="text-primary">Quên mật khẩu?</a>
+                    </div>
 
                     <button type="submit" class="btn btn-primary btn-block mb-3">Đăng nhập</button>
 
@@ -387,8 +427,10 @@
                                 <i class="fa fa-angle-right mr-2"></i>Chi tiết cửa
                                 hàng
                             </a>
-                            <a class="footer-white-text mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Giỏ hàng</a>
-                            <a class="footer-white-text mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Thanh toán</a>
+                            <a class="footer-white-text mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Giỏ
+                                hàng</a>
+                            <a class="footer-white-text mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Thanh
+                                toán</a>
                         </div>
                     </div>
                     <div class="col-md-4 mb-5">
@@ -405,8 +447,10 @@
                             <a class="footer-white-text mb-2" href="register.html">
                                 <i class="fa fa-angle-right mr-2"></i>Đăng ký
                             </a>
-                            <a class="footer-white-text mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Giỏ hàng</a>
-                            <a class="footer-white-text mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Thanh toán</a>
+                            <a class="footer-white-text mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Giỏ
+                                hàng</a>
+                            <a class="footer-white-text mb-2" href="#"><i class="fa fa-angle-right mr-2"></i>Thanh
+                                toán</a>
                         </div>
                     </div>
                     <div class="col-md-4 mb-5">
@@ -421,9 +465,6 @@
                                 </div>
                             </div>
                         </form>
-
-
-                      
 
                         <h6 class="footer-white-text text-uppercase mt-4 mb-3">Theo đổi chúng tôi</h6>
                         <div class="d-flex">
@@ -485,11 +526,11 @@
         });
 
         // Handle social login buttons
-        document.querySelector('.btn-facebook').addEventListener('click', function() {
+        document.querySelector('.btn-facebook').addEventListener('click', function () {
             alert('Tính năng đăng nhập bằng Facebook sẽ được cập nhật sớm!');
         });
 
-        document.querySelector('.btn-google').addEventListener('click', function() {
+        document.querySelector('.btn-google').addEventListener('click', function () {
             alert('Tính năng đăng nhập bằng Google sẽ được cập nhật sớm!');
         });
     </script>

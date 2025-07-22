@@ -35,11 +35,11 @@ public partial class Order
 
     public virtual Promotion? DiscountCodeNavigation { get; set; }
 
-    public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
+    public virtual ICollection<OrderDetail> OrderDetails { get; set; } = [];
 
     public virtual PaymentMethod? PaymentMethod { get; set; }
 
-    public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
+    public virtual ICollection<Payment> Payments { get; set; } = [];
 
     public virtual User? User { get; set; }
 }

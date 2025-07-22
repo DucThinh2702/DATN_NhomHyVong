@@ -1,16 +1,27 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddControllersWithViews();
 builder.Services.AddControllersWithViews().AddSessionStateTempDataProvider();
 
 builder.Services.AddDbContext<DATN.Data.ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.")));
-
 builder.Services.AddScoped<DATN.IRepository.IUsersRepository, DATN.Service.UsersService>();
+builder.Services.AddAuthentication("MyCookieAuth")
+        .AddCookie("MyCookieAuth", options =>
+        {
+            options.LoginPath = "/User/DangNhap";
+            options.LogoutPath = "/User/DangXuat";
+            options.AccessDeniedPath = "/User/KhongDuQuyen"; // ← thêm dòng này
+                                                             // Thời gian sống của cookie
+            options.ExpireTimeSpan = TimeSpan.FromMinutes(60);   // 60 phút
+            options.SlidingExpiration = true;
+            // (Tuỳ chọn) Chỉ gửi cookie qua HTTPS
+            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        });
+
+
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(30); // Set session timeout to 30 minutes
@@ -33,10 +44,12 @@ app.UseStaticFiles();
 
 app.UseRouting();
 app.UseSession();
+app.UseAuthentication(); // <- Bắt
 app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Admin}/{action=Index}/{id?}");
+
 
 app.Run();

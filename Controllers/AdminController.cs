@@ -1,21 +1,19 @@
 ﻿using DATN.Data;
 using DATN.IRepository;
 using DATN.Models;
+using DATN.Service;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 
 namespace DATN.Controllers
 {
-    public class AdminController : Controller
+    public class AdminController(ILogger<AdminController> logger, IUsersRepository context) : Controller
     {
-        private readonly IUsersRepository _context;
-        private readonly ILogger<AdminController> _logger;
-        public AdminController(ILogger<AdminController> logger, IUsersRepository context)
-        {
-            _logger = logger;
-            _context = context;
-        }
+        private readonly IUsersRepository _context = context;
+        private readonly ILogger<AdminController> _logger = logger;
+
         public IActionResult Index()
         {
             return View();
@@ -37,23 +35,22 @@ namespace DATN.Controllers
         {
             return View();
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> KhachHang(string? searchName, string? filterBy, int page = 1, int pageSize = 6)
         {
             var listUsers = await _context.GetAllUsers();
-
+            // Tùy tình huống, có thể delay ở đây
+            
             // 1. Tìm kiếm
             if (!string.IsNullOrEmpty(searchName))
             {
                 listUsers = listUsers
                     .Where(u => !string.IsNullOrEmpty(u.FullName) &&
                                 u.FullName.Contains(searchName, StringComparison.OrdinalIgnoreCase))
-                    .ToList();
-
+                    .ToList()!;
             }
-            
-
+           
             // 2. Lọc theo điều kiện
             if (!string.IsNullOrEmpty(filterBy))
             {
@@ -62,12 +59,12 @@ namespace DATN.Controllers
                     case "money":
                         listUsers = listUsers
                             .OrderByDescending(u => u.Orders?.Sum(o => o.TotalAmount) ?? 0)
-                            .ToList();
+                            .ToList()!;
                         break;
                     case "date":
                         listUsers = listUsers
                             .OrderByDescending(u => u.CreatedDate)
-                            .ToList();
+                            .ToList()!;
                         break;
                 }
             }
@@ -92,8 +89,6 @@ namespace DATN.Controllers
             return View();
         }
 
-
-
         public IActionResult KhoHang()
         {
             return View();
@@ -110,5 +105,35 @@ namespace DATN.Controllers
         {
             return View();
         }
+        [HttpGet]
+        public async Task<JsonResult> IsEmailExists(string email, int? excludeUserId)
+        {
+            bool exists = excludeUserId.HasValue
+                ? await _context.IsEmailExistsAsync(email, excludeUserId.Value)
+                : await _context.IsEmailExistsAsync(email);
+
+            return Json(new { exists });
+        }
+
+        [HttpGet]
+        public async Task<JsonResult> IsUsernameExists(string username, int? excludeUserId)
+        {
+            bool exists = excludeUserId.HasValue
+                ? await _context.IsUsernameExistsAsync(username, excludeUserId.Value)
+                : await _context.IsUsernameExistsAsync(username);
+
+            return Json(new { exists });
+        }
+
+        [HttpGet]
+        public async Task<JsonResult> IsPhoneExists(string phone, int? excludeUserId)
+        {
+            bool exists = excludeUserId.HasValue
+                ? await _context.IsPhoneNumberExistsAsync(phone, excludeUserId.Value)
+                : await _context.IsPhoneNumberExistsAsync(phone);
+
+            return Json(new { exists });
+        }
+
     }
 }

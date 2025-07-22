@@ -1,4 +1,5 @@
-﻿using DATN.Data;
+﻿using DATN.Controllers;
+using DATN.Data;
 using DATN.IRepository;
 using DATN.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -13,12 +14,12 @@ namespace DATN.Service
     {
         //private readonly List<User> _users = new List<User>();
         private readonly ApplicationDbContext _context = context;
-
+        
         public async Task<IEnumerable<User>> GetAllUsers()
         {
-            return await _context.Users
+                return await _context.Users
                 .Include(u => u.Orders!)
-                .ToListAsync();
+                .ToListAsync();       
         }
         public async Task<int> CountUsersAsync()
         {
@@ -111,16 +112,23 @@ namespace DATN.Service
         {
             return await _context.Users.AnyAsync(u => u.PhoneNumber == phoneNumber);
         }
+
         public User GetUserByEmail(string email, string pass)
         {
             string hashedPassword = HmacSHA256(pass);
 
-            var user = _context.Users.FirstOrDefault(u => u.Email == email && u.Password == hashedPassword) 
+            var user = _context.Users
+                .Include(u => u.Role!)
+                .FirstOrDefault(u => u.Email == email && u.Password == hashedPassword)
                 ?? throw new KeyNotFoundException($"Email hoặc mật khẩu không đúng.");
 
             return user;
         }
-
+        public bool IsValidUser(string email, string password)
+        {
+            string hashed = HmacSHA256(password);
+            return _context.Users.Any(u => u.Email == email && u.Password == hashed);
+        }
         private static string HmacSHA256(string input)
         {
             var bytes = Encoding.UTF8.GetBytes(input);
@@ -155,6 +163,20 @@ namespace DATN.Service
                 Password = passwordToUse, // có thể giữ hoặc cập nhật
                 CreatedDate = existingUser.CreatedDate
             };
+            var existingUser2 = await _context.Users.FirstOrDefaultAsync(u =>
+               u.Email == user.Email ||
+               u.Username == user.Username ||
+               u.PhoneNumber == user.PhoneNumber);
+
+            if (existingUser2 != null)
+            {
+                if (existingUser2.Email == user.Email && existingUser2.UserId != user.UserId)
+                    throw new InvalidOperationException("Email đã tồn tại");
+                if (existingUser2.Username == user.Username && existingUser2.UserId != user.UserId)
+                    throw new InvalidOperationException("Username đã tồn tại");
+                if (existingUser2.PhoneNumber == user.PhoneNumber && existingUser2.UserId != user.UserId)
+                    throw new InvalidOperationException("Số điện thoại đã tồn tại");
+            }
             _context.Entry(existingUser).CurrentValues.SetValues(updatedUser);
             await _context.SaveChangesAsync();
         }

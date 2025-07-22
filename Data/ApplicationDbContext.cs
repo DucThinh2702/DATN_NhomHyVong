@@ -14,6 +14,10 @@ namespace DATN.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<User>()
+             .HasOne(u => u.Role)
+             .WithMany(r => r.Users)
+             .HasForeignKey(u => u.RoleId); // Chỉ định đúng khóa ngoại
 
             // Add any additional model configurations here
         }

@@ -1,0 +1,24 @@
+﻿@using DATN.Middleware
+
+
+@{
+    var notification = TempData.GetNotification();
+    var alertClass = "alert-info"; // default
+    if (notification != null)
+    {
+        alertClass = notification.Type switch
+        {
+            "success" => "alert-success",
+            "error" => "alert-danger",
+            "warning" => "alert-warning",
+            _ => "alert-info"
+        };
+    }
+}
+
+@if (notification != null)
+{
+    <div class="alert @alertClass">
+        @notification.Message
+    </div>
+}

@@ -13,7 +13,7 @@ public partial class Cart
 
     public DateTime? LastUpdated { get; set; }
 
-    public virtual ICollection<CartDetail> CartDetails { get; set; } = new List<CartDetail>();
+    public virtual ICollection<CartDetail> CartDetails { get; set; } = [];
 
     public virtual User? User { get; set; }
 }

@@ -43,8 +43,6 @@ public partial class User
 
     public bool? Status { get; set; } = true;
 
-    [Required(ErrorMessage = "Vai trò không được để trống")]
-    public int? RoleId { get; set; } = 1;
     //public int? CartId {get;set; }
     public virtual Cart? Cart { get; set; }
 
@@ -52,5 +50,7 @@ public partial class User
 
     public virtual ICollection<Order>? Orders { get; set; } = [];
 
+    [Required(ErrorMessage = "Vai trò không được để trống")]
+    public int? RoleId { get; set; } 
     public virtual Role? Role { get; set; }
 }

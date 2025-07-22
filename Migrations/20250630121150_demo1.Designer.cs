@@ -13,7 +13,7 @@ namespace DATN.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     [Migration("20250630121150_demo1")]
-    partial class demo1
+    partial class Demo1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

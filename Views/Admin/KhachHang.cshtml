@@ -1,6 +1,7 @@
 ﻿@model DATN.Models.User
-@using Azure.Core
+@* @using Azure.Core *@
 @using DATN.Models
+@using Newtonsoft.Json
 @{
     ViewData["Title"] = "Khách hàng - The Bag Studio Admin";
 }
@@ -13,8 +14,7 @@
 
     int totalPages = ViewBag.TotalPages ?? 1;
     string searchKeyword = ViewBag.SearchKeyword as string ?? "";
-    string currentFilter = ViewBag.CurrentFilter as string ?? "";
-
+    string currentFilter = ViewBag.CurrentFilter as string ?? ""; 
 }
 
 <head>
@@ -101,7 +101,7 @@
             background: linear-gradient(135deg, #1a1d29 0%, #2c3142 100%);
             color: white;
             overflow-y: auto;
-            z-index: 1000;
+            z-index: 888;
             transition: all 0.3s ease;
         }
 
@@ -179,6 +179,33 @@
                 margin-left: 0;
             }
         }
+    </style>
+    <style>      
+        .skiptranslate{
+            display: none !important;
+        }
+        #languageSelector {
+            padding: 6px 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            background-color: #f9f9f9;
+            font-size: 14px;
+            cursor: pointer;
+            color: #333;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg fill='gray' height='12' viewBox='0 0 24 24' width='12' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 12px;
+            padding-right: 30px;
+        }
+
+            #languageSelector:focus {
+                outline: none;
+                border-color: #007bff;
+            }
     </style>
 </head>
 <body>
@@ -288,14 +315,17 @@
             <div class="container-fluid">
                 <button class="btn btn-outline-secondary me-3" id="sidebarToggle">
                     <i class="fas fa-bars"></i>
-                </button>
-
+                </button>               
                 <div>
                     <h4 class="mb-0">Khách hàng</h4>
                     <small class="text-muted">Quản lý thông tin khách hàng</small>
                 </div>
 
                 <div class="d-flex align-items-center ms-auto">
+                    <select id="languageSelector" onchange="changeLanguage(this.value)">
+                        <option value="vi" selected>Tiếng Việt</option>
+                        <option value="en">English</option>
+                    </select>
                     @* Tìm kiếm khách hàng (SEARCH) *@
                     <form method="get" asp-action="KhachHang" asp-controller="Admin">
                         <div class="input-group" style="width: 300px;">
@@ -413,6 +443,7 @@
             <!-- Customers Table -->
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
+                    <div id="google_translate_element" style="display:none;"></div>
                     <h6 class="m-0 font-weight-bold">Danh sách khách hàng</h6>
                     <div class="d-flex">
 
@@ -481,8 +512,8 @@
                                         </td>
                                         <td>
                                             <span class="badge
-                                                                                                        @(user.Orders?.Count() >= 10 ? "bg-warning" :
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    user.Orders?.Count() >= 5 ? "bg-primary" : "bg-success")">
+                                                                                                                        @(user.Orders?.Count() >= 10 ? "bg-warning" :
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            user.Orders?.Count() >= 5 ? "bg-primary" : "bg-success")">
                                                 @(user.Orders?.Count() >= 10 ? "VIP" :
                                                                                             user.Orders?.Count() >= 5 ? "Thường xuyên" : "Mới")
                                         </span>
@@ -571,7 +602,7 @@
                                     </div>
                                     <div class="mb-3">
                                         <label for="phoneNumber" class="form-label">Số điện thoại</label>
-                                        <input type="tel" name="PhoneNumber" id="phoneNumber" class="form-control" />
+                                        <input type="tel" name="PhoneNumber" id="phoneNumber" pattern="[0-9]{7,15}" class="form-control" />
                                         <span id="phoneNumberError" class="text-danger"></span>
                                     </div>
                                 </div>
@@ -617,11 +648,13 @@
 
                     <script>
                         // Gắn sự kiện submit vào form
-                        document.addEventListener("DOMContentLoaded", function () {
+                             document.addEventListener("DOMContentLoaded", function () {
                             const form = document.getElementById("userForm");
-                            form.addEventListener("submit", function (e) {
-                                if (!validateUserForm()) {
-                                    e.preventDefault();
+                            form.addEventListener("submit", async function (e) {
+                                e.preventDefault(); // Chặn mặc định trước
+                                const isValid = await validateUserForm();
+                                if (isValid) {
+                                    form.submit(); // Gửi form thủ công nếu hợp lệ
                                 }
                             });
                         });
@@ -636,16 +669,15 @@
 
                         if (showModal) {
                             $('#userModal').modal('show');
-
-                            // Hiển thị hộp thoại xác nhận sau khi modal hiện ra
+                            // Redirect sau khi modal hiện ra
                             setTimeout(function () {
-                                    window.location.href = "/Admin/KhachHang";
-                                
-                            }, 2000); // đợi 2 giây để modal hiển thị xong
+                                window.location.replace("/Admin/KhachHang");
+                            }, 2000);
                         }
                     });
                 </script>
             }
+
         </div>
     </div>
 
@@ -654,7 +686,34 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/js/ValidUser.js"></script>
 
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+          new google.translate.TranslateElement({
+            pageLanguage: 'vi',
+            includedLanguages: 'en,vi',
+            autoDisplay: false
+          }, 'google_translate_element');
+        }
 
+        function changeLanguage(lang) {
+          const select = document.querySelector("select.goog-te-combo");
+
+          if (!select) return;
+
+          if (lang === 'vi') {
+            // Reset lại về tiếng Việt
+            document.cookie = 'googtrans=/vi/vi;path=/';
+            location.reload();
+          } else {
+            // Dịch sang ngôn ngữ được chọn
+            select.value = lang;
+            select.dispatchEvent(new Event("change"));
+          }
+        }
+    </script>
+
+    <!-- Load Google Translate -->
+    <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
     <script>
         function openUserModal(mode, userData = null) {
             const isEdit = mode === "edit";
@@ -757,6 +816,7 @@
 
             navLinks.forEach(link => {
                 const href = link.getAttribute("href")?.toLowerCase();
+
                 if (href && currentPath.startsWith(href)) {
                     link.classList.add("active");
                 } else {
