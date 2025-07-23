@@ -28,7 +28,7 @@ namespace DATN.Controllers
             {
                 query = query.Where(v =>
                     v.Product.ProductName.Contains(search) ||
-                    v.SKU.Contains(search));
+                    v.Sku.Contains(search));
             }
 
             var variants = await query
@@ -58,7 +58,7 @@ namespace DATN.Controllers
                 .Include(v => v.Product)
                 .Include(v => v.Color)
                 .Include(v => v.Size)
-                .FirstOrDefaultAsync(m => m.VariantID == id);
+                .FirstOrDefaultAsync(m => m.VariantId == id);
 
             if (variant == null) return NotFound();
 
@@ -104,46 +104,52 @@ namespace DATN.Controllers
         // POST: ProductVariants/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, ProductVariant variant)
+        public async Task<IActionResult> Edit(int id, ProductVariant variant, IFormFile ImageFile)
         {
-            if (id != variant.VariantID) return NotFound();
+            if (id != variant.VariantId) return NotFound();
 
-            if (ModelState.IsValid)
+            var existingVariant = await _context.ProductVariants.FindAsync(id);
+            if (existingVariant == null) return NotFound();
+
+            // Cập nhật các trường
+            existingVariant.ProductId = variant.ProductId;
+            existingVariant.ColorId = variant.ColorId;
+            existingVariant.SizeId = variant.SizeId;
+            existingVariant.Sku = variant.Sku;
+            existingVariant.Stock = variant.Stock;
+            existingVariant.SalePrice = variant.SalePrice;
+            existingVariant.OriginalPrice = variant.OriginalPrice;
+            existingVariant.Status = variant.Status;
+            existingVariant.UpdatedDate = DateTime.Now;
+
+            // Nếu có ảnh mới thì lưu
+            if (ImageFile != null && ImageFile.Length > 0)
             {
-                try
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/hinh");
+                Directory.CreateDirectory(uploadsFolder);
+
+                var fileName = Path.GetFileName(ImageFile.FileName);
+                var filePath = Path.Combine(uploadsFolder, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
                 {
-                    // Lấy bản ghi gốc từ DB
-                    var existingVariant = await _context.ProductVariants.FindAsync(id);
-                    if (existingVariant == null) return NotFound();
-
-                    // Cập nhật các trường
-                    existingVariant.ProductID = variant.ProductID;
-                    existingVariant.ColorID = variant.ColorID;
-                    existingVariant.SizeID = variant.SizeID;
-                    existingVariant.SKU = variant.SKU;
-                    existingVariant.Stock = variant.Stock;
-                    existingVariant.SalePrice = variant.SalePrice;
-                    existingVariant.OriginalPrice = variant.OriginalPrice;
-                    existingVariant.ThumbnailImage = variant.ThumbnailImage;
-                    existingVariant.Status = variant.Status;
-
-                    // Chỉ gán UpdatedDate
-                    existingVariant.UpdatedDate = DateTime.Now;
-
-                    _context.Update(existingVariant);
-                    await _context.SaveChangesAsync();
+                    await ImageFile.CopyToAsync(stream);
                 }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!VariantExists(variant.VariantID)) return NotFound();
-                    else throw;
-                }
-                return RedirectToAction(nameof(Index));
+
+                existingVariant.ThumbnailImage = "/hinh/" + fileName;
+            }
+            else
+            {
+                // Nếu không có ảnh mới, giữ ảnh cũ từ hidden input
+                existingVariant.ThumbnailImage = variant.ThumbnailImage;
             }
 
-            LoadSelectLists();
-            return View(variant);
+            _context.Update(existingVariant);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
         }
+
 
 
         // GET: ProductVariants/Delete/5
@@ -155,7 +161,7 @@ namespace DATN.Controllers
                 .Include(v => v.Product)
                 .Include(v => v.Color)
                 .Include(v => v.Size)
-                .FirstOrDefaultAsync(m => m.VariantID == id);
+                .FirstOrDefaultAsync(v => v.VariantId == id);
 
             if (variant == null) return NotFound();
 
@@ -168,45 +174,39 @@ namespace DATN.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var variant = await _context.ProductVariants.FindAsync(id);
-            if (variant != null)
-            {
-                _context.ProductVariants.Remove(variant);
-                await _context.SaveChangesAsync();
-            }
+            if (variant == null) return NotFound();
 
+            _context.ProductVariants.Remove(variant);
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Đã xoá biến thể thành công!";
             return RedirectToAction(nameof(Index));
         }
 
-        private bool VariantExists(int id)
-        {
-            return _context.ProductVariants.Any(e => e.VariantID == id);
-        }
 
-        /// <summary>
-        /// Nạp danh sách dropdown Product, Color, Size
-        /// </summary>
         private void LoadSelectLists()
         {
             ViewBag.Products = _context.Products
                 .Select(p => new SelectListItem
                 {
-                    Value = p.ProductID.ToString(),
+                    Value = p.ProductId.ToString(),
                     Text = p.ProductName
                 }).ToList();
 
             ViewBag.Colors = _context.Colors
                 .Select(c => new SelectListItem
                 {
-                    Value = c.ColorID.ToString(),
+                    Value = c.ColorId.ToString(),
                     Text = c.ColorName
                 }).ToList();
 
             ViewBag.Sizes = _context.Sizes
                 .Select(s => new SelectListItem
                 {
-                    Value = s.SizeID.ToString(),
+                    Value = s.SizeId.ToString(),
                     Text = s.SizeName
                 }).ToList();
         }
+
     }
 }

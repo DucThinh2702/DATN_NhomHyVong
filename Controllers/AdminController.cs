@@ -31,13 +31,13 @@ namespace DATN.Controllers
             var products = await query.ToListAsync();
 
             // Tính toán thống kê
-            ViewBag.TotalCount = products.Count;
-            ViewBag.InStockCount = products.Count(p => p.Stock > 5);
-            ViewBag.LowStockCount = products.Count(p => p.Stock > 0 && p.Stock <= 5);
-            ViewBag.OutOfStockCount = products.Count(p => p.Stock == 0);
+            //ViewBag.TotalCount = products.Count;
+            //ViewBag.InStockCount = products.Count(p => p.Stock > 5);
+            //ViewBag.LowStockCount = products.Count(p => p.Stock > 0 && p.Stock <= 5);
+            //ViewBag.OutOfStockCount = products.Count(p => p.Stock == 0);
 
-            // Sản phẩm sắp hết hàng
-            ViewBag.LowStockProducts = products.Where(p => p.Stock > 0 && p.Stock <= 5).ToList();
+            //// Sản phẩm sắp hết hàng
+            //ViewBag.LowStockProducts = products.Where(p => p.Stock > 0 && p.Stock <= 5).ToList();
 
             return View(products);
         }

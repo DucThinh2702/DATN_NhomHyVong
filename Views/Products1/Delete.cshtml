@@ -1,57 +1,57 @@
-﻿
-@model DATN.Models.Product
+﻿@model DATN.Models.Product
 
 @{
     ViewData["Title"] = "Xóa sản phẩm";
 }
 
-<h1 class="mb-4 text-danger">Xóa sản phẩm</h1>
+<div class="main-content" id="mainContent">
+    <h1 class="mb-4 text-danger">Xóa sản phẩm</h1>
 
-<div class="alert alert-warning">
-    <strong>Bạn có chắc chắn muốn xóa sản phẩm này?</strong>
-    Thao tác này không thể hoàn tác.
-</div>
+    <div class="alert alert-warning">
+        <strong>Bạn có chắc chắn muốn xóa sản phẩm này?</strong>
+        Thao tác này không thể hoàn tác.
+    </div>
 
-<div class="card mb-3">
-    <div class="row g-0">
-        <div class="col-md-3">
-            @if (!string.IsNullOrEmpty(Model.ThumbnailImage))
-            {
-                <img src="@Model.ThumbnailImage" class="img-fluid rounded-start" alt="Ảnh sản phẩm" />
-            }
-            else
-            {
-                <div class="text-muted text-center p-4">Chưa có ảnh</div>
-            }
-        </div>
-        <div class="col-md-9">
-            <div class="card-body">
-                <h5 class="card-title">@Model.ProductName</h5>
-                <p class="card-text"><strong>Mô tả:</strong> @Model.Description</p>
-                <p class="card-text">
-                    <strong>Giá bán:</strong>
-                    @(Model.SalePrice.HasValue ? Model.SalePrice.Value.ToString("N0") + " ₫" : "Chưa có")
-                    |
-                    <strong>Giá gốc:</strong>
-                    @(Model.OriginalPrice.HasValue ? Model.OriginalPrice.Value.ToString("N0") + " ₫" : "Chưa có")
-                </p>
-
-                <p class="card-text">
-                    <strong>Tồn kho:</strong> @Model.Stock |
-                    <strong>Trạng thái:</strong> @Model.Status
-                </p>
-                <p class="card-text">
-                    <strong>Ngày tạo:</strong> @Model.CreatedDate.ToString("dd/MM/yyyy")
-                </p>
+    <div class="card mb-3">
+        <div class="row g-0">
+            <div class="col-md-3">
+                @if (!string.IsNullOrEmpty(Model.ThumbnailImage))
+                {
+                    <img src="@Model.ThumbnailImage" class="img-fluid rounded-start" alt="Ảnh sản phẩm" />
+                }
+                else
+                {
+                    <div class="text-muted text-center p-4">Chưa có ảnh</div>
+                }
+            </div>
+            <div class="col-md-9">
+                <div class="card-body">
+                    <h5 class="card-title">@Model.ProductName</h5>
+                    <p class="card-text"><strong>Mô tả:</strong> @Model.Description</p>
+                    <p class="card-text">
+                        <strong>Giá bán:</strong> @(Model.SalePrice?.ToString("N0") ?? "N/A") ₫ |
+                        <strong>Giá gốc:</strong> @(Model.OriginalPrice?.ToString("N0") ?? "N/A") ₫
+                    </p>
+                    <p class="card-text">
+                        @* <strong>Tồn kho:</strong> @Model.Stock | *@
+                        <strong>Trạng thái:</strong> @Model.Status
+                    </p>
+                    <p class="card-text">
+                        <strong>Ngày tạo:</strong> @(Model.CreatedDate?.ToString("dd/MM/yyyy"))
+                    </p>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<form asp-action="Delete" class="d-inline">
-    <input type="hidden" asp-for="ProductID" />
-    <button type="submit" class="btn btn-danger">
-        <i class="bi bi-trash"></i> Xóa sản phẩm
-    </button>
-    <a asp-action="Index" class="btn btn-secondary ms-2">Hủy</a>
-</form>
+    <form asp-action="Delete" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="ProductId" />
+
+        <button type="submit" class="btn btn-danger">
+            <i class="bi bi-trash"></i> Xóa sản phẩm
+        </button>
+
+        <a asp-action="Index" class="btn btn-secondary ms-2">Hủy</a>
+    </form>
+</div>

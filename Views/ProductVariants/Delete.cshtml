@@ -1,20 +1,21 @@
 ﻿@model DATN.Models.ProductVariant
-
 @{
     ViewData["Title"] = "Xóa biến thể sản phẩm";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <div class="main-content" id="mainContent">
-    <h1 class="mb-4 text-danger">Xóa biến thể sản phẩm</h1>
+    <h1 class="mb-4 text-danger">Xoá biến thể sản phẩm</h1>
 
     <div class="alert alert-warning">
-        <strong>Bạn có chắc chắn muốn xóa biến thể này?</strong> Thao tác này không thể hoàn tác.
+        <strong>Bạn có chắc chắn muốn xoá biến thể này?</strong><br />
+        Thao tác này <u>không thể hoàn tác</u>.
     </div>
 
     <div class="card mb-3">
         <div class="card-body">
             <p><strong>Sản phẩm:</strong> @Model.Product?.ProductName</p>
-            <p><strong>Mã SKU:</strong> @Model.SKU</p>
+            <p><strong>Mã SKU:</strong> @Model.Sku</p>
             <p><strong>Màu sắc:</strong> @Model.Color?.ColorName</p>
             <p><strong>Kích thước:</strong> @Model.Size?.SizeName</p>
             <p><strong>Tồn kho:</strong> @Model.Stock</p>
@@ -34,11 +35,12 @@
         </div>
     </div>
 
-    <form asp-action="DeleteConfirmed">
-        <input type="hidden" asp-for="VariantID" />
+    <form asp-action="Delete" method="post">
+        <input type="hidden" asp-for="VariantId" />
         <button type="submit" class="btn btn-danger">
-            <i class="bi bi-trash"></i> Xóa biến thể
+            <i class="bi bi-trash"></i> Xóa 
         </button>
         <a asp-action="Index" class="btn btn-secondary">Hủy</a>
     </form>
+
 </div>

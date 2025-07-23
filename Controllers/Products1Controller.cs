@@ -1,16 +1,14 @@
-﻿
-
-
-
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using DATN.Data;
+using DATN.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using DATN.Data;
-using DATN.Models;
 
 namespace DATN.Controllers
 {
@@ -23,88 +21,139 @@ namespace DATN.Controllers
             _context = context;
         }
 
-        // GET: Products1
         public async Task<IActionResult> Index(string search)
         {
-            var query = _context.Products.AsQueryable();
+            var data = await _context.Products
+                .Select(p => new ProductViewModel
+                {
+                    ProductId = p.ProductId,
+                    ProductName = p.ProductName,
+                    ThumbnailImage = p.ThumbnailImage,
+                    SalePrice = p.SalePrice,
+                    CreatedDate = p.CreatedDate,
+                    Stock = _context.ProductVariants
+                                .Where(v => v.ProductId == p.ProductId)
+                                .Sum(v => (int?)v.Stock) ?? 0
+                }).ToListAsync();
 
             if (!string.IsNullOrEmpty(search))
             {
-                query = query.Where(p => p.ProductName.Contains(search));
+                data = data.Where(p => p.ProductName!.Contains(search)).ToList();
             }
 
-            var products = await query.ToListAsync();
+            ViewBag.TotalCount = data.Count;
+            ViewBag.InStockCount = data.Count(p => p.Stock > 5);
+            ViewBag.LowStockCount = data.Count(p => p.Stock > 0 && p.Stock <= 5);
+            ViewBag.OutOfStockCount = data.Count(p => p.Stock == 0);
+            ViewBag.LowStockProducts = data.Where(p => p.Stock > 0 && p.Stock <= 5).ToList();
 
-            ViewBag.TotalCount = products.Count;
-            ViewBag.InStockCount = products.Count(p => p.Stock > 5);
-            ViewBag.LowStockCount = products.Count(p => p.Stock > 0 && p.Stock <= 5);
-            ViewBag.OutOfStockCount = products.Count(p => p.Stock == 0);
-            ViewBag.LowStockProducts = products.Where(p => p.Stock > 0 && p.Stock <= 5).ToList();
-
-            return View(products);
+            return View(data); // ✅ data là List<ProductViewModel>
         }
 
-        // GET: Products1/Details/5
+
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
 
             var product = await _context.Products
-                .Include(p => p.Category) // Nếu có navigation property
-                .FirstOrDefaultAsync(m => m.ProductID == id);
+                .Include(p => p.Category)
+                .Include(p => p.ProductVariants)
+                    .ThenInclude(v => v.Color)
+                .Include(p => p.ProductVariants)
+                    .ThenInclude(v => v.Size)
+                .FirstOrDefaultAsync(p => p.ProductId == id);
 
             if (product == null) return NotFound();
 
             return View(product);
         }
 
-        // GET: Products1/Create
+
+
+        // GET: Create
         public IActionResult Create()
         {
-            LoadCategories();
+            LoadDropdowns();
             return View();
         }
 
-        // POST: Products1/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Product product, IFormFile ImageFile)
+        public async Task<IActionResult> Create(
+     Product product,
+     [Bind(Prefix = "variants")] List<ProductVariant> variants,
+     IFormFile ImageFile)
         {
-            if (ModelState.IsValid)
+            if (variants == null || !variants.Any())
             {
-                // Xử lý ảnh
-                if (ImageFile != null && ImageFile.Length > 0)
+                TempData["Error"] = "Vui lòng chọn ít nhất một biến thể.";
+                LoadDropdowns();
+                return View(product);
+            }
+
+            // Lưu ảnh đại diện sản phẩm
+            if (ImageFile != null && ImageFile.Length > 0)
+            {
+                var productFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/hinh");
+                Directory.CreateDirectory(productFolder);
+
+                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(ImageFile.FileName);
+                var filePath = Path.Combine(productFolder, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await ImageFile.CopyToAsync(stream);
+                }
+                product.ThumbnailImage = "/hinh/" + fileName;
+            }
+
+            product.CreatedDate = DateTime.Now;
+            product.UpdatedDate = DateTime.Now;
+
+            _context.Products.Add(product);
+            await _context.SaveChangesAsync();
+
+            foreach (var variant in variants)
+            {
+                variant.ProductId = product.ProductId;
+                variant.Sku = $"BAG-{product.ProductId}-{variant.ColorId}-{variant.SizeId}";
+                variant.CreatedDate = DateTime.Now;
+                variant.UpdatedDate = DateTime.Now;
+                variant.Status = "Active";
+                variant.SalePrice = product.SalePrice;
+                variant.OriginalPrice = product.OriginalPrice;
+
+                if (variant.ImageFile != null && variant.ImageFile.Length > 0)
                 {
                     var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/hinh");
-                    if (!Directory.Exists(uploadsFolder))
-                    {
-                        Directory.CreateDirectory(uploadsFolder);
-                    }
+                    Directory.CreateDirectory(uploadsFolder);
 
-                    var fileName = Path.GetFileName(ImageFile.FileName);
+                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(variant.ImageFile.FileName);
                     var filePath = Path.Combine(uploadsFolder, fileName);
 
                     using (var stream = new FileStream(filePath, FileMode.Create))
                     {
-                        await ImageFile.CopyToAsync(stream);
+                        await variant.ImageFile.CopyToAsync(stream);
                     }
 
-                    product.ThumbnailImage = "/hinh/" + fileName;
+                    variant.ThumbnailImage = "/hinh/" + fileName;
                 }
 
-                product.CreatedDate = DateTime.Now;
-
-                _context.Add(product);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                _context.ProductVariants.Add(variant);
             }
 
-            // Nếu ModelState lỗi, load lại danh mục
-            LoadCategories();
-            return View(product);
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Thêm sản phẩm thành công!";
+            return RedirectToAction(nameof(Index));
+
         }
 
-        // GET: Products1/Edit/5
+
+
+
+
+        // GET: Products/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -112,29 +161,48 @@ namespace DATN.Controllers
             var product = await _context.Products.FindAsync(id);
             if (product == null) return NotFound();
 
-            LoadCategories();
+            // Lấy danh mục
+            ViewBag.Categories = new SelectList(
+                _context.Categories.OrderBy(c => c.CategoryName),
+                "CategoryId",
+                "CategoryName",
+                product.CategoryId
+            );
+
             return View(product);
         }
 
-        // POST: Products1/Edit/5
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Product product, IFormFile ImageFile)
         {
-            if (id != product.ProductID) return NotFound();
+            if (id != product.ProductId) return NotFound();
+
+            var existing = await _context.Products.FindAsync(id);
+            if (existing == null) return NotFound();
 
             if (ModelState.IsValid)
             {
                 try
                 {
-                    // Nếu có file ảnh mới
+                    // Cập nhật các trường được chỉnh sửa
+                    existing.ProductName = product.ProductName;
+                    existing.Description = product.Description;
+                    existing.SalePrice = product.SalePrice;
+                    existing.OriginalPrice = product.OriginalPrice;
+                    existing.CategoryId = product.CategoryId;
+                    existing.Size = product.Size;
+                    existing.Color = product.Color;
+                    existing.Material = product.Material;
+                    existing.Status = product.Status;
+                    existing.UpdatedDate = DateTime.Now;
+
+                    // Nếu có upload ảnh mới
                     if (ImageFile != null && ImageFile.Length > 0)
                     {
                         var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/hinh");
-                        if (!Directory.Exists(uploadsFolder))
-                        {
-                            Directory.CreateDirectory(uploadsFolder);
-                        }
+                        Directory.CreateDirectory(uploadsFolder);
 
                         var fileName = Path.GetFileName(ImageFile.FileName);
                         var filePath = Path.Combine(uploadsFolder, fileName);
@@ -144,79 +212,77 @@ namespace DATN.Controllers
                             await ImageFile.CopyToAsync(stream);
                         }
 
-                        product.ThumbnailImage = "/hinh/" + fileName;
+                        existing.ThumbnailImage = "/hinh/" + fileName;
                     }
+                    // Nếu không upload thì giữ nguyên existing.ThumbnailImage
 
-                    product.UpdatedDate = DateTime.Now;
-
-                    _context.Update(product);
+                    _context.Update(existing);
                     await _context.SaveChangesAsync();
+
+                    TempData["SuccessMessage"] = "Cập nhật thông tin thành công!";
+                    return RedirectToAction(nameof(Index));
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ProductExists(product.ProductID))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    if (!ProductExists(product.ProductId)) return NotFound();
+                    else throw;
                 }
-                return RedirectToAction(nameof(Index));
             }
 
-            LoadCategories();
-            return View(product);
+            // Nếu ModelState invalid → trả về existing để hiển thị ảnh cũ
+            return View(existing);
         }
 
-        // GET: Products1/Delete/5
+
+
+
+        private bool ProductExists(int id)
+        {
+            return _context.Products.Any(e => e.ProductId == id);
+        }
+
+
+        // GET: Delete
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
 
             var product = await _context.Products
-                .Include(p => p.Category) // nếu có navigation property
-                .FirstOrDefaultAsync(m => m.ProductID == id);
+                .Include(p => p.Category)
+                .FirstOrDefaultAsync(p => p.ProductId == id);
 
             if (product == null) return NotFound();
 
             return View(product);
         }
 
-        // POST: Products1/Delete/5
+        // POST: Delete
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var product = await _context.Products.FindAsync(id);
-            if (product != null)
-            {
-                _context.Products.Remove(product);
-                await _context.SaveChangesAsync();
-            }
+            if (product == null) return NotFound();
+
+            var variants = _context.ProductVariants.Where(v => v.ProductId == id);
+            _context.ProductVariants.RemoveRange(variants);
+
+            _context.Products.Remove(product);
+            await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
         }
 
-        private bool ProductExists(int id)
-        {
-            return _context.Products.Any(e => e.ProductID == id);
-        }
+        //private bool ProductExists(int id)
+        //{
+        //    return _context.Products.Any(e => e.ProductId == id);
+        //}
 
-        /// <summary>
-        /// Load danh sách danh mục vào ViewBag.Categories
-        /// </summary>
-        private void LoadCategories()
+        private void LoadDropdowns()
         {
-            ViewBag.Categories = _context.Categories
-                .OrderBy(c => c.CategoryName)
-                .Select(c => new SelectListItem
-                {
-                    Value = c.CategoryID.ToString(),
-                    Text = c.CategoryName
-                })
-                .ToList();
+            ViewBag.Categories = new SelectList(_context.Categories.OrderBy(c => c.CategoryName), "CategoryId", "CategoryName");
+            ViewBag.Colors = _context.Colors.OrderBy(c => c.ColorName).ToList();
+            ViewBag.Sizes = _context.Sizes.OrderBy(s => s.SizeName).ToList();
         }
     }
 }

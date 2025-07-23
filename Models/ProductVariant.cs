@@ -1,31 +1,76 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
-namespace DATN.Models
+namespace DATN.Models;
+
+[Index(nameof(ProductId), nameof(ColorId), nameof(SizeId), IsUnique = true, Name = "UQ_Product_Color_Size")]
+[Index(nameof(Sku), IsUnique = true, Name = "UQ_ProductVariant_Sku")]
+public partial class ProductVariant
 {
-    public class ProductVariant
-    {
-        [Key]
-        public int VariantID { get; set; }
+    [Key]
+    [Column("VariantID")]
+    public int VariantId { get; set; }
 
-        public int ProductID { get; set; }
-        public int ColorID { get; set; }
-        public int SizeID { get; set; }
+    [Required]
+    [Column("ProductID")]
+    public int ProductId { get; set; }
 
-        public string SKU { get; set; }
-        public int Stock { get; set; }
+    [Required]
+    [Column("ColorID")]
+    public int ColorId { get; set; }
 
-        public decimal? SalePrice { get; set; }
-        public decimal? OriginalPrice { get; set; }
+    [Required]
+    [Column("SizeID")]
+    public int SizeId { get; set; }
 
-        public string? ThumbnailImage { get; set; }
-        public string? Status { get; set; }
-        public DateTime CreatedDate { get; set; }
-        public DateTime? UpdatedDate { get; set; }
+    [Required]
+    [StringLength(100)]
+    public string Sku { get; set; } = null!;
 
-        // Navigation
-        public Product? Product { get; set; }
-        public Color? Color { get; set; }
-        public Size? Size { get; set; }
-    }
+    [Display(Name = "Tồn kho")]
+    public int? Stock { get; set; }
+
+    [Display(Name = "Giá bán")]
+    [Column(TypeName = "decimal(18, 2)")]
+    public decimal? SalePrice { get; set; }
+
+    [Display(Name = "Giá gốc")]
+    [Column(TypeName = "decimal(18, 2)")]
+    public decimal? OriginalPrice { get; set; }
+
+    [StringLength(225)]
+    public string? ThumbnailImage { get; set; }
+
+    [StringLength(50)]
+    public string? Status { get; set; }
+
+    [Column(TypeName = "datetime")]
+    public DateTime? CreatedDate { get; set; }
+
+    [Column(TypeName = "datetime")]
+    public DateTime? UpdatedDate { get; set; }
+
+    [ForeignKey(nameof(ProductId))]
+    [InverseProperty("ProductVariants")]
+    public virtual Product Product { get; set; } = null!;
+
+    [ForeignKey(nameof(ColorId))]
+    [InverseProperty("ProductVariants")]
+    public virtual Color Color { get; set; } = null!;
+
+    [ForeignKey(nameof(SizeId))]
+    [InverseProperty("ProductVariants")]
+    public virtual Size Size { get; set; } = null!;
+
+    [NotMapped]   // Không map vào database
+    public IFormFile? ImageFile { get; set; }
+
+    [InverseProperty("Variant")]
+    public virtual ICollection<CartDetail> CartDetails { get; set; } = new List<CartDetail>();
+
+    [InverseProperty("Variant")]
+    public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
 }

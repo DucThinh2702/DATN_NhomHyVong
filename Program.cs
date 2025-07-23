@@ -60,6 +60,6 @@ app.UseAuthorization();
 // ✅ Cấu hình route mặc định
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Admin}/{action=SanPham}/{id?}");
+    pattern: "{controller=Products1}/{action=Index}/{id?}");
 
 app.Run();

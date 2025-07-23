@@ -13,7 +13,7 @@
         <!-- Sản phẩm -->
         <div class="col-md-4 mb-3">
             <label class="form-label">Sản phẩm</label>
-            @Html.DropDownListFor(m => m.ProductID,
+            @Html.DropDownListFor(m => m.ProductId,
                      (IEnumerable<SelectListItem>)ViewBag.Products,
                      "-- Chọn sản phẩm --",
                      new { @class = "form-select" })
@@ -22,7 +22,7 @@
         <!-- Màu sắc -->
         <div class="col-md-4 mb-3">
             <label class="form-label">Màu sắc</label>
-            @Html.DropDownListFor(m => m.ColorID,
+            @Html.DropDownListFor(m => m.ColorId,
                      (IEnumerable<SelectListItem>)ViewBag.Colors,
                      "-- Chọn màu sắc --",
                      new { @class = "form-select" })
@@ -31,7 +31,7 @@
         <!-- Kích thước -->
         <div class="col-md-4 mb-3">
             <label class="form-label">Kích thước</label>
-            @Html.DropDownListFor(m => m.SizeID,
+            @Html.DropDownListFor(m => m.SizeId,
                      (IEnumerable<SelectListItem>)ViewBag.Sizes,
                      "-- Chọn kích thước --",
                      new { @class = "form-select" })
@@ -40,8 +40,8 @@
         <!-- Mã SKU -->
         <div class="col-md-6 mb-3">
             <label class="form-label">Mã SKU</label>
-            <input asp-for="SKU" class="form-control" placeholder="Nhập mã SKU..." />
-            <span asp-validation-for="SKU" class="text-danger"></span>
+            <input asp-for="Sku" class="form-control" placeholder="Nhập mã SKU..." />
+            <span asp-validation-for="Sku" class="text-danger"></span>
         </div>
 
         <!-- Tồn kho -->

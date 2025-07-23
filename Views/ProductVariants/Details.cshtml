@@ -1,0 +1,37 @@
+﻿@model DATN.Models.ProductVariant
+@{
+    ViewData["Title"] = "Chi tiết biến thể sản phẩm";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="main-content" id="mainContent">
+    <h2>Chi tiết biến thể: @Model.Sku</h2>
+
+    <div class="card">
+        <div class="card-body">
+            <p><strong>Sản phẩm:</strong> @Model.Product?.ProductName</p>
+            <p><strong>Màu sắc:</strong> @Model.Color?.ColorName</p>
+            <p><strong>Kích thước:</strong> @Model.Size?.SizeName</p>
+            <p><strong>Giá bán:</strong> @Model.SalePrice?.ToString("N0") ₫</p>
+            <p><strong>Giá gốc:</strong> @Model.OriginalPrice?.ToString("N0") ₫</p>
+            <p><strong>Tồn kho:</strong> @Model.Stock</p>
+            <p><strong>Trạng thái:</strong> @Model.Status</p>
+            <p>
+                <strong>Ảnh:</strong><br />
+                @if (!string.IsNullOrEmpty(Model.ThumbnailImage))
+                {
+                    <img src="@Model.ThumbnailImage" style="height:100px;" />
+                }
+                else
+                {
+                    <span class="text-muted">Chưa có ảnh</span>
+                }
+            </p>
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <a asp-action="Edit" asp-route-id="@Model.VariantId" class="btn btn-warning">✏️ Sửa</a>
+        <a asp-action="Index" class="btn btn-secondary">⬅ Quay lại</a>
+    </div>
+</div>

@@ -1,76 +1,62 @@
-﻿//using System.ComponentModel.DataAnnotations;
-
-//namespace DATN.Models
-//{
-//    public class Product
-//    {
-//        public int ProductID { get; set; }
-
-//        [Required]
-//        [StringLength(200)]
-//        public string ProductName { get; set; }
-
-//        [StringLength(225)]
-//        public string Description { get; set; }
-
-//        [Required]
-//        public decimal SalePrice { get; set; }
-
-//        public decimal OriginalPrice { get; set; }
-
-//        public int Stock { get; set; }
-
-//        [StringLength(50)]
-//        public string Size { get; set; }
-
-//        [StringLength(50)]
-//        public string Color { get; set; }
-
-//        [StringLength(100)]
-//        public string Material { get; set; }
-
-//        public int CategoryID { get; set; }
-
-//        public DateTime CreatedDate { get; set; }
-
-//        public DateTime? UpdatedDate { get; set; }
-
-//        [StringLength(225)]
-//        public string ThumbnailImage { get; set; }
-
-//        [StringLength(50)]
-//        public string Status { get; set; }
-
-//        //// Nếu muốn join Category
-//        //public Category Category { get; set; }
-//    }
-
-//}
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
-namespace DATN.Models
+namespace DATN.Models;
+
+[Index("ProductName", Name = "UQ__Products__DD5A978ADD220D96", IsUnique = true)]
+public partial class Product
 {
-    public class Product
-    {
-        public int ProductID { get; set; }
-        public string ProductName { get; set; }
-        public string? Description { get; set; }
-        public decimal? SalePrice { get; set; }
-        public decimal? OriginalPrice { get; set; }
-        public int? Stock { get; set; }
-        public string? Size { get; set; } // chỉ dùng nếu không quản lý biến thể
-        public string? Color { get; set; } // chỉ dùng nếu không quản lý biến thể
-        public string? Material { get; set; }
-        public int? CategoryID { get; set; }
-        public DateTime CreatedDate { get; set; }
-        public DateTime? UpdatedDate { get; set; }
-        public string? ThumbnailImage { get; set; }
-        public string? Status { get; set; }
+    [Key]
+    [Column("ProductID")]
+    public int ProductId { get; set; }
 
-        // Navigation
-        public Category? Category { get; set; }
-        public ICollection<ProductVariant>? ProductVariants { get; set; }
-    }
+    [StringLength(200)]
+    public string? ProductName { get; set; }
 
+    [StringLength(225)]
+    public string? Description { get; set; }
+
+    [Column(TypeName = "decimal(18, 2)")]
+    public decimal? SalePrice { get; set; }
+
+    [Column(TypeName = "decimal(18, 2)")]
+    public decimal? OriginalPrice { get; set; }
+
+   
+
+    [StringLength(50)]
+    public string? Size { get; set; }
+
+    [StringLength(50)]
+    public string? Color { get; set; }
+
+    [StringLength(100)]
+    public string? Material { get; set; }
+
+    [Column("CategoryID")]
+    public int? CategoryId { get; set; }
+
+    [Column(TypeName = "datetime")]
+    public DateTime? CreatedDate { get; set; }
+
+    [Column(TypeName = "datetime")]
+    public DateTime? UpdatedDate { get; set; }
+
+    [StringLength(225)]
+    public string? ThumbnailImage { get; set; }
+
+    [StringLength(50)]
+    public string? Status { get; set; }
+
+    [NotMapped]
+    public IFormFile? ImageFile { get; set; }  // <-- ảnh upload cho từng biến thể
+    [ForeignKey("CategoryId")]
+    [InverseProperty("Products")]
+    public virtual Category? Category { get; set; }
+
+    [InverseProperty("Product")]
+    public virtual ICollection<ProductVariant> ProductVariants { get; set; } = new List<ProductVariant>();
 }
-

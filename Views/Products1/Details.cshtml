@@ -2,69 +2,117 @@
 
 @{
     ViewData["Title"] = "Chi tiết sản phẩm";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1 class="mb-4">Chi tiết sản phẩm</h1>
+<div class="main-content" id="mainContent">
+    <h1 class="mb-4">Chi tiết sản phẩm</h1>
 
-<div class="card mb-3 shadow-sm">
-    <div class="row g-0">
-        <!-- Cột ảnh sản phẩm -->
-        <div class="col-md-4">
-            @if (!string.IsNullOrEmpty(Model.ThumbnailImage))
-            {
-                <img src="@Model.ThumbnailImage" class="img-fluid rounded-start" alt="Ảnh sản phẩm" />
-            }
-            else
-            {
-                <div class="text-muted text-center p-4">Chưa có ảnh</div>
-            }
-        </div>
+    <div class="card mb-3 shadow-sm">
+        <div class="row g-0">
+            <div class="col-md-4">
+                @if (!string.IsNullOrEmpty(Model.ThumbnailImage))
+                {
+                    <img src="@Model.ThumbnailImage" class="img-fluid rounded-start" alt="Ảnh sản phẩm" />
+                }
+                else
+                {
+                    <div class="text-muted text-center p-4">Chưa có ảnh</div>
+                }
+            </div>
+            <div class="col-md-8">
+                <div class="card-body">
+                    <h5 class="card-title">@Model.ProductName</h5>
+                    <p class="card-text">
+                        <strong>Mô tả:</strong> @Html.Raw(Model.Description)
+                    </p>
 
-        <!-- Cột thông tin sản phẩm -->
-        <div class="col-md-8">
-            <div class="card-body">
-                <h5 class="card-title">@Model.ProductName</h5>
+                    <p class="card-text">
+                        <strong>Giá bán:</strong> @(Model.SalePrice?.ToString("N0") ?? "Chưa có") ₫ <br />
+                        <strong>Giá gốc:</strong> @(Model.OriginalPrice?.ToString("N0") ?? "Chưa có") ₫
+                    </p>
+                    <p class="card-text">
+                        <strong>Chất liệu:</strong> @Model.Material <br />
+                        <strong>Danh mục:</strong> @Model.Category?.CategoryName <br />
+                        <strong>Trạng thái:</strong> @Model.Status
+                    </p>
+                    <p class="card-text">
+                        <small class="text-muted">
+                            Ngày tạo: @Model.CreatedDate?.ToString("dd/MM/yyyy") <br />
+                            Cập nhật: @Model.UpdatedDate?.ToString("dd/MM/yyyy")
+                        </small>
+                    </p>
 
-                <p class="card-text"><strong>Mô tả:</strong> @Model.Description</p>
-
-                <p class="card-text">
-                    <strong>Giá bán:</strong>
-                    @(Model.SalePrice.HasValue ? Model.SalePrice.Value.ToString("N0") + " ₫" : "Chưa có") <br />
-                    <strong>Giá gốc:</strong>
-                    @(Model.OriginalPrice.HasValue ? Model.OriginalPrice.Value.ToString("N0") + " ₫" : "Chưa có")
-                </p>
-
-                <p class="card-text">
-                    <strong>Tồn kho:</strong> @Model.Stock <br />
-                    <strong>Kích thước:</strong> @(string.IsNullOrEmpty(Model.Size) ? "Chưa có" : Model.Size) <br />
-                    <strong>Màu sắc:</strong> @(string.IsNullOrEmpty(Model.Color) ? "Chưa có" : Model.Color) <br />
-                    <strong>Chất liệu:</strong> @(string.IsNullOrEmpty(Model.Material) ? "Chưa có" : Model.Material) <br />
-                    <strong>Danh mục (ID):</strong> @Model.CategoryID
-                </p>
-
-                <p class="card-text">
-                    <strong>Trạng thái:</strong> @Model.Status
-                </p>
-
-                <p class="card-text">
-                    <small class="text-muted">
-                        Ngày tạo: @Model.CreatedDate.ToString("dd/MM/yyyy") <br />
-                        Ngày cập nhật:
-                        @(Model.UpdatedDate.HasValue
-                            ? Model.UpdatedDate.Value.ToString("dd/MM/yyyy")
-                            : "Chưa cập nhật")
-                    </small>
-                </p>
-
-                <div class="mt-3">
-                    <a asp-action="Edit" asp-route-id="@Model.ProductID" class="btn btn-warning">
-                        <i class="bi bi-pencil"></i> Sửa
-                    </a>
-                    <a asp-action="Index" class="btn btn-secondary">
-                        Quay lại danh sách
-                    </a>
+                    <div class="mt-3">
+                        <a asp-action="Edit" asp-route-id="@Model.ProductId" class="btn btn-warning">
+                            <i class="bi bi-pencil"></i> Sửa
+                        </a>
+                        <a asp-action="Index" class="btn btn-secondary">⬅ Quay lại</a>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <h4 class="mt-4">Các sản phẩm hiện có - @Model.ProductName</h4>
+
+    @if (Model.ProductVariants != null && Model.ProductVariants.Any())
+    {
+        <table class="table table-bordered align-middle">
+            <thead>
+                <tr>
+                    <th>SKU</th>
+                    <th>Màu</th>
+                    <th>Size</th>
+                    <th>Tồn kho</th>
+                    <th>Giá bán</th>
+                    <th>Ảnh</th>
+                    <th class="text-center">Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var v in Model.ProductVariants)
+                {
+                    <tr>
+                        <td>@v.Sku</td>
+                        <td>@v.Color?.ColorName</td>
+                        <td>@v.Size?.SizeName</td>
+                        <td>@v.Stock</td>
+                        <td>@(v.SalePrice?.ToString("N0") ?? "Chưa có") ₫</td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(v.ThumbnailImage))
+                            {
+                                <img src="@v.ThumbnailImage" style="height:50px;" />
+                            }
+                            else
+                            {
+                                <span class="text-muted">Chưa có</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            <div class="btn-group">
+                                
+
+                                <a asp-controller="ProductVariants" asp-action="Details" class="btn btn-sm btn-outline-info me-1">
+                                    <i class="fa-solid fa-eye text-primary"></i>
+                                </a>
+
+                                <a asp-controller="ProductVariants" asp-action="Edit" class="btn btn-sm btn-light border-end" title="Sửa">
+                                    <i class="fa-solid fa-pen-to-square text-warning"></i>
+                                </a>
+                                <a asp-controller="ProductVariants" asp-action="Details" class="btn btn-sm btn-light" title="Xoá">
+                                    <i class="fa-solid fa-trash text-danger"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p class="text-muted">Sản phẩm chưa có biến thể nào.</p>
+    }
+
 </div>
