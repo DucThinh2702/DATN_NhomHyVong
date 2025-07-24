@@ -7,11 +7,11 @@
 <div class="container mt-4">
     <h2>@ViewData["Title"]</h2>
 
-    <form asp-action="Create" enctype="multipart/form-data" class="mt-3">
+    <form id="categoryForm" asp-action="Create" enctype="multipart/form-data" class="mt-3" novalidate>
         <div class="mb-3">
             <label asp-for="CategoryName" class="form-label"></label>
-            <input asp-for="CategoryName" class="form-control" />
-            <span asp-validation-for="CategoryName" class="text-danger"></span>
+            <input asp-for="CategoryName" class="form-control" id="CategoryName" name="CategoryName" />
+            <span class="text-danger" data-valmsg-for="CategoryName"></span>
         </div>
 
         <div class="mb-3">
@@ -19,15 +19,39 @@
             <input type="file" name="imageFile" class="form-control" />
         </div>
 
-        <button type="submit" class="btn btn-primary">
-            <i class="bi bi-save"></i> Lưu
-        </button>
-        <a asp-action="Index" class="btn btn-secondary">
-            Quay lại
-        </a>
+        <button type="submit" class="btn btn-primary">Lưu</button>
+        <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
     </form>
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        document.getElementById("categoryForm").addEventListener("submit", function (e) {
+            const nameInput = document.getElementById("CategoryName");
+            const errorSpan = document.querySelector("span[data-valmsg-for='CategoryName']");
+            const name = nameInput.value.trim();
+
+            // Reset lỗi cũ
+            errorSpan.textContent = "";
+            nameInput.classList.remove("is-invalid");
+
+            // Kiểm tra rỗng
+            if (!name) {
+                e.preventDefault();
+                errorSpan.textContent = "Tên danh mục không được để trống";
+                nameInput.classList.add("is-invalid");
+                return;
+            }
+
+            // Kiểm tra độ dài
+            if (name.length > 100) {
+                e.preventDefault();
+                errorSpan.textContent = "Tên danh mục tối đa 100 ký tự";
+                nameInput.classList.add("is-invalid");
+                return;
+            }
+        });
+    </script>
 }

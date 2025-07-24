@@ -4,12 +4,13 @@
     ViewData["Title"] = "Danh sách danh mục";
     var totalCategory = Model?.Count() ?? 0;
     var totalProduct = Model?.Sum(c => c.Products?.Count() ?? 0) ?? 0;
+    string currentFilter = Context.Request.Query["searchString"];
 }
 
 <div class="container mt-4">
     <h2 class="mb-4">@ViewData["Title"]</h2>
 
-    <!-- Thống kê tổng quát: Hình chữ nhật nằm ngang -->
+    <!-- Thống kê tổng quát -->
     <div class="row mb-4">
         <div class="col-md-6 mb-2">
             <div class="card text-white bg-primary">
@@ -34,6 +35,23 @@
             </div>
         </div>
     </div>
+
+    <!-- Tìm kiếm -->
+    <form method="get" asp-controller="Category" asp-action="Index" class="mb-3 row g-3">
+        <div class="col-md-4">
+            <input type="text" name="searchString" value="@currentFilter" class="form-control" placeholder="Nhập tên danh mục..." />
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-outline-primary">
+                <i class="bi bi-search"></i> Tìm kiếm
+            </button>
+        </div>
+        <div class="col-auto">
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                <i class="bi bi-x-circle"></i> Xóa lọc
+            </a>
+        </div>
+    </form>
 
     <p>
         <a class="btn btn-success" asp-action="Create">

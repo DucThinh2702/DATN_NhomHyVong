@@ -1,17 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
-namespace DATN.Models;
-
-public partial class Category
+namespace DATN.Models
 {
-    public int CategoryId { get; set; }
+    public class Category
+    {
+        [Key] // Khóa chính
+        public int CategoryId { get; set; }
 
-    public string? CategoryName { get; set; }
+        [Required(ErrorMessage = "Tên danh mục không được để trống")]
+        [StringLength(100, ErrorMessage = "Tên danh mục tối đa 100 ký tự")]
+        [Display(Name = "Tên danh mục")]
+        public string CategoryName { get; set; }
 
-    public string? CategoryDescription { get; set; }
+        [Display(Name = "Ảnh danh mục")]
+        public string? CategoryImage { get; set; }
 
-    public string? CategoryImage { get; set; }
-
-    public virtual ICollection<Product> Products { get; set; } = new List<Product>();
+        // Navigation property đến Product
+        public virtual ICollection<Product>? Products { get; set; }
+    }
 }

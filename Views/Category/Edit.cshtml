@@ -7,6 +7,12 @@
 <div class="container mt-4">
     <h2>@ViewData["Title"]</h2>
 
+    @* Hiển thị lỗi nếu có từ ViewBag *@
+    @if (ViewBag.ErrorMessage != null)
+    {
+        <div class="alert alert-danger">@ViewBag.ErrorMessage</div>
+    }
+
     <form asp-action="Edit" enctype="multipart/form-data" class="mt-3">
         <input type="hidden" asp-for="CategoryId" />
 

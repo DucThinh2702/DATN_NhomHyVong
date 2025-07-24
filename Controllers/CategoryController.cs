@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System.IO;
+using System.Linq;
 
 namespace DATN.Controllers
 {
@@ -20,10 +21,21 @@ namespace DATN.Controllers
         }
 
         // GET: /Category
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString)
         {
-            var categories = await _context.Categories.ToListAsync();
-            return View(categories);
+            ViewData["CurrentFilter"] = searchString;
+
+            var categories = _context.Categories
+                .Include(c => c.Products)
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                categories = categories.Where(c => c.CategoryName.Contains(searchString));
+            }
+
+            var categoryList = await categories.ToListAsync();
+            return View(categoryList);
         }
 
         // GET: /Category/Create
@@ -37,32 +49,40 @@ namespace DATN.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Category category, IFormFile imageFile)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                if (imageFile != null && imageFile.Length > 0)
-                {
-                    var uniqueFileName = $"{Path.GetFileNameWithoutExtension(imageFile.FileName)}_{Guid.NewGuid()}{Path.GetExtension(imageFile.FileName)}";
-                    var uploadPath = Path.Combine(_env.WebRootPath, "hinh");
-
-                    if (!Directory.Exists(uploadPath))
-                        Directory.CreateDirectory(uploadPath);
-
-                    var filePath = Path.Combine(uploadPath, uniqueFileName);
-                    using (var stream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await imageFile.CopyToAsync(stream);
-                    }
-
-                    category.CategoryImage = uniqueFileName;
-                }
-
-                _context.Categories.Add(category);
-                await _context.SaveChangesAsync();
-
-                return RedirectToAction(nameof(Index));
+                ViewBag.ErrorMessage = "Dữ liệu không hợp lệ. Vui lòng kiểm tra lại.";
+                return View(category);
             }
 
-            return View(category);
+            if (imageFile != null && imageFile.Length > 0)
+            {
+                var uniqueFileName = $"{Path.GetFileNameWithoutExtension(imageFile.FileName)}_{Guid.NewGuid()}{Path.GetExtension(imageFile.FileName)}";
+                var uploadPath = Path.Combine(_env.WebRootPath, "hinh");
+
+                if (!Directory.Exists(uploadPath))
+                    Directory.CreateDirectory(uploadPath);
+
+                var filePath = Path.Combine(uploadPath, uniqueFileName);
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await imageFile.CopyToAsync(stream);
+                }
+
+                category.CategoryImage = uniqueFileName;
+            }
+
+            try
+            {
+                _context.Categories.Add(category);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = "Lỗi khi thêm danh mục: " + ex.Message;
+                return View(category);
+            }
         }
 
         // GET: /Category/Edit/5
@@ -86,42 +106,47 @@ namespace DATN.Controllers
             if (id != category.CategoryId)
                 return NotFound();
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                try
-                {
-                    if (imageFile != null && imageFile.Length > 0)
-                    {
-                        var uniqueFileName = $"{Path.GetFileNameWithoutExtension(imageFile.FileName)}_{Guid.NewGuid()}{Path.GetExtension(imageFile.FileName)}";
-                        var uploadPath = Path.Combine(_env.WebRootPath, "hinh");
-
-                        if (!Directory.Exists(uploadPath))
-                            Directory.CreateDirectory(uploadPath);
-
-                        var filePath = Path.Combine(uploadPath, uniqueFileName);
-                        using (var stream = new FileStream(filePath, FileMode.Create))
-                        {
-                            await imageFile.CopyToAsync(stream);
-                        }
-
-                        category.CategoryImage = uniqueFileName;
-                    }
-
-                    _context.Update(category);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!CategoryExists(category.CategoryId))
-                        return NotFound();
-                    else
-                        throw;
-                }
-
-                return RedirectToAction(nameof(Index));
+                ViewBag.ErrorMessage = "Dữ liệu không hợp lệ.";
+                return View(category);
             }
 
-            return View(category);
+            try
+            {
+                if (imageFile != null && imageFile.Length > 0)
+                {
+                    var uniqueFileName = $"{Path.GetFileNameWithoutExtension(imageFile.FileName)}_{Guid.NewGuid()}{Path.GetExtension(imageFile.FileName)}";
+                    var uploadPath = Path.Combine(_env.WebRootPath, "hinh");
+
+                    if (!Directory.Exists(uploadPath))
+                        Directory.CreateDirectory(uploadPath);
+
+                    var filePath = Path.Combine(uploadPath, uniqueFileName);
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await imageFile.CopyToAsync(stream);
+                    }
+
+                    category.CategoryImage = uniqueFileName;
+                }
+
+                _context.Update(category);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!CategoryExists(category.CategoryId))
+                    return NotFound();
+                else
+                    throw;
+            }
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = "Lỗi khi cập nhật: " + ex.Message;
+                return View(category);
+            }
         }
 
         // GET: /Category/Delete/5
