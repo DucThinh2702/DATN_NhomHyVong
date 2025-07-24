@@ -42,6 +42,52 @@ public partial class Promotion
 
     [StringLength(50)]
     public string? Status { get; set; }
+    // Thêm Description mới vào đây
+    [Required(ErrorMessage = "Mô tả không được bỏ trống")]
+    [StringLength(500, MinimumLength = 10, ErrorMessage = "Mô tả phải từ 10 đến 500 ký tự")]
+    public string? Description { get; set; }
+    // Thêm PromoNameCode, nó sẽ được tạo tự động
+    public string? PromoNameCode { get; set; } = GeneratePromoNameCode();
+    [StringLength(10000)]
+    // Mối quan hệ một Promotion có thể có nhiều ShippingProviders
+    public string? ShippingProviderName { get; set; }  // Lưu tên đơn vị vận chuyển hoặc mã của đơn vị vận chuyển (nếu cần)
+    [MinCount(1)] // Custom validate yêu cầu ít nhất 1 item
+    public ICollection<ShippingProvider>? ShippingProviders { get; set; }
 
+    // Phương thức tạo mã khuyến mãi ngẫu nhiên
+    public static string GeneratePromoNameCode()
+    {
+        var random = new Random();
+        var letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        var digits = "0123456789";
+
+        // Sinh phần chữ
+        var letterPart = new string(Enumerable.Range(0, 5)
+            .Select(_ => letters[random.Next(letters.Length)])
+            .ToArray());
+
+        // Sinh phần số
+        var numberPart = new string(Enumerable.Range(0, 4)
+            .Select(_ => digits[random.Next(digits.Length)])
+            .ToArray());
+
+        return $"{letterPart}{numberPart}";
+    }
+    public class MinCountAttribute : ValidationAttribute
+    {
+        private readonly int _min;
+
+        public MinCountAttribute(int min)
+        {
+            _min = min;
+            ErrorMessage = $"Phải chọn ít nhất {_min} đơn vị vận chuyển.";
+        }
+
+        public override bool IsValid(object value)
+        {
+            var list = value as ICollection<ShippingProvider>;
+            return list != null && list.Count >= _min;
+        }
+    }
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 }

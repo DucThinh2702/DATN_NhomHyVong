@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using DATN.Data;
+using DATN.Models;
+using DATN.Models.ViewModels;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using DATN.Data;
 using DATN.Models;
@@ -142,32 +145,74 @@ namespace DATN.Controllers
         }
         public async Task<IActionResult> MaGiamGia(string status = "Tất cả", string search = "")
         {
-            var danhSach = await _context.Promotions.ToListAsync();
+            var today = DateTime.Today;
 
-            // 1. Lọc theo trạng thái
+            // Lấy danh sách mã giảm giá và xử lý null tại đây
+            var danhSach = await _context.Promotions
+                .Select(p => new Promotion
+                {
+                    PromoCode = p.PromoCode,
+                    PromoName = p.PromoName ?? "",
+                    PromoNameCode = p.PromoNameCode ?? "",
+                    PromoType = p.PromoType ?? "",
+                    DiscountValue = p.DiscountValue ?? 0,
+                    MinOrderAmount = p.MinOrderAmount ?? 0,
+                    StartDate = p.StartDate,
+                    EndDate = p.EndDate,
+                    Quantity = p.Quantity ?? 0,
+                    UsedQuantity = p.UsedQuantity ?? 0,
+                    Description = p.Description ?? "",
+                    ShippingProviderName = p.ShippingProviderName ?? ""
+                })
+                .AsNoTracking()
+                .ToListAsync();
+
+            // 1. Trạng thái theo thời gian và số lượng
+            foreach (var promo in danhSach)
+            {
+                if (promo.EndDate.HasValue && promo.EndDate.Value < today)
+                {
+                    promo.Status = "Hết hạn";
+                }
+                else if (promo.EndDate.HasValue && (promo.EndDate.Value - today).TotalDays <= 5)
+                {
+                    promo.Status = "Sắp hết hạn";
+                }
+                else if (promo.Quantity == promo.UsedQuantity)
+                {
+                    promo.Status = "Đã dùng hết";
+                }
+                else
+                {
+                    promo.Status = "Đang hoạt động";
+                }
+            }
+
+            // 2. Lọc theo trạng thái
             if (!string.IsNullOrEmpty(status) && status != "Tất cả")
             {
                 danhSach = danhSach.Where(p => p.Status == status).ToList();
             }
 
-            // 2. Lọc theo từ khoá tìm kiếm (mã hoặc tên)
+            // 3. Tìm kiếm
             if (!string.IsNullOrWhiteSpace(search))
             {
                 var keyword = search.ToLower();
                 danhSach = danhSach.Where(p =>
-                    (p.PromoCode.ToString().ToLower().Contains(keyword)) ||
-                    (p.PromoName != null && p.PromoName.ToLower().Contains(keyword))
+                    p.PromoCode.ToString().Contains(keyword) ||
+                    p.PromoName.ToLower().Contains(keyword) ||
+                    p.PromoNameCode.ToLower().Contains(keyword)
                 ).ToList();
             }
 
-            // 3. Tính toán thống kê
+            // 4. Thống kê
             var tongMa = danhSach.Count;
             var daSuDung = danhSach.Sum(p => p.UsedQuantity ?? 0);
             var tongGiamGia = danhSach.Sum(p => (p.UsedQuantity ?? 0) * (p.DiscountValue ?? 0));
             var tongSoLuong = danhSach.Sum(p => p.Quantity ?? 0);
             var tyLeChuyenDoi = tongSoLuong > 0 ? ((double)daSuDung / tongSoLuong * 100).ToString("0.0") : "0";
 
-            // 4. Truyền lên view qua ViewBag
+            // 5. Truyền lên view
             ViewBag.TongMa = tongMa;
             ViewBag.DaSuDung = daSuDung;
             ViewBag.TietKiem = tongGiamGia;

@@ -197,10 +197,23 @@
                     <div class="col-xl-4 col-lg-6 mb-4">
                         <div class="card coupon-card h-100">
                             <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-start mb-3">
-                                    <div class="coupon-code">@item.PromoName</div>
-                                    <span class="badge bg-@badge">@item.Status</span>
+                                <!-- CODE HIỂN THỊ MÃ GIẢM GIÁ CHUẨN SHOPEE -->
+                                <div class="d-flex flex-wrap gap-2 mb-3">
+                                    <span class="badge bg-warning text-dark fw-bold px-3 py-1" style="border-radius: 20px; font-family: 'Courier New', monospace;">
+                                        @item.PromoName
+                                    </span>
+                                    @{
+                                        var codes = item.PromoNameCode?.Split(' ', StringSplitOptions.RemoveEmptyEntries) ?? new string[0];
+                                        foreach (var code in codes)
+                                        {
+                                            <span class="badge bg-warning text-dark fw-bold px-3 py-1" style="border-radius: 20px; font-family: 'Courier New', monospace;">
+                                                @code
+                                            </span>
+                                        }
+                                    }
+                                    <span class="badge bg-@badge ms-auto">@item.Status</span>
                                 </div>
+
                                 <h5 class="card-title">@item.PromoType</h5>
                                 <p class="card-text text-muted">Áp dụng cho đơn từ ₫@item.MinOrderAmount?.ToString("0")</p>
                                 <div class="row text-center mb-3">
