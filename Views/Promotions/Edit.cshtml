@@ -14,8 +14,28 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <style>
+        .form-section {
+            border: 1px solid #e3e3e3;
+            border-left: 5px solid #ffc107;
+            padding: 20px;
+            margin-bottom: 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            background: #fff;
+        }
+
+            .form-section h5 {
+                color: #212529;
+                margin-bottom: 16px;
+                font-weight: 600;
+            }
+
+        .form-floating label {
+            padding-left: 12px;
+        }
         :root {
             --primary-color: #ffc107;
             --sidebar-width: 280px;
@@ -110,7 +130,58 @@
             border-radius: 20px;
             font-family: 'Courier New', monospace;
         }
+        /* Vùng chọn Select2 nhiều - giữ đẹp + scroll nếu quá nhiều */
+        .select2-container--default .select2-selection--multiple {
+            border: 1px solid #ced4da;
+            border-radius: 0.375rem;
+            padding: 6px;
+            min-height: 38px;
+            max-height: 90px; /* Giới hạn chiều cao */
+            background-color: #fff;
+            display: flex;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            overflow-y: auto; /* Thêm scroll dọc */
+            overflow-x: hidden;
+            scrollbar-width: thin; /* Firefox */
+        }
 
+        /* Style tag đã chọn */
+        .select2-selection__rendered {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        /* Tag chip style */
+        .select2-selection__choice {
+            background-color: #0d6efd;
+            border: none;
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+
+        /* Nút xoá tag */
+        .select2-selection__choice__remove {
+            margin-right: 6px;
+            color: white;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        /* Thanh cuộn nhẹ nhàng */
+        .select2-container--default .select2-selection--multiple::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .select2-container--default .select2-selection--multiple::-webkit-scrollbar-thumb {
+            background-color: #ccc;
+            border-radius: 3px;
+        }
         @@media (max-width: 768px) {
             .sidebar {
                 width: 80px;
@@ -279,92 +350,148 @@
             </div>
         </nav>
 
-        <div class="container-fluid p-4">
+        <div class="container py-5">
+            <form asp-action="Edit" asp-controller="Promotions" method="post" class="needs-validation" novalidate>
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div class="alert alert-danger">
+                        <strong>Form có lỗi:</strong>
+                        <ul>
+                            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                            {
+                                <li>@error.ErrorMessage</li>
+                            }
+                        </ul>
+                    </div>
+                }
 
-            <form asp-action="Edit" asp-controller="Promotions" method="post">
                 <input type="hidden" asp-for="PromoCode" />
 
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label asp-for="PromoName" class="form-label">Tên mã giảm giá</label>
-                            <input asp-for="PromoName" class="form-control" placeholder="Ví dụ: SALE20" />
+                <div class="form-section">
+                    <h5><i class="fas fa-info-circle me-2"></i>Thông tin cơ bản</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6 form-floating">
+                            <input asp-for="PromoName" class="form-control" placeholder="" />
+                            <label asp-for="PromoName">Tên mã giảm giá</label>
                             <span asp-validation-for="PromoName" class="text-danger"></span>
                         </div>
+                        <div class="col-md-6 form-floating">
+                            <input asp-for="PromoNameCode" class="form-control" readonly disabled placeholder="" />
+                            <label asp-for="PromoNameCode">Mã giảm giá tự tạo</label>
+                        </div>
                     </div>
-                    <div class="col-md-6">
-                        <div class="mb-3">
+                </div>
+
+                <div class="form-section">
+                    <h5><i class="fas fa-percent me-2"></i>Giá trị & Loại giảm</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
                             <label asp-for="PromoType" class="form-label">Loại giảm giá</label>
                             <select asp-for="PromoType" class="form-select">
-                                <option value="">-- Chọn loại giảm giá --</option>
-                                <option value="Phần trăm" selected="@((Model.PromoType == "Phần trăm") ? "selected" : "")">Phần trăm</option>
-                                <option value="Số tiền cố định" selected=@(Model.PromoType == "Số tiền cố định" ? "selected" : "")>Số tiền cố định</option>
-                                <option value="Miễn phí vận chuyển" selected=@(Model.PromoType == "Miễn phí vận chuyển" ? "selected" : "")>Miễn phí vận chuyển</option>
+                                <option value="">-- Chọn loại --</option>
+                                <option value="Phần trăm" selected=@(Model.PromoType == "Phần trăm")>Phần trăm</option>
+                                <option value="Số tiền cố định" selected=@(Model.PromoType == "Số tiền cố định")>Số tiền cố định</option>
+                                <option value="Miễn phí vận chuyển" selected=@(Model.PromoType == "Miễn phí vận chuyển")>Miễn phí vận chuyển</option>
                             </select>
                             <span asp-validation-for="PromoType" class="text-danger"></span>
                         </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label asp-for="DiscountValue" class="form-label">Giá trị giảm</label>
-                            <input asp-for="DiscountValue" class="form-control" />
+                        <div class="col-md-6 input-group">
+                            <input asp-for="DiscountValue" class="form-control" placeholder="Giá trị giảm" />
+                            <span class="input-group-text">VNĐ / %</span>
                             <span asp-validation-for="DiscountValue" class="text-danger"></span>
                         </div>
                     </div>
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label asp-for="Quantity" class="form-label">Số lượng</label>
-                            <input asp-for="Quantity" class="form-control" />
-                            <span asp-validation-for="Quantity" class="text-danger"></span>
-                        </div>
-                    </div>
                 </div>
 
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label asp-for="StartDate" class="form-label">Ngày bắt đầu</label>
-                            <input asp-for="StartDate" class="form-control" type="date" />
+                <div class="form-section">
+                    <h5><i class="fas fa-calendar-alt me-2"></i>Thời gian áp dụng</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6 form-floating">
+                            <input asp-for="StartDate" type="date" class="form-control" placeholder="" />
+                            <label asp-for="StartDate">Ngày bắt đầu</label>
                             <span asp-validation-for="StartDate" class="text-danger"></span>
                         </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label asp-for="EndDate" class="form-label">Ngày kết thúc</label>
-                            <input asp-for="EndDate" class="form-control" type="date" />
+                        <div class="col-md-6 form-floating">
+                            <input asp-for="EndDate" type="date" class="form-control" placeholder="" />
+                            <label asp-for="EndDate">Ngày kết thúc</label>
                             <span asp-validation-for="EndDate" class="text-danger"></span>
                         </div>
                     </div>
                 </div>
 
-                <div class="mb-3">
-                    <label asp-for="MinOrderAmount" class="form-label">Giá trị đơn hàng tối thiểu</label>
-                    <input asp-for="MinOrderAmount" class="form-control" />
-                    <span asp-validation-for="MinOrderAmount" class="text-danger"></span>
+                <div class="form-section">
+                    <h5><i class="fas fa-layer-group me-2"></i>Điều kiện khác</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6 form-floating">
+                            <input asp-for="Quantity" class="form-control" placeholder="" />
+                            <label asp-for="Quantity">Số lượng</label>
+                            <span asp-validation-for="Quantity" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 form-floating">
+                            <input asp-for="MinOrderAmount" class="form-control" placeholder="" />
+                            <label asp-for="MinOrderAmount">Giá trị đơn hàng tối thiểu</label>
+                            <span asp-validation-for="MinOrderAmount" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Status" class="form-label">Đối tượng áp dụng</label>
+                            <select asp-for="Status" class="form-select">
+                                <option value="Tất cả khách hàng" selected=@(Model.Status == "Tất cả khách hàng")>Tất cả khách hàng</option>
+                                <option value="Khách hàng mới" selected=@(Model.Status == "Khách hàng mới")>Khách hàng mới</option>
+                                <option value="Khách hàng VIP" selected=@(Model.Status == "Khách hàng VIP")>Khách hàng VIP</option>
+                                <option value="Sinh viên" selected=@(Model.Status == "Sinh viên")>Sinh viên</option>
+                            </select>
+                            <span asp-validation-for="Status" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-12">
+                            <label asp-for="Description" class="form-label">Mô tả</label>
+                            <textarea asp-for="Description" class="form-control" rows="3" placeholder="Mô tả chi tiết về mã giảm giá..."></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+                    </div>
                 </div>
+                <div class="form-section">
+                    <h5><i class="fas fa-truck me-2"></i>Đơn vị vận chuyển áp dụng</h5>
 
-                <div class="mb-3">
-                    <label asp-for="Status" class="form-label">Đối tượng áp dụng</label>
-                    <select asp-for="Status" class="form-select">
-                        <option value="Tất cả khách hàng" selected=@(Model.Status == "Tất cả khách hàng" ? "selected" : "")>Tất cả khách hàng</option>
-                        <option value="Khách hàng mới" selected=@(Model.Status == "Khách hàng mới" ? "selected" : "")>Khách hàng mới</option>
-                        <option value="Khách hàng VIP" selected=@(Model.Status == "Khách hàng VIP" ? "selected" : "")>Khách hàng VIP</option>
-                        <option value="Sinh viên" selected=@(Model.Status == "Sinh viên" ? "selected" : "")>Sinh viên</option>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label for="ShippingProvider" class="form-label mb-0">Chọn đơn vị vận chuyển</label>
+                        <button type="button" class="btn btn-sm btn-outline-primary" id="toggleSelectAll">
+                            <i class="fas fa-check-double me-1"></i><span id="toggleText">Chọn tất cả</span>
+                        </button>
+                    </div>
+
+                    <select id="ShippingProvider"
+                            name="selectedShippingProviderIds"
+                            class="form-select"
+                            multiple>
+                        @{
+                            var providers = ViewBag.ShippingProviders as List<SelectListItem>;
+                            var selectedIds = ViewBag.SelectedProviderIds as int[] ?? Array.Empty<int>();
+                        }
+
+                        @if (providers != null && providers.Any())
+                        {
+                            foreach (var provider in providers)
+                            {
+                                bool isSelected = selectedIds.Contains(int.Parse(provider.Value));
+                                var selectedAttr = isSelected ? " selected" : "";
+
+                                @Html.Raw($"<option value='{provider.Value}'{selectedAttr}>{provider.Text}</option>")
+                            }
+                        }
+                        else
+                        {
+                            <option disabled>Không có đơn vị vận chuyển</option>
+                        }
+
                     </select>
-                    <span asp-validation-for="Status" class="text-danger"></span>
-                </div>
 
-                <div class="mb-3">
-                    <label class="form-label">Mô tả</label>
-                    <textarea class="form-control" rows="3" placeholder="Nhập mô tả chi tiết về mã giảm giá..."></textarea>
+                    <span class="text-danger">
+                        @Html.ValidationMessage("selectedShippingProviderIds", "", new { @class = "text-danger" })
+                    </span>
                 </div>
-
-                <div class="d-flex justify-content-between">
-                    <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
-                    <a asp-action="MaGiamGia" asp-controller="Admin" class="btn btn-outline-secondary">Quay lại danh sách</a>
+                <div class="d-flex justify-content-end gap-2">
+                    <button type="submit" class="btn btn-primary px-4"><i class="fas fa-save me-2"></i>Lưu thay đổi</button>
+                    <a asp-action="MaGiamGia" asp-controller="Admin" class="btn btn-outline-secondary px-4">Quay lại</a>
                 </div>
             </form>
         </div>
@@ -377,8 +504,55 @@
     }
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script>
+         $('form').on('submit', function () {
+            const selected = $('#ShippingProvider').val();
+            console.log("✅ Đã chọn đơn vị vận chuyển:", selected);
+        });
+        $(document).ready(function () {
+            const $select = $('#ShippingProvider');
+            const $toggleBtn = $('#toggleSelectAll');
+            const $toggleText = $('#toggleText');
+
+            // Kích hoạt Select2
+            $select.select2({
+                allowClear: true,
+                width: '100%'
+            });
+
+            // Cập nhật text nút dựa trên trạng thái hiện tại
+            function updateToggleLabel() {
+                const total = $select.find('option').length;
+                const selected = $select.find('option:selected').length;
+                const isAllSelected = total > 0 && total === selected;
+                $toggleText.text(isAllSelected ? "Bỏ chọn tất cả" : "Chọn tất cả");
+            }
+
+            // Gọi khi khởi tạo
+            updateToggleLabel();
+
+            // Toggle hành vi
+            $toggleBtn.on('click', function () {
+                const total = $select.find('option').length;
+                const selected = $select.find('option:selected').length;
+                const isAllSelected = total > 0 && total === selected;
+
+                // Nếu đã chọn hết thì bỏ chọn, ngược lại thì chọn hết
+                $select.find('option').prop('selected', !isAllSelected);
+                $select.trigger('change'); // cập nhật lại UI Select2
+
+                updateToggleLabel();
+            });
+
+            // Nếu người dùng chọn/bỏ thủ công
+            $select.on('change', updateToggleLabel);
+        });
+
             // Sidebar Toggle
             document.getElementById('sidebarToggle').addEventListener('click', function() {
                 const sidebar = document.getElementById('sidebar');

@@ -16,6 +16,41 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
     <style>
+        .voucher-detail {
+            max-width: 800px;
+            margin: 4rem auto;
+            padding: 2rem;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            font-size: 16px;
+        }
+
+            .voucher-detail h5 {
+                color: #dc3545;
+                font-weight: bold;
+            }
+
+            .voucher-detail .badge {
+                font-size: 1rem;
+            }
+
+            .voucher-detail dt {
+                font-weight: 600;
+            }
+
+            .voucher-detail dd {
+                margin-bottom: 1rem;
+            }
+
+            .voucher-detail ul {
+                list-style-type: none;
+                padding-left: 0;
+            }
+
+                .voucher-detail ul li::before {
+                    content: none;
+                }
         :root {
             --primary-color: #ffc107;
             --sidebar-width: 280px;
@@ -278,84 +313,120 @@
                 </div>
             </div>
         </nav>
-        <div class="container-fluid p-4">
+        <div class="voucher-detail">
+            <dl class="row">
+                <dt class="col-sm-4">Tên mã giảm giá:</dt>
+                <dd class="col-sm-8">@Model.PromoName</dd>
 
-<div class="mb-3">
-    <dl class="row">
-        <dt class="col-sm-3">Tên mã</dt>
-        <dd class="col-sm-9">@Model.PromoName</dd>
+                <dt class="col-sm-4">Mã sử dụng:</dt>
+                <dd class="col-sm-8">
+                    <span class="badge bg-warning text-dark">@Model.PromoNameCode</span>
+                </dd>
 
-        <dt class="col-sm-3">Loại giảm giá</dt>
-        <dd class="col-sm-9">@Model.PromoType</dd>
+                <dt class="col-sm-4">Ưu đãi:</dt>
+                <dd class="col-sm-8">Giảm @FormatDiscount(Model.DiscountValue, Model.PromoType) cho đơn từ @FormatCurrency(Model.MinOrderAmount)</dd>
 
-        <dt class="col-sm-3">Giá trị giảm</dt>
-                    <dd class="col-sm-9">@Model.DiscountValue?.ToString("0")</dd>
+                <dt class="col-sm-4">Thời gian áp dụng:</dt>
+                <dd class="col-sm-8">@Model.StartDate?.ToString("dd.MM.yyyy") – @Model.EndDate?.ToString("dd.MM.yyyy")</dd>
 
-        <dt class="col-sm-3">Đơn tối thiểu</dt>
-                    <dd class="col-sm-9">@Model.MinOrderAmount?.ToString("0")</dd>
+                <dt class="col-sm-4">HSD:</dt>
+                <dd class="col-sm-8">@Model.EndDate?.ToString("dd.MM.yyyy")</dd>
 
-        <dt class="col-sm-3">Bắt đầu</dt>
-        <dd class="col-sm-9">@Model.StartDate?.ToString("dd/MM/yyyy")</dd>
+                <dt class="col-sm-4">Số lượng:</dt>
+                <dd class="col-sm-8">@Model.Quantity &nbsp;&nbsp; | &nbsp;&nbsp; Đã dùng: @Model.UsedQuantity</dd>
 
-        <dt class="col-sm-3">Kết thúc</dt>
-        <dd class="col-sm-9">@Model.EndDate?.ToString("dd/MM/yyyy")</dd>
+                <dt class="col-sm-4">Đối tượng áp dụng:</dt>
+                <dd class="col-sm-8">@Model.Status</dd>
 
-        <dt class="col-sm-3">Số lượng</dt>
-        <dd class="col-sm-9">@Model.Quantity</dd>
+                <dt class="col-sm-4">Mô tả:</dt>
+                <dd class="col-sm-8">@Model.Description</dd>
 
-        <dt class="col-sm-3">Đã sử dụng</dt>
-        <dd class="col-sm-9">@Model.UsedQuantity</dd>
-
-                    <dt class="col-sm-3">Đối tượng áp dụng</dt>
-        <dd class="col-sm-9">@Model.Status</dd>
-    </dl>
-</div>
-
-<div class="d-flex gap-2">
-    <a class="btn btn-warning" asp-action="Edit" asp-route-id="@Model.PromoCode">Chỉnh sửa</a>
-    <a class="btn btn-secondary" asp-action="MaGiamGia" asp-controller="Admin">Quay lại</a>
-</div>
-</div>
-        <!-- Bootstrap JS -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-        <script>
-                // Sidebar Toggle
-                document.getElementById('sidebarToggle').addEventListener('click', function() {
-                    const sidebar = document.getElementById('sidebar');
-                    const mainContent = document.getElementById('mainContent');
-
-                    sidebar.classList.toggle('collapsed');
-                    mainContent.classList.toggle('expanded');
-
-                    localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
-                });
-
-                // Restore sidebar state
-                if (localStorage.getItem('sidebarCollapsed') === 'true') {
-                    document.getElementById('sidebar').classList.add('collapsed');
-                    document.getElementById('mainContent').classList.add('expanded');
-                }
-
-                // Logout function
-                function logout() {
-                    if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
-                        alert('Đăng xuất thành công!');
+                <dt class="col-sm-4">Đơn vị vận chuyển:</dt>
+                <dd class="col-sm-8">
+                    @if (Model.ShippingProviders != null && Model.ShippingProviders.Any())
+                    {
+                        <ul class="mb-0">
+                            @foreach (var provider in Model.ShippingProviders)
+                            {
+                                <li>@provider.ShippingProviderName</li>
+                            }
+                        </ul>
                     }
-                }
-                  document.addEventListener("DOMContentLoaded", function () {
-                const currentPath = window.location.pathname.split("/").pop(); // Lấy tên file cuối
-                const navLinks = document.querySelectorAll(".sidebar .nav-link");
-
-                navLinks.forEach(link => {
-                    const href = link.getAttribute("href");
-                    if (href && currentPath === href) {
-                        link.classList.add("active");
-                    } else {
-                        link.classList.remove("active");
+                    else
+                    {
+                        <span class="text-muted fst-italic">Không có</span>
                     }
-                });
+                </dd>
+            </dl>
+            <div class="d-flex gap-2">
+                <a class="btn btn-warning" asp-action="Edit" asp-route-id="@Model.PromoCode">Chỉnh sửa</a>
+                <a class="btn btn-secondary" asp-action="MaGiamGia" asp-controller="Admin">Quay lại</a>
+            </div>
+        </div>
+    </div>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    @functions {
+        string FormatCurrency(decimal? value)
+        {
+            if (value == null) return "0";
+
+            var amount = value.Value;
+
+            if (amount >= 1000)
+                return $"{amount / 1000:#.##} triệu";
+            else
+                return $"{amount:#.##}K";
+        }
+        string FormatDiscount(decimal? value, string type)
+        {
+            if (value == null) return "0";
+
+            if (type == "Phần trăm" || type.Contains("%"))
+                return $"{Math.Round(value.Value, 0)}%"; // làm tròn về số nguyên
+
+            return FormatCurrency(value);
+        }
+    }
+
+    <script>
+
+            // Sidebar Toggle
+            document.getElementById('sidebarToggle').addEventListener('click', function() {
+                const sidebar = document.getElementById('sidebar');
+                const mainContent = document.getElementById('mainContent');
+
+                sidebar.classList.toggle('collapsed');
+                mainContent.classList.toggle('expanded');
+
+                localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
             });
-        </script>
+
+            // Restore sidebar state
+            if (localStorage.getItem('sidebarCollapsed') === 'true') {
+                document.getElementById('sidebar').classList.add('collapsed');
+                document.getElementById('mainContent').classList.add('expanded');
+            }
+
+            // Logout function
+            function logout() {
+                if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+                    alert('Đăng xuất thành công!');
+                }
+            }
+              document.addEventListener("DOMContentLoaded", function () {
+            const currentPath = window.location.pathname.split("/").pop(); // Lấy tên file cuối
+            const navLinks = document.querySelectorAll(".sidebar .nav-link");
+
+            navLinks.forEach(link => {
+                const href = link.getAttribute("href");
+                if (href && currentPath === href) {
+                    link.classList.add("active");
+                } else {
+                    link.classList.remove("active");
+                }
+            });
+        });
+    </script>
 </body>
 </html>
