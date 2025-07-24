@@ -1,0 +1,30 @@
+﻿@model IEnumerable<DATN.Models.Color>
+@{
+    ViewData["Title"] = "Danh sách màu sắc";
+}
+<div class="main-content" id="mainContent">
+<h2>Danh sách màu sắc</h2>
+<a asp-action="Create" class="btn btn-primary">Thêm mới</a>
+<table class="table table-bordered mt-3">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Tên màu</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.ColorId</td>
+                <td>@item.ColorName</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.ColorId" class="btn btn-warning">Sửa</a>
+                    <a asp-action="Delete" asp-route-id="@item.ColorId" class="btn btn-danger">Xóa</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+</div>

@@ -1,0 +1,24 @@
+﻿@model DATN.Models.Color
+
+@{
+    ViewData["Title"] = "Chi tiết màu sắc";
+}
+<div class="main-content" id="mainContent">
+
+<h2>Chi tiết màu sắc</h2>
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        <dl class="row">
+            <dt class="col-sm-3">ID</dt>
+            <dd class="col-sm-9">@Model.ColorId</dd>
+
+            <dt class="col-sm-3">Tên màu</dt>
+            <dd class="col-sm-9">@Model.ColorName</dd>
+        </dl>
+        <a asp-action="Edit" asp-route-id="@Model.ColorId" class="btn btn-warning">Sửa</a>
+        <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+    </div>
+</div>
+</div>

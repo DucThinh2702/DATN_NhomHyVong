@@ -1,0 +1,26 @@
+﻿@model DATN.Models.Size
+@{
+    ViewData["Title"] = "Thêm kích cỡ";
+}
+<div class="main-content" id="mainContent">
+<h2>Thêm kích cỡ</h2>
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Create">
+            <div class="form-group mb-3">
+                <label asp-for="SizeName" class="control-label"></label>
+                <input asp-for="SizeName" class="form-control" />
+                <span asp-validation-for="SizeName" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-primary">Lưu</button>
+            <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+        </form>
+    </div>
+</div>
+</div>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

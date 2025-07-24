@@ -9,14 +9,12 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<DatnContext>(options =>
     options.UseSqlServer(connectionString));
 
-// ✅ Đăng ký MVC
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<DatnContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 var app = builder.Build();
 
-// ✅ Cấu hình middleware pipeline
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -25,12 +23,9 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
-
 app.UseAuthorization();
 
-// ✅ Cấu hình route mặc định
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Admin}/{action=SanPham}/{id?}");
