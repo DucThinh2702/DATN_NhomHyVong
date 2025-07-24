@@ -4,105 +4,107 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<!-- Giữ nguyên phần thống kê, filter và các box bên trên như ảnh -->
-<h2>Đơn hàng</h2>
+<div class="main-content" id="mainContent">
+    <h2>Đơn hàng</h2>
 
-<div class="row mb-3">
-    <div class="col">
-        <div class="card text-center">
-            <div class="card-body">
-                <h6 class="text-muted">TỔNG ĐƠN HÀNG</h6>
-                <h4>@Model.Count()</h4>
+    <!-- Thống kê đơn hàng -->
+    <div class="row mb-3">
+        <div class="col">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h6 class="text-muted">TỔNG ĐƠN HÀNG</h6>
+                    <h4>@Model.Count()</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h6 class="text-muted">CHỜ XỬ LÝ</h6>
+                    <h4>@Model.Count(x => x.OrderStatus?.ToLower() == "đang xử lý")</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h6 class="text-muted">HOÀN THÀNH</h6>
+                    <h4>@Model.Count(x => x.OrderStatus?.ToLower() == "hoàn thành")</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h6 class="text-muted">ĐÃ HUỶ</h6>
+                    <h4>@Model.Count(x => x.OrderStatus?.ToLower() == "đã huỷ")</h4>
+                </div>
             </div>
         </div>
     </div>
-    <div class="col">
-        <div class="card text-center">
-            <div class="card-body">
-                <h6 class="text-muted">CHỜ XỬ LÝ</h6>
-                <h4>@Model.Count(x => x.OrderStatus?.ToLower() == "đang xử lý")</h4>
-            </div>
-        </div>
-    </div>
-    <div class="col">
-        <div class="card text-center">
-            <div class="card-body">
-                <h6 class="text-muted">HOÀN THÀNH</h6>
-                <h4>@Model.Count(x => x.OrderStatus?.ToLower() == "hoàn thành")</h4>
-            </div>
-        </div>
-    </div>
-    <div class="col">
-        <div class="card text-center">
-            <div class="card-body">
-                <h6 class="text-muted">ĐÃ HUỶ</h6>
-                <h4>@Model.Count(x => x.OrderStatus?.ToLower() == "đã huỷ")</h4>
-            </div>
-        </div>
-    </div>
-</div>
 
-<!-- Bảng danh sách đơn hàng -->
-<table class="table table-bordered table-hover">
-    <thead class="table-light">
-        <tr>
-            <th>Mã đơn</th>
-            <th>Khách hàng</th>
-            <th>Ngày đặt</th>
-            <th>Sản phẩm</th>
-            <th>Tổng tiền</th>
-            <th>Trạng thái</th>
-            <th>Thao tác</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
+    <!-- Bảng danh sách đơn hàng -->
+    <table class="table table-bordered table-hover">
+        <thead class="table-light">
             <tr>
-                <td>#ORD-@item.OrderID</td>
-                <td>
-                    @item.RecipientName<br />
-                    <small>@item.RecipientPhone</small>
-                </td>
-                <td>@item.OrderDate.ToString("dd/MM/yyyy")</td>
-                <td>@item.Quantity sản phẩm</td>
-                <td>@string.Format("{0:#,##0}₫", item.TotalAmount)</td>
-                <td>
-                    @switch (item.OrderStatus?.ToLower())
-                    {
-                        case "hoàn thành":
-                            <span class="badge bg-success">Hoàn thành</span>
-                            ; break;
-                        case "đang xử lý":
-                            <span class="badge bg-primary">Đang xử lý</span>
-                            ; break;
-                        case "chờ thanh toán":
-                            <span class="badge bg-warning text-dark">Chờ thanh toán</span>
-                            ; break;
-                        case "đã huỷ":
-                            <span class="badge bg-danger">Đã huỷ</span>
-                            ; break;
-                        case "đã giao":
-                            <span class="badge bg-info text-dark">Đã giao</span>
-                            ; break;
-                        default:
-                            <span class="badge bg-secondary">@item.OrderStatus</span>
-                            ; break;
-                    }
-                </td>
-                <td>
-                    <a href="@Url.Action("Details", "Orders", new { id = item.OrderID })" class="btn btn-sm btn-info">
-                        <i class="fas fa-eye"></i> Xem
-                    </a>
-                    <a href="@Url.Action("Edit", "Orders", new { id = item.OrderID })" class="btn btn-sm btn-warning">
-                        <i class="fas fa-edit"></i> Sửa
-                    </a>
-                    @* <a href="@Url.Action("Delete", "Orders", new { id = item.OrderID })" class="btn btn-sm btn-danger" onclick="return confirm('Bạn có chắc muốn xoá đơn hàng này không?');">
-                        <i class="fas fa-trash"></i> Xoá
-                    </a> *@
-
-                </td>
+                <th>Mã đơn</th>
+                <th>Khách hàng</th>
+                <th>Ngày đặt</th>
+                <th>Sản phẩm</th>
+                <th>Tổng tiền</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>#ORD-@item.OrderId</td>
+                    <td>
+                        @item.RecipientName<br />
+                        <small>@item.RecipientPhone</small>
+                    </td>
+                    <td>@(item.OrderDate?.ToString("dd/MM/yyyy"))</td>
+                    <td>@item.Quantity sản phẩm</td>
+                    <td>@string.Format("{0:#,##0}₫", item.TotalAmount)</td>
+                    <td>
+                        @{
+                            var status = item.OrderStatus?.ToLower();
+                        }
+
+                        @if (status == "processing")
+                        {
+                            <span class="badge bg-primary">Đang xử lý</span>
+                        }
+                        else if (status == "shipped")
+                        {
+                            <span class="badge bg-info text-dark">Đã giao</span>
+                        }
+                        else if (status == "delivered")
+                        {
+                            <span class="badge bg-success">Hoàn thành</span>
+                        }
+                        else if (status == "cancelled")
+                        {
+                            <span class="badge bg-danger">Đã huỷ</span>
+                        }
+                        else if (status == "pending")
+                        {
+                            <span class="badge bg-warning text-dark">Chờ thanh toán</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">@item.OrderStatus</span>
+                        }
+                    </td>   
+                    <td>
+                        <a href="@Url.Action("Details", "Orders", new { id = item.OrderId })" class="btn btn-sm btn-info">
+                            <i class="fas fa-eye"></i> Xem
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

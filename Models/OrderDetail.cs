@@ -1,28 +1,23 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
 
-namespace DATN.Models
+namespace DATN.Models;
+
+public partial class OrderDetail
 {
-    public class OrderDetail
-    {
-        [Key]
-        public int OrderDetailID { get; set; } 
+    public int OrderDetailId { get; set; }
 
-        [Required]
-        public int OrderID { get; set; }      
+    public int? OrderId { get; set; }
 
-        [Required]
-        public int ProductID { get; set; }     
+    public int? ProductId { get; set; }
 
-        [Required]
-        [Range(1, int.MaxValue, ErrorMessage = "Số lượng phải lớn hơn 0")]
-        public int Quantity { get; set; }
+    public int? Quantity { get; set; }
 
-        [Required]
-        [DataType(DataType.Currency)]
-        public decimal UnitPrice { get; set; }
+    public decimal? UnitPrice { get; set; }
 
-        [Required]
-        [DataType(DataType.Currency)]
-        public decimal TotalPrice { get; set; }
-    }
+    public decimal? TotalPrice { get; set; }
+
+    public virtual Order? Order { get; set; }
+
+    public virtual Product? Product { get; set; }
 }

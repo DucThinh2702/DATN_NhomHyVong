@@ -4,14 +4,42 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewData["Title"] = "Chi tiết đơn hàng";
 }
-
-<h3>Chi tiết đơn hàng #@order.OrderID</h3>
+<div class="main-content" id="mainContent">
+    <h3>Chi tiết đơn hàng #@order.OrderId</h3>
 
 <p>
     <strong>Người nhận:</strong> @order.RecipientName<br />
     <strong>SĐT:</strong> @order.RecipientPhone<br />
     <strong>Địa chỉ:</strong> @order.DeliveryAddress<br />
-    <strong>Trạng thái:</strong> @order.OrderStatus
+        <strong>Trạng thái:</strong>
+        @{
+            var status = order.OrderStatus?.ToLower();
+            if (status == "processing")
+            {
+                <span class="badge bg-primary">Đang xử lý</span>
+            }
+            else if (status == "shipped")
+            {
+                <span class="badge bg-info text-dark">Đã giao</span>
+            }
+            else if (status == "delivered")
+            {
+                <span class="badge bg-success">Hoàn thành</span>
+            }
+            else if (status == "cancelled")
+            {
+                <span class="badge bg-danger">Đã huỷ</span>
+            }
+            else if (status == "pending")
+            {
+                <span class="badge bg-warning text-dark">Chờ thanh toán</span>
+            }
+            else
+            {
+                <span class="badge bg-secondary">@order.OrderStatus</span>
+            }
+        }
+
 </p>
 
 <table class="table table-bordered">
@@ -27,7 +55,7 @@
         @foreach (var d in Model)
         {
             <tr>
-                <td>@d.ProductID</td>
+                <td>@d.ProductId</td>
                 <td>@d.Quantity</td>
                 <td>@string.Format("{0:#,##0}₫", d.UnitPrice)</td>
                 <td>@string.Format("{0:#,##0}₫", d.TotalPrice)</td>
@@ -37,3 +65,4 @@
 </table>
 
 <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+</div>

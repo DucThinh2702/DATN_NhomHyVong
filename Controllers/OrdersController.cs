@@ -114,7 +114,7 @@ namespace DATN.Controllers
             }
 
             // lấy đơn hàng gốc từ database
-            var existingOrder = await _orderRepo.GetByIdAsync(model.Order.OrderID);
+            var existingOrder = await _orderRepo.GetByIdAsync(model.Order.OrderId);
             if (existingOrder == null)
             {
                 return NotFound();
