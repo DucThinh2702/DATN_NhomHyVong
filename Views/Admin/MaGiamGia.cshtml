@@ -17,6 +17,293 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
     <style>
+        .coupon-style {
+            border: 1px solid rgba(0,0,0,0.05);
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            overflow: hidden;
+            background: #fff;
+            transition: all 0.3s ease-in-out;
+        }
+
+            .coupon-style:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            }
+
+        .coupon-left {
+            width: 100px;
+            min-width: 100px;
+            background: linear-gradient(135deg, #ff4d4f, #d9363e);
+            border-right: 1px dashed rgba(255,255,255,0.3);
+            text-align: center;
+        }
+
+        .coupon-style {
+            background: white;
+            border: 2px dashed #dee2e6;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .coupon-left {
+            width: 100px;
+            background: linear-gradient(135deg, #e53935, #d32f2f);
+            border-right: 2px dotted white;
+        }
+
+        .coupon-right {
+            background-color: #fff;
+            position: relative;
+        }
+
+        .voucher-card {
+            border-radius: 10px;
+            border: 1px dashed #ccc;
+            overflow: hidden;
+            background-color: #fff;
+            transition: all 0.3s ease;
+        }
+
+            .voucher-card:hover {
+                box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+                transform: scale(1.01);
+            }
+
+        .voucher-left {
+            width: 100px;
+            background-color: #f44336;
+            text-align: center;
+            padding: 12px 8px;
+            font-size: 13px;
+            border-right: 2px dashed #fff;
+        }
+
+        .voucher-name {
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .voucher-code {
+            background-color: rgba(255,255,255,0.2);
+            padding: 3px 6px;
+            border-radius: 12px;
+            font-size: 12px;
+            margin: 2px 0;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .status-active {
+            background-color: #28a745;
+        }
+
+        .status-warning {
+            background-color: #ffc107;
+        }
+
+        .status-expired {
+            background-color: #6c757d;
+        }
+
+        .status-used-up {
+            background-color: #dc3545;
+        }
+
+        .btn-action {
+            border-radius: 8px;
+            padding: 6px 10px;
+            font-size: 13px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-details {
+            background-color: #fff3cd;
+            border: 1px solid #ffecb5;
+            color: #856404;
+        }
+
+        .btn-edit {
+            background-color: #fff9db;
+            border: 1px solid #ffeeba;
+            color: #8a6d3b;
+        }
+
+        .btn-delete {
+            background-color: #fdecea;
+            border: 1px solid #f5c6cb;
+            color: #a71d2a;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 4px;
+        }
+
+        .status-active {
+            background-color: #28a745;
+        }
+
+        .status-warning {
+            background-color: #ffc107;
+        }
+
+        .status-expired {
+            background-color: #6c757d;
+        }
+
+        .status-used-up {
+            background-color: #dc3545;
+        }
+
+        .coupon-card {
+            transition: all 0.25s ease-in-out;
+            border: 1px solid #e0e0e0;
+            background-color: #fff;
+        }
+
+            .coupon-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.06);
+                border-color: #ffc107;
+            }
+
+        /* === Action Buttons (Chi tiết - Edit - Delete) === */
+        .btn-action {
+            font-weight: 500;
+            border-radius: 8px;
+            padding: 6px 14px;
+            font-size: 14px;
+            transition: all 0.2s ease-in-out;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Chi tiết mã - tone xanh chuẩn admin */
+        /* Chi tiết mã – Xanh lá đậm */
+        .btn-details {
+            color: #198754;
+            border: 1px solid #198754;
+            background-color: #fff;
+        }
+
+            .btn-details:hover {
+                background-color: #198754;
+                color: #fff;
+            }
+
+
+        /* Sửa - tone vàng đậm */
+        .btn-edit {
+            color: #ffc107;
+            border: 1px solid #ffc107;
+            background-color: #fff;
+            padding: 6px 10px;
+        }
+
+            .btn-edit:hover {
+                background-color: #ffc107;
+                color: #212529;
+            }
+
+        /* Xoá - tone đỏ cảnh báo */
+        .btn-delete {
+            color: #dc3545;
+            border: 1px solid #dc3545;
+            background-color: #fff;
+            padding: 6px 10px;
+        }
+
+            .btn-delete:hover {
+                background-color: #dc3545;
+                color: #fff;
+            }
+
+        /* Optional: cho responsive */
+        @@media (max-width: 576px) {
+            .btn-action
+
+        {
+            font-size: 13px;
+            padding: 5px 10px;
+        }
+
+        }
+
+        /* === Filter Buttons Style (Không dùng màu xanh biển) === */
+        .custom-filter-group .custom-filter-btn {
+            color: #333;
+            background-color: #f8f9fa;
+            border: 1px solid #ffc107;
+            border-radius: 0 !important;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+            .custom-filter-group .custom-filter-btn:hover {
+                background-color: #fff3cd;
+                color: #000;
+            }
+
+            .custom-filter-group .custom-filter-btn.active {
+                background-color: #ffc107;
+                color: white;
+                font-weight: 600;
+                border-color: #e0a800;
+            }
+
+            /* Làm nút đầu và cuối bo góc nhẹ */
+            .custom-filter-group .custom-filter-btn:first-child {
+                border-top-left-radius: 8px !important;
+                border-bottom-left-radius: 8px !important;
+            }
+
+            .custom-filter-group .custom-filter-btn:last-child {
+                border-top-right-radius: 8px !important;
+                border-bottom-right-radius: 8px !important;
+            }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+            vertical-align: middle;
+        }
+
+        .status-active {
+            background-color: #28a745; /* xanh lá */
+        }
+
+        .status-warning {
+            background-color: #ffc107; /* vàng */
+        }
+
+        .status-expired {
+            background-color: #6c757d; /* xám */
+        }
+
+        .status-used-up {
+            background-color: #dc3545; /* đỏ */
+        }
+
+        .card:hover {
+            transform: scale(1.01);
+            transition: all 0.3s ease;
+        }
+
         :root {
             --primary-color: #ffc107;
             --sidebar-width: 280px;
@@ -292,67 +579,48 @@
         <!-- Coupons Content -->
         <div class="container-fluid p-4">
             <!-- Stats Cards -->
-            <div class="row mb-4">
-                <div class="col-xl-3 col-md-6 mb-4">
-                    <div class="card stat-card h-100">
-                        <div class="card-body">
-                            <div class="row align-items-center">
-                                <div class="col">
-                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Tổng mã giảm giá</div>
-                                    <div class="h5 mb-0 font-weight-bold">@ViewBag.TongMa</div>
-                                </div>
-                                <div class="col-auto">
-                                    <i class="fas fa-ticket-alt fa-2x text-primary"></i>
-                                </div>
+            <div class="row g-4 mb-4">
+                <div class="col-md-6 col-xl-3">
+                    <div class="card shadow-sm border-0 rounded-4 bg-light-subtle">
+                        <div class="card-body d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-uppercase text-muted small mb-1">Tổng mã giảm giá</h6>
+                                <h4 class="fw-bold text-dark">@ViewBag.TongMa</h4>
                             </div>
+                            <i class="fas fa-ticket-alt fa-2x text-warning"></i>
                         </div>
                     </div>
                 </div>
-
-                <div class="col-xl-3 col-md-6 mb-4">
-                    <div class="card stat-card h-100">
-                        <div class="card-body">
-                            <div class="row align-items-center">
-                                <div class="col">
-                                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Đã sử dụng</div>
-                                    <div class="h5 mb-0 font-weight-bold">@ViewBag.DaSuDung.ToString("N0")</div>
-                                </div>
-                                <div class="col-auto">
-                                    <i class="fas fa-check-circle fa-2x text-success"></i>
-                                </div>
+                <div class="col-md-6 col-xl-3">
+                    <div class="card shadow-sm border-0 rounded-4 bg-light-subtle">
+                        <div class="card-body d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-uppercase text-muted small mb-1">Đã sử dụng</h6>
+                                <h4 class="fw-bold text-success">@ViewBag.DaSuDung.ToString("N0")</h4>
                             </div>
+                            <i class="fas fa-check-circle fa-2x text-success"></i>
                         </div>
                     </div>
                 </div>
-
-                <div class="col-xl-3 col-md-6 mb-4">
-                    <div class="card stat-card h-100">
-                        <div class="card-body">
-                            <div class="row align-items-center">
-                                <div class="col">
-                                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Tiết kiệm khách hàng</div>
-                                    <div class="h5 mb-0 font-weight-bold">₫@ViewBag.TietKiem.ToString("N0")</div>
-                                </div>
-                                <div class="col-auto">
-                                    <i class="fas fa-piggy-bank fa-2x text-warning"></i>
-                                </div>
+                <div class="col-md-6 col-xl-3">
+                    <div class="card shadow-sm border-0 rounded-4 bg-light-subtle">
+                        <div class="card-body d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-uppercase text-muted small mb-1">Tiết kiệm khách hàng</h6>
+                                <h4 class="fw-bold text-primary">₫@ViewBag.TietKiem.ToString("N0")</h4>
                             </div>
+                            <i class="fas fa-piggy-bank fa-2x text-primary"></i>
                         </div>
                     </div>
                 </div>
-
-                <div class="col-xl-3 col-md-6 mb-4">
-                    <div class="card stat-card h-100">
-                        <div class="card-body">
-                            <div class="row align-items-center">
-                                <div class="col">
-                                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Tỷ lệ chuyển đổi</div>
-                                    <div class="h5 mb-0 font-weight-bold">@ViewBag.ChuyenDoi%</div>
-                                </div>
-                                <div class="col-auto">
-                                    <i class="fas fa-percentage fa-2x text-info"></i>
-                                </div>
+                <div class="col-md-6 col-xl-3">
+                    <div class="card shadow-sm border-0 rounded-4 bg-light-subtle">
+                        <div class="card-body d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-uppercase text-muted small mb-1">Tỷ lệ chuyển đổi</h6>
+                                <h4 class="fw-bold text-info">@ViewBag.ChuyenDoi%</h4>
                             </div>
+                            <i class="fas fa-percentage fa-2x text-info"></i>
                         </div>
                     </div>
                 </div>
@@ -361,25 +629,25 @@
             <!-- Action Buttons -->
             <div class="row mb-4">
                 <div class="col-12">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <a class="btn btn-primary me-2" asp-controller="Promotions" asp-action="Create">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                        <!-- Buttons bên trái -->
+                        <div class="d-flex flex-wrap gap-2">
+                            <a class="btn btn-warning text-white fw-semibold" asp-controller="Promotions" asp-action="Create">
                                 <i class="fas fa-plus me-2"></i>Tạo mã mới
                             </a>
-                            <button class="btn btn-outline-secondary me-2">
+                            <button class="btn btn-outline-dark fw-semibold">
                                 <i class="fas fa-download me-2"></i>Xuất danh sách
                             </button>
-                            <button class="btn btn-outline-info">
-                                <i class="fas fa-upload me-2"></i>Import mã
-                            </button>
                         </div>
-                        <div class="btn-group">
+
+                        <!-- Filter trạng thái bên phải -->
+                        <div class="btn-group custom-filter-group" role="group">
                             @{
                                 var statuses = new[] { "Tất cả", "Đang hoạt động", "Sắp hết hạn", "Hết hạn", "Đã dùng hết" };
                                 foreach (var s in statuses)
                                 {
                                     var active = s == ViewBag.CurrentStatus ? "active" : "";
-                                    <button type="button" class="btn btn-outline-primary @active" onclick="setStatus('@s')">@s</button>
+                                    <button type="button" class="btn custom-filter-btn @active" onclick="setStatus('@s')">@s</button>
                                 }
                             }
                         </div>
@@ -388,6 +656,34 @@
             </div>
 
             <!-- Coupon Cards -->
+            @functions {
+                public string FormatCurrency(decimal? amount)
+                {
+                    if (!amount.HasValue) return "0";
+
+                    if (amount < 1000)
+                        return $"{amount:N0}K";
+                    else
+                        return $"{(amount / 1000):N1} triệu";
+                }
+            }
+            @functions {
+                public string FormatDiscount(Promotion item)
+                {
+                    if (item.PromoType?.Contains("%") == true || item.PromoType?.ToLower().Contains("phần trăm") == true)
+                    {
+                        return $"{item.DiscountValue?.ToString("N0")}%";
+                    }
+
+                    var value = item.DiscountValue ?? 0;
+
+                    if (value >= 1000)
+                        return $"{Math.Round(value / 1000, 1)} triệu";
+                    else
+                        return $"{value:N0}K";
+                }
+            }
+
             <div class="row">
                 @foreach (var item in Model)
                 {
@@ -399,82 +695,65 @@
                     ? item.Quantity.Value - item.UsedQuantity.Value
                     : 0;
 
-                    var badge = item.Status switch
+                    var statusClass = item.Status switch
                     {
-                        "Đang hoạt động" => "success",
-                        "Hết hạn" => "secondary",
-                        "Sắp hết hạn" => "warning",
-                        _ => "info"
+                        "Đang hoạt động" => "status-active",
+                        "Sắp hết hạn" => "status-warning",
+                        "Hết hạn" => "status-expired",
+                        "Đã dùng hết" => "status-used-up",
+                        _ => "status-expired"
                     };
 
-                    <div class="col-xl-4 col-lg-6 mb-4">
-                        <div class="card coupon-card h-100">
-                            <div class="card-body">
-                                <!-- CODE HIỂN THỊ MÃ GIẢM GIÁ CHUẨN SHOPEE -->
-                                <div class="d-flex flex-wrap gap-2 mb-3">
-                                    <span class="badge bg-warning text-dark fw-bold px-3 py-1" style="border-radius: 20px; font-family: 'Courier New', monospace;">
-                                        @item.PromoName
-                                    </span>
-                                    @{
-                                        var codes = item.PromoNameCode?.Split(' ', StringSplitOptions.RemoveEmptyEntries) ?? new string[0];
-                                        foreach (var code in codes)
-                                        {
-                                            <span class="badge bg-warning text-dark fw-bold px-3 py-1" style="border-radius: 20px; font-family: 'Courier New', monospace;">
-                                                @code
-                                            </span>
-                                        }
-                                    }
-                                    <span class="badge bg-@badge ms-auto">@item.Status</span>
-                                </div>
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="d-flex coupon-style">
+                            <!-- Dải đỏ bên trái -->
+                            <div class="coupon-left text-white d-flex flex-column justify-content-center align-items-center p-3">
+                                <h6 class="fw-bold mb-1 text-center">@item.PromoName</h6>
+                                @foreach (var code in item.PromoNameCode?.Split(' ', StringSplitOptions.RemoveEmptyEntries) ?? new string[0])
+                                {
+                                    <span class="badge bg-light text-dark fw-bold px-2 py-1 rounded-pill">@code</span>
+                                }
+                            </div>
 
-                                <h5 class="card-title">@item.PromoType</h5>
-                                <p class="card-text text-muted">
-                                    Áp dụng cho đơn từ <span class="min-order">@item.MinOrderAmount</span>
+                            <!-- Phần nội dung chính -->
+                            <div class="coupon-right p-3 position-relative w-100">
+                                @if (remaining > 1)
+                                {
+                                    <span class="badge bg-danger text-white position-absolute top-0 end-0 me-2 mt-2">
+                                        @($"x{remaining}")
+                                    </span>
+
+                                }
+
+                                <h5 class="fw-bold text-danger">Giảm @FormatDiscount(item)</h5>
+
+                                <p class="mb-1 text-muted">
+                                    Áp dụng đơn tối thiểu:
+                                    <strong>@FormatCurrency(item.MinOrderAmount)</strong>
                                 </p>
 
-                                <div class="row text-center mb-3">
-                                    <div class="col-4">
-                                        <div class="fw-bold text-primary">
-                                            <span class="discount-value" data-type="@item.PromoType">@item.DiscountValue</span>
-                                        </div>
-                                        <small class="text-muted">Giảm giá</small>
-                                    </div>
-                                    <div class="col-4">
-                                        <div class="fw-bold text-success">@item.UsedQuantity</div>
-                                        <small class="text-muted">Đã dùng</small>
-                                    </div>
-                                    <div class="col-4">
-                                        <div class="fw-bold text-warning">
-                                            @(item.Quantity.HasValue? item.Quantity.Value.ToString() : "∞")
-                                        </div>
-                                        <small class="text-muted">Giới hạn</small>
-                                    </div>
+                                <div class="progress mb-2" style="height: 8px;">
+                                    <div class="progress-bar bg-success progress-bar-striped" style="width: @percentUsed%"></div>
+                                </div>
+                                <p class="text-muted small mb-1">Đã dùng: @percentUsed%</p>
+
+                                <div class="d-flex justify-content-between small text-muted mb-2">
+                                    <span><i class="fas fa-calendar-alt me-1"></i> @item.StartDate?.ToString("dd/MM/yyyy")</span>
+                                    <span><i class="fas fa-clock me-1"></i> @item.EndDate?.ToString("dd/MM/yyyy")</span>
                                 </div>
 
-                                <div class="progress mb-2" style="height: 6px;">
-                                    <div class="progress-bar bg-success" style="width: @percentUsed%"></div>
-                                </div>
-                                <div class="d-flex justify-content-between small text-muted mb-3">
-                                    <span>Đã sử dụng: @percentUsed%</span>
-                                    <span>@(item.Quantity.HasValue ? $"Còn {remaining} lượt" : "Không giới hạn")</span>
-                                </div>
-
-                                <div class="d-flex justify-content-between small text-muted mb-3">
-                                    <span><i class="fas fa-calendar me-1"></i>Từ: @item.StartDate?.ToString("dd/MM/yyyy")</span>
-                                    <span>
-                                        <i class="fas fa-calendar-times me-1"></i>Đến: @(item.EndDate?.ToString("dd/MM/yyyy") ?? "Vô thời hạn")
-                                    </span>
-                                </div>
-
-                                <div class="d-flex gap-2">
-                                    <a asp-controller="Promotions" asp-action="Details" asp-route-id="@item.PromoCode" class="btn btn-outline-primary btn-sm flex-fill">
-                                        <i class="fas fa-chart-bar me-1"></i>Chi tiết mã
+                                <div class="d-flex justify-content-end gap-2 mt-3">
+                                    <a asp-controller="Promotions" asp-action="Details" asp-route-id="@item.PromoCode"
+                                       class="btn btn-info btn-sm">
+                                        <i class="fas fa-eye me-1"></i>Chi tiết
                                     </a>
-                                    <a asp-controller="Promotions" asp-action="Edit" asp-route-id="@item.PromoCode" class="btn btn-outline-warning btn-sm">
-                                        <i class="fas fa-edit"></i>
+                                    <a asp-controller="Promotions" asp-action="Edit" asp-route-id="@item.PromoCode"
+                                       class="btn btn-warning btn-sm">
+                                        <i class="fas fa-edit me-1"></i>Sửa
                                     </a>
-                                    <a asp-controller="Promotions" asp-action="Delete" asp-route-id="@item.PromoCode" class="btn btn-outline-danger btn-sm">
-                                        <i class="fas fa-trash"></i>
+                                    <a asp-controller="Promotions" asp-action="Delete" asp-route-id="@item.PromoCode"
+                                       class="btn btn-danger btn-sm">
+                                        <i class="fas fa-trash-alt me-1"></i>Xoá
                                     </a>
                                 </div>
                             </div>
