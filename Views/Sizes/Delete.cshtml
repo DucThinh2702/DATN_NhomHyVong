@@ -1,0 +1,24 @@
+﻿@model DATN.Models.Size
+@{
+    ViewData["Title"] = "Xóa kích cỡ";
+}
+<div class="main-content" id="mainContent">
+<h2>Xóa kích cỡ</h2>
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <h4>Bạn có chắc chắn muốn xóa kích cỡ này?</h4>
+        <dl class="row">
+            <dt class="col-sm-3">ID</dt>
+            <dd class="col-sm-9">@Model.SizeId</dd>
+            <dt class="col-sm-3">Tên kích cỡ</dt>
+            <dd class="col-sm-9">@Model.SizeName</dd>
+        </dl>
+        <form asp-action="Delete">
+            <input type="hidden" asp-for="SizeId" />
+            <button type="submit" class="btn btn-danger">Xóa</button>
+            <a asp-action="Index" class="btn btn-secondary">Hủy</a>
+        </form>
+    </div>
+</div>
+</div>

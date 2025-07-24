@@ -1,0 +1,29 @@
+﻿@model DATN.Models.Color
+
+@{
+    ViewData["Title"] = "Thêm màu sắc";
+}
+<div class="main-content" id="mainContent">
+
+<h2>Thêm màu sắc</h2>
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Create">
+            <div class="form-group mb-3">
+                <label asp-for="ColorName" class="control-label"></label>
+                <input asp-for="ColorName" class="form-control" />
+                <span asp-validation-for="ColorName" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-primary">Lưu</button>
+            <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+        </form>
+    </div>
+</div>
+</div>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

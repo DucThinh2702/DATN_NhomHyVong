@@ -14,9 +14,9 @@ namespace DATN.Controllers
 {
     public class Products1Controller : Controller
     {
-        private readonly AppDbContext _context;
+        private readonly DatnDbContext _context;
 
-        public Products1Controller(AppDbContext context)
+        public Products1Controller(DatnDbContext context)
         {
             _context = context;
         }

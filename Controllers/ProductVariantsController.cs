@@ -8,9 +8,9 @@ namespace DATN.Controllers
 {
     public class ProductVariantsController : Controller
     {
-        private readonly AppDbContext _context;
+        private readonly DatnDbContext _context;
 
-        public ProductVariantsController(AppDbContext context)
+        public ProductVariantsController(DatnDbContext context)
         {
             _context = context;
         }

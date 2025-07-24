@@ -1,0 +1,20 @@
+﻿@model DATN.Models.Size
+@{
+    ViewData["Title"] = "Chi tiết kích cỡ";
+}
+<div class="main-content" id="mainContent">
+<h2>Chi tiết kích cỡ</h2>
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <dl class="row">
+            <dt class="col-sm-3">ID</dt>
+            <dd class="col-sm-9">@Model.SizeId</dd>
+            <dt class="col-sm-3">Tên kích cỡ</dt>
+            <dd class="col-sm-9">@Model.SizeName</dd>
+        </dl>
+        <a asp-action="Edit" asp-route-id="@Model.SizeId" class="btn btn-warning">Sửa</a>
+        <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+    </div>
+</div>
+</div>
