@@ -1,110 +1,191 @@
 ﻿@model IEnumerable<DATN.Models.Order>
+
 @{
     ViewData["Title"] = "Đơn hàng";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <div class="main-content" id="mainContent">
-    <h2>Đơn hàng</h2>
+    <!-- Header -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top">
+        <div class="container-fluid">
+            <button class="btn btn-outline-secondary me-3" id="sidebarToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <div>
+                <h4 class="mb-0">Đơn hàng</h4>
+                <small class="text-muted">Quản lý các đơn đặt hàng</small>
+            </div>
+
+            <div class="d-flex align-items-center ms-auto">
+                <div class="dropdown">
+                    <button class="btn btn-outline-secondary d-flex align-items-center" data-bs-toggle="dropdown">
+                        <div class="bg-warning rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
+                            <i class="fas fa-user text-dark small"></i>
+                        </div>
+                        <div class="text-start d-none d-md-block">
+                            <div class="small fw-bold">Admin User</div>
+                            <div class="small text-muted">Quản trị viên</div>
+                        </div>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Hồ sơ</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Cài đặt</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="#" onclick="logout()"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
 
     <!-- Thống kê đơn hàng -->
-    <div class="row mb-3">
-        <div class="col">
-            <div class="card text-center">
+    <div class="row my-4">
+        <div class="col-md-3">
+            <div class="card border-left-primary">
                 <div class="card-body">
-                    <h6 class="text-muted">TỔNG ĐƠN HÀNG</h6>
-                    <h4>@Model.Count()</h4>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-uppercase text-primary small">Tổng đơn hàng</div>
+                            <div class="h5 mb-0 fw-bold">@Model.Count()</div>
+                        </div>
+                        <i class="fas fa-file-invoice fa-2x text-primary"></i>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col">
-            <div class="card text-center">
+        <div class="col-md-3">
+            <div class="card border-left-warning">
                 <div class="card-body">
-                    <h6 class="text-muted">CHỜ XỬ LÝ</h6>
-                    <h4>@Model.Count(x => x.OrderStatus?.ToLower() == "đang xử lý")</h4>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-uppercase text-warning small">Chờ xử lý</div>
+                            <div class="h5 mb-0 fw-bold">@Model.Count(x => x.OrderStatus?.ToLower() == "đang xử lý")</div>
+                        </div>
+                        <i class="fas fa-spinner fa-2x text-warning"></i>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col">
-            <div class="card text-center">
+        <div class="col-md-3">
+            <div class="card border-left-success">
                 <div class="card-body">
-                    <h6 class="text-muted">HOÀN THÀNH</h6>
-                    <h4>@Model.Count(x => x.OrderStatus?.ToLower() == "hoàn thành")</h4>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-uppercase text-success small">Hoàn thành</div>
+                            <div class="h5 mb-0 fw-bold">@Model.Count(x => x.OrderStatus?.ToLower() == "hoàn thành")</div>
+                        </div>
+                        <i class="fas fa-check-circle fa-2x text-success"></i>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col">
-            <div class="card text-center">
+        <div class="col-md-3">
+            <div class="card border-left-danger">
                 <div class="card-body">
-                    <h6 class="text-muted">ĐÃ HUỶ</h6>
-                    <h4>@Model.Count(x => x.OrderStatus?.ToLower() == "đã huỷ")</h4>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-uppercase text-danger small">Đã huỷ</div>
+                            <div class="h5 mb-0 fw-bold">@Model.Count(x => x.OrderStatus?.ToLower() == "đã huỷ")</div>
+                        </div>
+                        <i class="fas fa-times-circle fa-2x text-danger"></i>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Bảng danh sách đơn hàng -->
-    <table class="table table-bordered table-hover">
-        <thead class="table-light">
-            <tr>
-                <th>Mã đơn</th>
-                <th>Khách hàng</th>
-                <th>Ngày đặt</th>
-                <th>Sản phẩm</th>
-                <th>Tổng tiền</th>
-                <th>Trạng thái</th>
-                <th>Thao tác</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td>#ORD-@item.OrderId</td>
-                    <td>
-                        @item.RecipientName<br />
-                        <small>@item.RecipientPhone</small>
-                    </td>
-                    <td>@(item.OrderDate?.ToString("dd/MM/yyyy"))</td>
-                    <td>@item.Quantity sản phẩm</td>
-                    <td>@string.Format("{0:#,##0}₫", item.TotalAmount)</td>
-                    <td>
-                        @{
-                            var status = item.OrderStatus?.ToLower();
-                        }
-
-                        @if (status == "processing")
-                        {
-                            <span class="badge bg-primary">Đang xử lý</span>
-                        }
-                        else if (status == "shipped")
-                        {
-                            <span class="badge bg-info text-dark">Đã giao</span>
-                        }
-                        else if (status == "delivered")
-                        {
-                            <span class="badge bg-success">Hoàn thành</span>
-                        }
-                        else if (status == "cancelled")
-                        {
-                            <span class="badge bg-danger">Đã huỷ</span>
-                        }
-                        else if (status == "pending")
-                        {
-                            <span class="badge bg-warning text-dark">Chờ thanh toán</span>
-                        }
-                        else
-                        {
-                            <span class="badge bg-secondary">@item.OrderStatus</span>
-                        }
-                    </td>   
-                    <td>
-                        <a href="@Url.Action("Details", "Orders", new { id = item.OrderId })" class="btn btn-sm btn-info">
-                            <i class="fas fa-eye"></i> Xem
-                        </a>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <!-- Bảng đơn hàng -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Danh sách đơn hàng</h5>
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Mã đơn</th>
+                        <th>Khách hàng</th>
+                        <th>Ngày đặt</th>
+                        <th>Sản phẩm</th>
+                        <th>Tổng tiền</th>
+                        <th>Trạng thái</th>
+                        <th class="text-center">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>#ORD-@item.OrderId</td>
+                            <td>
+                                @item.RecipientName<br />
+                                <small class="text-muted">@item.RecipientPhone</small>
+                            </td>
+                            <td>@item.OrderDate?.ToString("dd/MM/yyyy")</td>
+                            <td>@item.Quantity sản phẩm</td>
+                            <td>@string.Format("{0:#,##0}₫", item.TotalAmount)</td>
+                            <td>
+                                @{
+                                    var status = item.OrderStatus?.ToLower();
+                                }
+                                @switch (status)
+                                {
+                                    case "processing":
+                                        <span class="badge bg-primary">Đang xử lý</span>
+                                        ; break;
+                                    case "shipped":
+                                        <span class="badge bg-info text-dark">Đã giao</span>
+                                        ; break;
+                                    case "delivered":
+                                        <span class="badge bg-success">Hoàn thành</span>
+                                        ; break;
+                                    case "cancelled":
+                                        <span class="badge bg-danger">Đã huỷ</span>
+                                        ; break;
+                                    case "pending":
+                                        <span class="badge bg-warning text-dark">Chờ thanh toán</span>
+                                        ; break;
+                                    default:
+                                        <span class="badge bg-secondary">@item.OrderStatus</span>
+                                        ; break;
+                                }
+                            </td>
+                            <td class="text-center">
+                                <a href="@Url.Action("Details", "Orders", new { id = item.OrderId })" class="btn btn-sm btn-outline-info">
+                                    <i class="fas fa-eye"></i> Xem
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
+
+@section Scripts {
+    <script>
+        // Sidebar toggle
+        document.getElementById('sidebarToggle')?.addEventListener('click', function () {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
+            sidebar?.classList.toggle('collapsed');
+            mainContent?.classList.toggle('expanded');
+            localStorage.setItem('sidebarCollapsed', sidebar?.classList.contains('collapsed'));
+        });
+
+        if (localStorage.getItem('sidebarCollapsed') === 'true') {
+            document.getElementById('sidebar')?.classList.add('collapsed');
+            document.getElementById('mainContent')?.classList.add('expanded');
+        }
+
+        function logout() {
+            if (confirm("Bạn có chắc muốn đăng xuất?")) {
+                alert("Đăng xuất thành công!");
+                // redirect nếu cần
+            }
+        }
+    </script>
+}
