@@ -56,7 +56,7 @@ public partial class Promotion
     [StringLength(10000)]
     // Mối quan hệ một Promotion có thể có nhiều ShippingProviders
     public string? ShippingProviderName { get; set; }  // Lưu tên đơn vị vận chuyển hoặc mã của đơn vị vận chuyển (nếu cần)
-    [MinCount(1)] // Custom validate yêu cầu ít nhất 1 item
+    //[MinCount(1)] // Custom validate yêu cầu ít nhất 1 item
     public ICollection<ShippingProvider>? ShippingProviders { get; set; }
 
     // Phương thức tạo mã khuyến mãi ngẫu nhiên
@@ -78,21 +78,21 @@ public partial class Promotion
 
         return $"{letterPart}{numberPart}";
     }
-    public class MinCountAttribute : ValidationAttribute
-    {
-        private readonly int _min;
+    //public class MinCountAttribute : ValidationAttribute
+    //{
+    //    private readonly int _min;
 
-        public MinCountAttribute(int min)
-        {
-            _min = min;
-            ErrorMessage = $"Phải chọn ít nhất {_min} đơn vị vận chuyển.";
-        }
+    //    public MinCountAttribute(int min)
+    //    {
+    //        _min = min;
+    //        ErrorMessage = $"Phải chọn ít nhất {_min} đơn vị vận chuyển.";
+    //    }
 
-        public override bool IsValid(object value)
-        {
-            var list = value as ICollection<ShippingProvider>;
-            return list != null && list.Count >= _min;
-        }
-    }
+    //    public override bool IsValid(object value)
+    //    {
+    //        var list = value as ICollection<ShippingProvider>;
+    //        return list != null && list.Count >= _min;
+    //    }
+    //}
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 }

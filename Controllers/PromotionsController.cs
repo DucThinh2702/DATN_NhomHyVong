@@ -15,98 +15,99 @@ namespace DATN.Controllers
             _context = context;
         }
 
-
-        // GET: Promotions/Create
-        [HttpGet]
-        public async Task<IActionResult> Create()
-        {
-            var shippingProviders = await _context.ShippingProviders
-                .Select(sp => new SelectListItem
-                {
-                    Value = sp.ShippingProviderId.ToString(),
-                    Text = sp.ShippingProviderName
-                }).ToListAsync();
-
-            ViewBag.ShippingProviders = shippingProviders;
-            ViewBag.SelectedProviderIds = new int[0]; // Mặc định không chọn gì
-
-            return View();
-        }
-
-        // POST: Promotions/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(
-            [Bind("PromoCode,PromoName,PromoType,DiscountValue,MinOrderAmount,StartDate,EndDate,Quantity,UsedQuantity,Status,Description")]
-    Promotion promotion, int[] selectedShippingProviderIds)
-        {
-            // ⚠️ Không kiểm tra ModelState trước, mà gán shipping trước
-            var selectedProviders = await _context.ShippingProviders
-                .Where(sp => selectedShippingProviderIds.Contains(sp.ShippingProviderId))
-                .ToListAsync();
-
-            promotion.ShippingProviders = selectedProviders;
-            promotion.ShippingProviderName = string.Join(", ", selectedProviders.Select(sp => sp.ShippingProviderName));
-
-            // Gán mã code
-            promotion.PromoNameCode = Promotion.GeneratePromoNameCode();
-
-            // ✅ Ép revalidate lại model sau khi gán shipping
-            TryValidateModel(promotion);
-
-            // Các custom validation
-            if (selectedShippingProviderIds == null || selectedShippingProviderIds.Length == 0)
-                ModelState.AddModelError("selectedShippingProviderIds", "Vui lòng chọn ít nhất một đơn vị vận chuyển.");
-
-            if (promotion.StartDate >= promotion.EndDate)
-                ModelState.AddModelError("EndDate", "Ngày kết thúc phải lớn hơn ngày bắt đầu.");
-
-            if (promotion.PromoType == "Phần trăm" && (promotion.DiscountValue < 0 || promotion.DiscountValue > 100))
-                ModelState.AddModelError("DiscountValue", "Phần trăm phải từ 0 đến 100.");
-
-            if (promotion.PromoType == "Số tiền cố định" && promotion.DiscountValue > promotion.MinOrderAmount)
-                ModelState.AddModelError("DiscountValue", "Giảm giá không vượt quá giá trị đơn hàng tối thiểu.");
-
-            if (await CheckPromoNameExists(promotion.PromoName))
-                ModelState.AddModelError("PromoName", "Tên mã giảm giá đã tồn tại.");
-
-            if (!ModelState.IsValid)
+            // GET: Promotions/Create
+            [HttpGet]
+            public async Task<IActionResult> Create()
             {
-                var providers = await _context.ShippingProviders
+                var shippingProviders = await _context.ShippingProviders
                     .Select(sp => new SelectListItem
                     {
                         Value = sp.ShippingProviderId.ToString(),
                         Text = sp.ShippingProviderName
                     }).ToListAsync();
 
-                ViewBag.ShippingProviders = providers;
-                ViewBag.SelectedProviderIds = selectedShippingProviderIds;
-                return View(promotion);
+                ViewBag.ShippingProviders = shippingProviders;
+                ViewBag.SelectedProviderIds = new int[0]; // Mặc định không chọn gì
+
+                return View();
             }
-            Console.WriteLine("selectedShippingProviderIds:");
-            foreach (var id in selectedShippingProviderIds)
+
+            // POST: Promotions/Create
+            [HttpPost]
+            [ValidateAntiForgeryToken]
+            public async Task<IActionResult> Create(
+                [Bind("PromoCode,PromoName,PromoType,DiscountValue,MinOrderAmount,StartDate,EndDate,Quantity,UsedQuantity,Status,Description")]
+        Promotion promotion, int[] selectedShippingProviderIds)
             {
-                Console.WriteLine($"- {id}");
+                // Kiểm tra nếu không chọn ít nhất một đơn vị vận chuyển
+                if (selectedShippingProviderIds == null || selectedShippingProviderIds.Length == 0)
+                {
+                    ModelState.AddModelError("selectedShippingProviderIds", "Vui lòng chọn ít nhất một đơn vị vận chuyển.");
+                }
+
+                // Lấy các đơn vị vận chuyển đã chọn
+                var selectedProviders = await _context.ShippingProviders
+                    .Where(sp => selectedShippingProviderIds.Contains(sp.ShippingProviderId))
+                    .ToListAsync();
+
+                // Gán các đơn vị vận chuyển đã chọn vào Promotion
+                promotion.ShippingProviders = selectedProviders;
+                // Lưu tên các đơn vị vận chuyển vào trường ShippingProviderName
+                promotion.ShippingProviderName = string.Join(", ", selectedProviders.Select(sp => sp.ShippingProviderName));
+
+                // Tạo mã giảm giá ngẫu nhiên
+                promotion.PromoNameCode = Promotion.GeneratePromoNameCode();
+
+                // Validate lại model sau khi gán ShippingProviders
+                TryValidateModel(promotion);
+
+                // Kiểm tra các điều kiện khác
+                if (promotion.StartDate >= promotion.EndDate)
+                    ModelState.AddModelError("EndDate", "Ngày kết thúc phải lớn hơn ngày bắt đầu.");
+
+                if (promotion.PromoType == "Phần trăm" && (promotion.DiscountValue < 0 || promotion.DiscountValue > 100))
+                    ModelState.AddModelError("DiscountValue", "Phần trăm phải từ 0 đến 100.");
+
+                if (promotion.PromoType == "Số tiền cố định" && promotion.DiscountValue > promotion.MinOrderAmount)
+                    ModelState.AddModelError("DiscountValue", "Giảm giá không vượt quá giá trị đơn hàng tối thiểu.");
+
+                if (await CheckPromoNameExists(promotion.PromoName))
+                    ModelState.AddModelError("PromoName", "Tên mã giảm giá đã tồn tại.");
+
+                // Kiểm tra xem ModelState có hợp lệ không
+                if (!ModelState.IsValid)
+                {
+                    var providers = await _context.ShippingProviders
+                        .Select(sp => new SelectListItem
+                        {
+                            Value = sp.ShippingProviderId.ToString(),
+                            Text = sp.ShippingProviderName
+                        }).ToListAsync();
+
+                    ViewBag.ShippingProviders = providers;
+                    ViewBag.SelectedProviderIds = selectedShippingProviderIds;
+                    return View(promotion);
+                }
+
+                _context.Add(promotion);
+                await _context.SaveChangesAsync();
+                return RedirectToAction("MaGiamGia", "Admin");
             }
 
-            _context.Add(promotion);
-            await _context.SaveChangesAsync();
-            return RedirectToAction("MaGiamGia", "Admin");
-        }
+            // Kiểm tra nếu tên mã giảm giá đã tồn tại trong cơ sở dữ liệu
+            private async Task<bool> CheckPromoNameExists(string promoName)
+            {
+                if (string.IsNullOrWhiteSpace(promoName))
+                    return false;
 
+                string normalized = promoName.Trim().ToLower();
 
-        // Kiểm tra nếu tên mã giảm giá đã tồn tại trong cơ sở dữ liệu
-        private async Task<bool> CheckPromoNameExists(string promoName)
-        {
-            if (string.IsNullOrWhiteSpace(promoName))
-                return false;
+                return await _context.Promotions
+                    .AsNoTracking()
+                    .AnyAsync(p => p.PromoName.ToLower() == normalized);
+            }
+        
 
-            string normalized = promoName.Trim().ToLower();
-
-            return await _context.Promotions
-                .AsNoTracking()
-                .AnyAsync(p => p.PromoName.ToLower() == normalized);
-        }
 
 
         // GET: Promotions/Details/5
@@ -132,7 +133,7 @@ namespace DATN.Controllers
             if (id == null) return NotFound();
 
             var promotion = await _context.Promotions
-                .Include(p => p.ShippingProviders)
+                .Include(p => p.ShippingProviders)  // Đảm bảo bao gồm ShippingProviders
                 .FirstOrDefaultAsync(p => p.PromoCode == id);
 
             if (promotion == null) return NotFound();
@@ -157,7 +158,7 @@ namespace DATN.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id,
             [Bind("PromoCode,PromoName,PromoType,DiscountValue,MinOrderAmount,StartDate,EndDate,Quantity,UsedQuantity,Status,Description")]
-    Promotion promotion, int[] selectedShippingProviderIds)
+Promotion promotion, int[] selectedShippingProviderIds)
         {
             if (id != promotion.PromoCode)
                 return NotFound();
@@ -169,6 +170,7 @@ namespace DATN.Controllers
             if (existingPromotion == null)
                 return NotFound();
 
+            // Lấy các đơn vị vận chuyển đã chọn
             var selectedProviders = await _context.ShippingProviders
                 .Where(sp => selectedShippingProviderIds.Contains(sp.ShippingProviderId))
                 .ToListAsync();
@@ -189,9 +191,10 @@ namespace DATN.Controllers
             foreach (var sp in selectedProviders)
                 existingPromotion.ShippingProviders.Add(sp);
 
-            // ✅ Ép revalidate lại
+            // Validate lại
             TryValidateModel(existingPromotion);
 
+            // Kiểm tra các điều kiện
             if (selectedShippingProviderIds == null || selectedShippingProviderIds.Length == 0)
                 ModelState.AddModelError("selectedShippingProviderIds", "Vui lòng chọn ít nhất một đơn vị vận chuyển.");
 
@@ -207,6 +210,7 @@ namespace DATN.Controllers
             if (await CheckPromoNameExists(promotion.PromoName, id))
                 ModelState.AddModelError("PromoName", "Tên mã giảm giá đã tồn tại.");
 
+            // Kiểm tra lại ModelState
             if (!ModelState.IsValid)
             {
                 var providers = await _context.ShippingProviders
@@ -225,6 +229,7 @@ namespace DATN.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction("MaGiamGia", "Admin");
         }
+
 
 
 
