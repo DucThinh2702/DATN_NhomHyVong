@@ -25,9 +25,9 @@
                 </form>
 
                 <div class="dropdown me-2">
-                    <button class="btn btn-outline-secondary position-relative" data-bs-toggle="dropdown">
+                    <button id="notificationButton" class="btn btn-outline-secondary position-relative" data-bs-toggle="dropdown">
                         <i class="fas fa-bell"></i>
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        <span id="notificationBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                             @lowStockProducts.Count
                         </span>
                     </button>
@@ -49,6 +49,7 @@
                         }
                     </ul>
                 </div>
+
 
                 <div class="dropdown">
                     <button class="btn btn-outline-secondary d-flex align-items-center" data-bs-toggle="dropdown">
@@ -201,6 +202,36 @@
                     }
                 </tbody>
             </table>
+            @if (ViewBag.TotalPages > 1)
+            {
+                <!-- Pagination -->
+                <nav aria-label="Page navigation" class="mt-3">
+                    <ul class="pagination justify-content-center">
+                        <!-- căn giữa -->
+                        <li class="page-item @(ViewBag.Page <= 1 ? "disabled" : "")">
+                            <a class="page-link" href="@Url.Action("Index", new { page = ViewBag.Page - 1, search = Context.Request.Query["search"] })">
+                                <i class="fas fa-chevron-left"></i>
+                              
+                            </a>
+                        </li>
+
+                        @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                        {
+                            <li class="page-item @(i == ViewBag.Page ? "active" : "")">
+                                <a class="page-link" href="@Url.Action("Index", new { page = i, search = Context.Request.Query["search"] })">@i</a>
+                            </li>
+                        }
+
+                        <li class="page-item @(ViewBag.Page >= ViewBag.TotalPages ? "disabled" : "")">
+                            <a class="page-link" href="@Url.Action("Index", new { page = ViewBag.Page + 1, search = Context.Request.Query["search"] })">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            }
+
+
         </div>
     </div>
 </div>
@@ -226,30 +257,10 @@
         function logout() {
             if (confirm("Bạn có chắc muốn đăng xuất?")) {
                 alert("Đăng xuất thành công!");
-                // Redirect nếu cần
             }
         }
 
         // Hiển thị thông báo thành công (SweetAlert2)
-        $(function () {
-            var successMessage = '@Html.Raw(TempData["SuccessMessage"])';
-            if (successMessage) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Thành công!',
-                    text: successMessage,
-                    timer: 5000,
-                    timerProgressBar: true,
-                    showConfirmButton: true,    // Hiển thị nút OK
-                    confirmButtonText: 'OK',   // Tên nút
-                    didOpen: () => {
-                        // Đảo chiều progress bar để chạy từ trái sang phải
-                        const bar = document.querySelector('.swal2-timer-progress-bar');
-                        if (bar) bar.style.right = 'auto';
-                    }
-                });
-            }
-        });
         $(function () {
             var successMessage = '@Html.Raw(TempData["SuccessMessage"])';
             if (successMessage) {
@@ -263,13 +274,39 @@
                     confirmButtonText: 'OK',
                     didOpen: () => {
                         const bar = document.querySelector('.swal2-timer-progress-bar');
-                        if (bar) bar.style.right = 'auto'; // chạy từ trái sang phải
+                        if (bar) bar.style.right = 'auto';
                     }
                 });
             }
-             });
+        });
+                var successMessage = '@Html.Raw(TempData["SuccessMessage"])';
+        if (successMessage) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Thành công!',
+                text: successMessage,
+                timer: 3000,
+                timerProgressBar: true,
+                showConfirmButton: true,
+                confirmButtonText: 'OK'
+            });
+        }
+
+
+        // Ẩn số thông báo khi bấm vào chuông
+        document.addEventListener('DOMContentLoaded', function () {
+            const notificationButton = document.getElementById('notificationButton');
+            const notificationBadge = document.getElementById('notificationBadge');
+
+            if (notificationButton && notificationBadge) {
+                notificationButton.addEventListener('click', function () {
+                    notificationBadge.style.display = 'none';
+                });
+            }
+        });
     </script>
 }
+
 
 
 

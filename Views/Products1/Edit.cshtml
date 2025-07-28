@@ -17,14 +17,14 @@
 
                 <!-- Tên sản phẩm -->
                 <div class="mb-3">
-                    <label asp-for="ProductName" class="form-label">Tên sản phẩm</label>
+                    <label asp-for="ProductName" class="form-label fw-bold">Tên sản phẩm</label>
                     <input asp-for="ProductName" class="form-control" />
                     <span asp-validation-for="ProductName" class="text-danger"></span>
                 </div>
 
                 <!-- Mô tả -->
                 <div class="mb-3">
-                    <label for="Description" class="form-label">Mô tả sản phẩm</label>
+                    <label for="Description" class="form-label fw-bold">Mô tả sản phẩm</label>
                     <textarea asp-for="Description" class="form-control" id="Description"></textarea>
                     <span asp-validation-for="Description" class="text-danger"></span>
                 </div>
@@ -32,12 +32,12 @@
                 <!-- Giá -->
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label asp-for="SalePrice" class="form-label">Giá bán</label>
+                        <label asp-for="SalePrice" class="form-label fw-bold">Giá bán</label>
                         <input asp-for="SalePrice" class="form-control" />
                         <span asp-validation-for="SalePrice" class="text-danger"></span>
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label asp-for="OriginalPrice" class="form-label">Giá gốc</label>
+                        <label asp-for="OriginalPrice" class="form-label fw-bold">Giá gốc</label>
                         <input asp-for="OriginalPrice" class="form-control" />
                         <span asp-validation-for="OriginalPrice" class="text-danger"></span>
                     </div>
@@ -46,7 +46,7 @@
                 <!-- Danh mục -->
                 <!-- Danh mục -->
                 <div class="mb-3">
-                    <label asp-for="CategoryId" class="form-label">Danh mục</label>
+                    <label asp-for="CategoryId" class="form-label fw-bold">Danh mục</label>
                     @Html.DropDownListFor(model => model.CategoryId,
                              (SelectList)ViewBag.Categories,
                              "-- Chọn danh mục --",
@@ -59,7 +59,7 @@
                 <div class="row">
                   
                     <div class="col-md-4 mb-3">
-                        <label asp-for="Material" class="form-label">Chất liệu</label>
+                        <label asp-for="Material" class="form-label fw-bold">Chất liệu</label>
                         <input asp-for="Material" class="form-control" />
                     </div>
                 </div>
@@ -67,18 +67,18 @@
                 <!-- Ngày tạo/cập nhật -->
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label asp-for="CreatedDate" class="form-label">Ngày tạo</label>
+                        <label asp-for="CreatedDate" class="form-label fw-bold">Ngày tạo</label>
                         <input asp-for="CreatedDate" class="form-control" readonly />
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label asp-for="UpdatedDate" class="form-label">Ngày cập nhật</label>
+                        <label asp-for="UpdatedDate" class="form-label fw-bold">Ngày cập nhật</label>
                         <input asp-for="UpdatedDate" class="form-control" readonly />
                     </div>
                 </div>
 
                 <!-- Ảnh đại diện -->
                 <div class="mb-3">
-                    <label class="form-label">Ảnh hiện tại</label><br />
+                    <label class="form-label fw-bold">Ảnh hiện tại</label><br />
                     @if (!string.IsNullOrEmpty(Model.ThumbnailImage))
                     {
                         <img src="@Model.ThumbnailImage" style="height:100px;" />
@@ -89,19 +89,19 @@
                     }
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Chọn ảnh mới (nếu cần)</label>
+                    <label class="form-label fw-bold">Chọn ảnh mới (nếu cần)</label>
                     <input type="file" name="ImageFile" class="form-control" />
                 </div>
 
 
                 <!-- Trạng thái -->
                 <div class="mb-3">
-                    <label asp-for="Status" class="form-label">Trạng thái</label>
+                    <label asp-for="Status" class="form-label fw-bold">Trạng thái</label>
                     <select asp-for="Status" class="form-select">
                         <option value="Đang bán" selected="@("Đang bán".Equals(Model.Status))">Đang bán</option>
                         <option value="Ngừng bán" selected="@("Ngừng bán".Equals(Model.Status))">Ngừng bán</option>
                     </select>
-                    <span asp-validation-for="Status" class="text-danger"></span>
+                    <span asp-validation-for="Status" class="text-danger fw-bold"></span>
                 </div>
 
                 <!-- Nút -->

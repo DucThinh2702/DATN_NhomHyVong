@@ -2,27 +2,83 @@
 @{
     ViewData["Title"] = "Chỉnh sửa kích cỡ";
 }
+
 <div class="main-content" id="mainContent">
-<h2>Chỉnh sửa kích cỡ</h2>
-<hr />
-<div class="row">
-    <div class="col-md-6">
-        <form asp-action="Edit">
+    <h2 class="mb-4 text-dark ">
+            @ViewData["Title"]
+
+    </h2>
+
+    <div class="card shadow-lg border-0 rounded-4 p-4 ">
+        <form asp-action="Edit" method="post" id="sizeEditForm">
             <input type="hidden" asp-for="SizeId" />
-            <div class="form-group mb-3">
-                <label asp-for="SizeName" class="control-label"></label>
-                <input asp-for="SizeName" class="form-control" />
-                <span asp-validation-for="SizeName" class="text-danger"></span>
+
+            <!-- Input tên kích cỡ -->
+            <div class="mb-3">
+                <label asp-for="SizeName" class="form-label fw-semibold">
+                    <i class="bi bi-rulers me-1"></i> Tên kích cỡ
+                </label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light">
+                        <i class="bi bi-tag-fill text-primary"></i>
+                    </span>
+                    <input asp-for="SizeName" class="form-control" id="SizeName" placeholder="Nhập tên kích cỡ..." />
+                </div>
+                <span id="sizeNameError" class="text-danger small"></span>
             </div>
-            <button type="submit" class="btn btn-primary">Cập nhật</button>
-            <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+
+            <!-- Nút hành động -->
+            <div class="d-flex gap-2 mt-4">
+                <button type="submit" class="btn btn-success px-4">
+                    <i class="bi bi-save2-fill me-1"></i> Cập nhật
+                </button>
+                <a asp-action="Index" class="btn btn-secondary px-4">
+                    <i class="bi bi-arrow-left-circle-fill me-1"></i> Quay lại
+                </a>
+            </div>
         </form>
     </div>
 </div>
-</div>
+
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // Hiển thị thông báo từ TempData
+        var successMessage = '@Html.Raw(TempData["SuccessMessage"])';
+        var errorMessage = '@Html.Raw(TempData["ErrorMessage"])';
+
+        if (successMessage) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Thành công!',
+                text: successMessage,
+                timer: 3000,
+                timerProgressBar: true,
+                confirmButtonText: 'OK'
+            });
+        }
+        if (errorMessage) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Thông báo!',
+                text: errorMessage,
+                confirmButtonText: 'OK'
+            });
+        }
+
+        // Bắt lỗi rỗng trước khi submit
+        document.getElementById('sizeEditForm').addEventListener('submit', function (e) {
+            let sizeNameInput = document.getElementById('SizeName');
+            let errorSpan = document.getElementById('sizeNameError');
+            let sizeName = sizeNameInput.value.trim();
+
+            errorSpan.textContent = '';
+            if (!sizeName) {
+                e.preventDefault();
+                errorSpan.textContent = 'Vui lòng nhập tên kích cỡ';
+                sizeNameInput.focus();
+            }
+        });
+    </script>
 }
-    

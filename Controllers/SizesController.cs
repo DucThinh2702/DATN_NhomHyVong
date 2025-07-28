@@ -14,11 +14,28 @@ namespace DATN.Controllers
             _context = context;
         }
 
-        // GET: Sizes
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? search)
         {
-            return View(await _context.Sizes.ToListAsync());
+            var query = _context.Sizes.AsQueryable();
+
+            // Nếu có tìm kiếm
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                query = query.Where(s => s.SizeName.Contains(search));
+            }
+
+            // Sắp xếp giảm dần để bản mới nhất lên đầu
+            var sizes = await query
+                .OrderByDescending(s => s.SizeId)
+                .ToListAsync();
+
+            // Tổng số kích cỡ
+            ViewBag.TotalSizes = await _context.Sizes.CountAsync();   // tổng tất cả
+            ViewBag.FilteredCount = sizes.Count;                      // tổng theo tìm kiếm
+
+            return View(sizes);
         }
+
 
         // GET: Sizes/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -29,25 +46,40 @@ namespace DATN.Controllers
             return View(size);
         }
 
-        // GET: Sizes/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
+            // GET: Sizes/Create
+            public IActionResult Create()
+            {
+                return View();
+            }
 
-        // POST: Sizes/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Size size)
+        public async Task<IActionResult> Create(Size size, string? returnUrl)
         {
             if (ModelState.IsValid)
             {
+                bool exists = await _context.Sizes
+                    .AnyAsync(s => s.SizeName.ToLower() == size.SizeName.ToLower());
+
+                if (exists)
+                {
+                    TempData["ErrorMessage"] = "Tên kích cỡ đã tồn tại!";
+                    return RedirectToAction(nameof(Create), new { returnUrl });
+                }
+
                 _context.Add(size);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                TempData["SuccessMessage"] = "Thêm kích cỡ thành công!";
+
+                if (!string.IsNullOrEmpty(returnUrl))
+                    return Redirect(returnUrl); // Quay lại trang Create Product
+                else
+                    return RedirectToAction(nameof(Index)); // Mặc định quay về danh sách kích cỡ
             }
             return View(size);
         }
+
+
 
         // GET: Sizes/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -64,14 +96,39 @@ namespace DATN.Controllers
         public async Task<IActionResult> Edit(int id, Size size)
         {
             if (id != size.SizeId) return NotFound();
+
             if (ModelState.IsValid)
             {
+                var existingSize = await _context.Sizes.AsNoTracking()
+                                       .FirstOrDefaultAsync(s => s.SizeId == id);
+
+                if (existingSize == null) return NotFound();
+
+                // Kiểm tra không thay đổi thông tin
+                if (existingSize.SizeName.Trim().ToLower() == size.SizeName.Trim().ToLower())
+                {
+                    TempData["ErrorMessage"] = "Vui lòng đổi thông tin trước khi lưu!";
+                    return RedirectToAction(nameof(Edit), new { id });
+                }
+
+                // Kiểm tra trùng tên kích cỡ ở bản ghi khác
+                bool exists = await _context.Sizes
+                    .AnyAsync(s => s.SizeId != id && s.SizeName.ToLower() == size.SizeName.ToLower());
+                if (exists)
+                {
+                    TempData["ErrorMessage"] = "Tên kích cỡ đã tồn tại!";
+                    return RedirectToAction(nameof(Edit), new { id });
+                }
+
                 _context.Update(size);
                 await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = "Cập nhật kích cỡ thành công!";
                 return RedirectToAction(nameof(Index));
             }
             return View(size);
         }
+
 
         // GET: Sizes/Delete/5
         public async Task<IActionResult> Delete(int? id)
@@ -82,15 +139,25 @@ namespace DATN.Controllers
             return View(size);
         }
 
-        // POST: Sizes/Delete
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var size = await _context.Sizes.FindAsync(id);
-            _context.Sizes.Remove(size);
+            var entity = await _context.Sizes.FindAsync(id);
+            if (entity == null)
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy kích cỡ cần xóa!";
+                return RedirectToAction(nameof(Index));
+            }
+
+            _context.Sizes.Remove(entity);
             await _context.SaveChangesAsync();
+            TempData["SuccessMessage"] = "Xóa kích cỡ thành công!";
             return RedirectToAction(nameof(Index));
         }
+
+
+
+
     }
 }

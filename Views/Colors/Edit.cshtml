@@ -1,30 +1,83 @@
 ﻿@model DATN.Models.Color
-
 @{
     ViewData["Title"] = "Chỉnh sửa màu sắc";
 }
+
 <div class="main-content" id="mainContent">
+    <h2 class="mb-4 text-dark ">
+        @ViewData["Title"]
+    </h2>
 
-<h2>Chỉnh sửa màu sắc</h2>
-<hr />
-
-<div class="row">
-    <div class="col-md-6">
-        <form asp-action="Edit">
+    <div class="card shadow-lg border-0 rounded-4 p-4 ">
+        <form asp-action="Edit" method="post" id="colorEditForm">
             <input type="hidden" asp-for="ColorId" />
-            <div class="form-group mb-3">
-                <label asp-for="ColorName" class="control-label"></label>
-                <input asp-for="ColorName" class="form-control" />
-                <span asp-validation-for="ColorName" class="text-danger"></span>
+
+            <!-- Input tên màu -->
+            <div class="mb-3">
+                <label asp-for="ColorName" class="form-label fw-semibold">
+                    <i class="bi bi-brush-fill me-1"></i>Tên màu
+                </label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light">
+                        <i class="bi bi-droplet-fill text-primary"></i>
+                    </span>
+                    <input asp-for="ColorName" class="form-control" id="ColorName" placeholder="Nhập tên màu..." />
+                </div>
+                <span id="colorNameError" class="text-danger small"></span>
             </div>
-            <button type="submit" class="btn btn-primary">Cập nhật</button>
-            <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+
+            <!-- Nút hành động -->
+            <div class="d-flex gap-2 mt-4">
+                <button type="submit" class="btn btn-success px-4">
+                    <i class="bi bi-save2-fill me-1"></i> Cập nhật
+                </button>
+                <a asp-action="Index" class="btn btn-secondary px-4">
+                    <i class="bi bi-arrow-left-circle-fill me-1"></i> Quay lại
+                </a>
+            </div>
         </form>
     </div>
 </div>
-</div>
+
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // Hiển thị thông báo từ TempData
+        var successMessage = '@Html.Raw(TempData["SuccessMessage"])';
+        var errorMessage = '@Html.Raw(TempData["ErrorMessage"])';
+
+        if (successMessage) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Thành công!',
+                text: successMessage,
+                timer: 3000,
+                timerProgressBar: true,
+                confirmButtonText: 'OK'
+            });
+        }
+        if (errorMessage) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Cảnh báo!',
+                text: errorMessage,
+                confirmButtonText: 'OK'
+            });
+        }
+
+        // Kiểm tra rỗng trước khi submit
+        document.getElementById('colorEditForm').addEventListener('submit', function (e) {
+            let colorNameInput = document.getElementById('ColorName');
+            let errorSpan = document.getElementById('colorNameError');
+            let colorName = colorNameInput.value.trim();
+
+            errorSpan.textContent = '';
+            if (!colorName) {
+                e.preventDefault();
+                errorSpan.textContent = 'Vui lòng nhập tên màu';
+                colorNameInput.focus();
+            }
+        });
+    </script>
 }

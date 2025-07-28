@@ -2,30 +2,156 @@
 @{
     ViewData["Title"] = "Danh sách kích cỡ";
 }
+
 <div class="main-content" id="mainContent">
-<h2>Danh sách kích cỡ</h2>
-<a asp-action="Create" class="btn btn-primary">Thêm mới</a>
-<table class="table table-bordered mt-3">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Tên kích cỡ</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
+    <!-- Header -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top">
+        <div class="container-fluid">
+            <button class="btn btn-outline-secondary me-3" id="sidebarToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div>
+                <h4 class="mb-0">@ViewData["Title"]</h4>
+                <small class="text-muted">Quản lý kích cỡ</small>
+            </div>
+
+            <div class="d-flex align-items-center ms-auto">
+                <!-- Form tìm kiếm -->
+                <form method="get" class="input-group me-3" style="width: 300px;">
+                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    <input type="text" name="search" class="form-control" placeholder="Tìm kích cỡ..." value="@Context.Request.Query["search"]">
+                </form>
+                <!-- Tài khoản -->
+                <div class="dropdown">
+                    <button class="btn btn-outline-secondary d-flex align-items-center" data-bs-toggle="dropdown">
+                        <div class="bg-warning rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
+                            <i class="fas fa-user text-dark small"></i>
+                        </div>
+                        <div class="text-start d-none d-md-block">
+                            <div class="small fw-bold">Admin User</div>
+                            <div class="small text-muted">Quản trị viên</div>
+                        </div>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Hồ sơ</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Cài đặt</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="#" onclick="logout()"><i class="fas fa-sign-out-alt me-2"></i>Đăng xuất</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Thông tin tổng quan -->
+    <div class="my-3">
+        <span class="fw-bold">Tổng số kích cỡ:</span> @ViewBag.TotalSizes
+        @if (!string.IsNullOrEmpty(Context.Request.Query["search"]))
         {
-            <tr>
-                <td>@item.SizeId</td>
-                <td>@item.SizeName</td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.SizeId" class="btn btn-warning">Sửa</a>
-                    <a asp-action="Details" asp-route-id="@item.SizeId" class="btn btn-info">Chi tiết</a>
-                    <a asp-action="Delete" asp-route-id="@item.SizeId" class="btn btn-danger">Xóa</a>
-                </td>
-            </tr>
+            <span class="ms-3 text-muted">Kết quả tìm thấy: @ViewBag.FilteredCount</span>
         }
-    </tbody>
-</table>
+    </div>
+   
+
+
+    <!-- Table -->
+    <div class="card shadow-sm mt-2">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Danh sách kích cỡ</h5>
+            <a asp-action="Create" class="btn btn-primary btn-sm">
+                <i class="fas fa-plus"></i> Thêm mới
+            </a>
+        </div>
+        <div class="card-body">
+            <table class="table table-hover table-striped table-bordered align-middle mb-0">
+                <thead class="table-dark text-center">
+                    <tr>
+                        <th style="width: 10%;">ID</th>
+                        <th style="width: 60%;">Tên kích cỡ</th>
+                        <th style="width: 30%;">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr id="row_@item.SizeId" class="text-center">
+                                <td>@item.SizeId</td>
+                                <td class="text-start">@item.SizeName</td>
+                                <td>
+                                    <div class="d-inline-flex gap-1">
+                                        <a asp-action="Edit" asp-route-id="@item.SizeId" class="btn btn-warning btn-sm">
+                                            <i class="fas fa-pen"></i> Sửa
+                                        </a>
+                                    
+                                        <button class="btn btn-danger btn-sm" onclick="confirmDelete(@item.SizeId)">
+                                            <i class="fas fa-trash"></i> Xóa
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="3" class="text-center text-muted">Chưa có dữ liệu</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function logout() {
+            if (confirm("Bạn có chắc muốn đăng xuất?")) {
+                alert("Đăng xuất thành công!");
+            }
+        }
+
+        // Hiển thị thông báo thành công (TempData)
+        var successMessage = '@Html.Raw(TempData["SuccessMessage"])';
+        if (successMessage) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Thành công!',
+                text: successMessage,
+                timer: 3000,
+                timerProgressBar: true,
+                showConfirmButton: true,
+                confirmButtonText: 'OK'
+            });
+        }
+
+        // Xác nhận xoá SweetAlert2
+        function confirmDelete(id) {
+            Swal.fire({
+                title: 'Bạn có chắc muốn xoá?',
+                text: "Hành động này không thể hoàn tác!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Xoá',
+                cancelButtonText: 'Huỷ'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post('/Sizes/DeleteAjax', { id: id }, function (response) {
+                        if (response.success) {
+                            $('#row_' + id).remove();
+                            Swal.fire('Đã xoá!', response.message, 'success');
+                        } else {
+                            Swal.fire('Lỗi', response.message, 'error');
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+}

@@ -2,23 +2,59 @@
 @{
     ViewData["Title"] = "Xóa kích cỡ";
 }
+
 <div class="main-content" id="mainContent">
-<h2>Xóa kích cỡ</h2>
-<hr />
-<div class="row">
-    <div class="col-md-6">
-        <h4>Bạn có chắc chắn muốn xóa kích cỡ này?</h4>
-        <dl class="row">
-            <dt class="col-sm-3">ID</dt>
+    <h2 class="mb-4 text-danger">
+        <i class="bi bi-trash-fill me-2"></i>@ViewData["Title"]
+    </h2>
+
+    <div class="card shadow-lg border-0 rounded-4 p-4 col-md-6">
+        <h4 class="mb-3 text-secondary">Bạn có chắc chắn muốn xóa kích cỡ này?</h4>
+        <dl class="row mb-4">
+            <dt class="col-sm-3 fw-bold">ID</dt>
             <dd class="col-sm-9">@Model.SizeId</dd>
-            <dt class="col-sm-3">Tên kích cỡ</dt>
+            <dt class="col-sm-3 fw-bold">Tên kích cỡ</dt>
             <dd class="col-sm-9">@Model.SizeName</dd>
         </dl>
-        <form asp-action="Delete">
-            <input type="hidden" asp-for="SizeId" />
-            <button type="submit" class="btn btn-danger">Xóa</button>
-            <a asp-action="Index" class="btn btn-secondary">Hủy</a>
+        <form asp-action="Delete" method="post">
+            <input type="hidden" name="id" value="@Model.SizeId" />
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-danger px-4">
+                    <i class="bi bi-trash me-1"></i> Xóa
+                </button>
+                <a asp-action="Index" class="btn btn-secondary px-4">
+                    <i class="bi bi-arrow-left-circle me-1"></i> Hủy
+                </a>
+            </div>
         </form>
+
+
     </div>
 </div>
-</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        var successMessage = '@Html.Raw(TempData["SuccessMessage"])';
+        var errorMessage = '@Html.Raw(TempData["ErrorMessage"])';
+
+        if (successMessage) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Thành công!',
+                text: successMessage,
+                timer: 3000,
+                timerProgressBar: true,
+                confirmButtonText: 'OK'
+            });
+        }
+        if (errorMessage) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi!',
+                text: errorMessage,
+                confirmButtonText: 'OK'
+            });
+        }
+    </script>
+}

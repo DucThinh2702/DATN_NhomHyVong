@@ -21,9 +21,32 @@ namespace DATN.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index(string search)
+        public async Task<IActionResult> Index(string search, string startsWith, int page = 1)
         {
-            var data = await _context.Products
+            int pageSize = 6; // 6 sản phẩm / trang
+
+            var query = _context.Products.AsQueryable();
+
+            // Lọc theo ký tự đầu (nếu có)
+            if (!string.IsNullOrEmpty(startsWith))
+            {
+                query = query.Where(p => p.ProductName.StartsWith(startsWith));
+            }
+
+            // Lọc theo từ khóa tìm kiếm
+            if (!string.IsNullOrEmpty(search))
+            {
+                query = query.Where(p => p.ProductName.Contains(search));
+            }
+
+            // Tổng sản phẩm sau lọc
+            var totalItems = await query.CountAsync();
+
+            // Lấy danh sách sản phẩm theo trang
+            var data = await query
+                .OrderByDescending(p => p.CreatedDate)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .Select(p => new ProductViewModel
                 {
                     ProductId = p.ProductId,
@@ -32,23 +55,26 @@ namespace DATN.Controllers
                     SalePrice = p.SalePrice,
                     CreatedDate = p.CreatedDate,
                     Stock = _context.ProductVariants
-                                .Where(v => v.ProductId == p.ProductId)
-                                .Sum(v => (int?)v.Stock) ?? 0
-                }).ToListAsync();
+                                    .Where(v => v.ProductId == p.ProductId)
+                                    .Sum(v => (int?)v.Stock) ?? 0
+                })
+                .ToListAsync();
 
-            if (!string.IsNullOrEmpty(search))
-            {
-                data = data.Where(p => p.ProductName!.Contains(search)).ToList();
-            }
-
-            ViewBag.TotalCount = data.Count;
+            // Tính tổng tồn kho để hiển thị thống kê
+            ViewBag.TotalCount = totalItems;
             ViewBag.InStockCount = data.Count(p => p.Stock > 5);
             ViewBag.LowStockCount = data.Count(p => p.Stock > 0 && p.Stock <= 5);
             ViewBag.OutOfStockCount = data.Count(p => p.Stock == 0);
             ViewBag.LowStockProducts = data.Where(p => p.Stock > 0 && p.Stock <= 5).ToList();
 
-            return View(data); // ✅ data là List<ProductViewModel>
+            // Truyền thông tin phân trang cho View
+            ViewBag.Page = page;
+            ViewBag.TotalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+
+            return View(data);
         }
+
+
 
 
         public async Task<IActionResult> Details(int? id)
@@ -270,8 +296,12 @@ namespace DATN.Controllers
             _context.Products.Remove(product);
             await _context.SaveChangesAsync();
 
+            // --- Thêm dòng này để hiển thị thông báo sau khi xóa ---
+            TempData["SuccessMessage"] = "Xóa sản phẩm thành công!";
+
             return RedirectToAction(nameof(Index));
         }
+
 
         //private bool ProductExists(int id)
         //{

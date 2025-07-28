@@ -4,10 +4,13 @@
     ViewData["Title"] = "Thêm sản phẩm mới";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
 <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <div class="main-content" id="mainContent">
     <h1 class="mb-4">Thêm sản phẩm mới</h1>
@@ -17,26 +20,26 @@
 
         <!-- Tên sản phẩm -->
         <div class="mb-3">
-            <label for="ProductName" class="form-label">Tên sản phẩm</label>
+            <label for="ProductName" class="form-label fw-bold">Tên sản phẩm</label>
             <input asp-for="ProductName" class="form-control" id="ProductName" placeholder="Nhập tên sản phẩm" />
             <span asp-validation-for="ProductName" class="text-danger"></span>
         </div>
 
         <!-- Mô tả -->
         <div class="mb-3">
-            <label for="Description" class="form-label">Mô tả sản phẩm</label>
+            <label for="Description" class="form-label fw-bold">Mô tả sản phẩm</label>
             <textarea asp-for="Description" class="form-control" id="Description"></textarea>
             <span asp-validation-for="Description" class="text-danger"></span>
         </div>
 
         <div class="row">
-            <div class="col-md-4 mb-3">
-                <label for="SalePrice" class="form-label">Giá bán</label>
+            <div class="col-md-6 mb-3">
+                <label for="SalePrice" class="form-label fw-bold">Giá bán</label>
                 <input asp-for="SalePrice" class="form-control" id="SalePrice" placeholder="Nhập giá bán" />
                 <span asp-validation-for="SalePrice" class="text-danger"></span>
             </div>
-            <div class="col-md-4 mb-3">
-                <label for="OriginalPrice" class="form-label">Giá gốc</label>
+            <div class="col-md-6 mb-3">
+                <label for="OriginalPrice" class="form-label fw-bold">Giá gốc</label>
                 <input asp-for="OriginalPrice" class="form-control" id="OriginalPrice" placeholder="Nhập giá gốc" />
                 <span asp-validation-for="OriginalPrice" class="text-danger"></span>
             </div>
@@ -44,14 +47,14 @@
 
         <div class="row">
             <div class="col-md-6 mb-3">
-                <label for="CategoryId" class="form-label">Danh mục</label>
+                <label for="CategoryId" class="form-label fw-bold">Danh mục</label>
                 @Html.DropDownListFor(model => model.CategoryId,
                          (SelectList)ViewBag.Categories,
                          "-- Chọn danh mục --", new { @class = "form-select", id = "CategoryId" })
                 <span asp-validation-for="CategoryId" class="text-danger"></span>
             </div>
             <div class="col-md-6 mb-3">
-                <label for="Status" class="form-label">Trạng thái</label>
+                <label for="Status" class="form-label fw-bold">Trạng thái</label>
                 <input asp-for="Status" class="form-control" id="Status" value="Đang bán" placeholder="Nhập trạng thái" />
                 <span asp-validation-for="Status" class="text-danger"></span>
             </div>
@@ -59,52 +62,68 @@
 
         <div class="row">
             <div class="col-md-6 mb-3">
-                <label for="Material" class="form-label">Chất liệu</label>
+                <label for="Material" class="form-label fw-bold">Chất liệu</label>
                 <input asp-for="Material" class="form-control" id="Material" placeholder="Nhập chất liệu" />
                 <span asp-validation-for="Material" class="text-danger"></span>
             </div>
             <div class="col-md-6 mb-3">
-                <label for="ImageFile" class="form-label">Ảnh sản phẩm</label>
+                <label for="ImageFile" class="form-label fw-bold">Ảnh sản phẩm</label>
                 <input type="file" name="ImageFile" id="ImageFile" class="form-control" accept="image/*" required />
                 <span class="text-danger field-validation-valid" data-valmsg-for="ImageFile" data-valmsg-replace="true"></span>
             </div>
         </div>
+        <div class="row">
+            <!-- Chọn màu -->
+            <div class="col-md-6 mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <label class="form-label fw-bold mb-0">Chọn màu:</label>
+                    <a asp-controller="Colors" asp-action="Create" asp-route-returnUrl="/Products1/Create"
+                       class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-plus-circle"></i> Thêm màu
+                    </a>
 
-        <!-- Chọn màu -->
-        <div class="mb-3">
-            <label class="form-label">Chọn màu:</label>
-            <div class="row">
-                @foreach (var color in ViewBag.Colors)
-                {
-                    <div class="col-md-2">
-                        <input type="checkbox"
-                               class="form-check-input color-checkbox"
-                               id="color_@color.ColorId"
-                               value="@color.ColorId"
-                               data-name="@color.ColorName" />
-                        <label class="form-check-label" for="color_@color.ColorId">@color.ColorName</label>
-                    </div>
-                }
+                </div>
+                <div class="checkbox-grid">
+                    @foreach (var color in ViewBag.Colors)
+                    {
+                        <div class="form-check">
+                            <input type="checkbox"
+                                   class="form-check-input color-checkbox"
+                                   id="color_@color.ColorId"
+                                   value="@color.ColorId"
+                                   data-name="@color.ColorName" />
+                            <label class="form-check-label" for="color_@color.ColorId">@color.ColorName</label>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="col-md-6 mb-3">
+
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <label class="form-label fw-bold mb-0">Chọn kích cỡ:</label>
+                    <a asp-controller="Sizes" asp-action="Create" asp-route-returnUrl="/Products1/Create"
+                       class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-plus-circle"></i> Thêm kích cỡ
+                    </a>
+
+                </div>
+                <div class="checkbox-grid">
+                    @foreach (var size in ViewBag.Sizes)
+                    {
+                        <div class="form-check">
+                            <input type="checkbox"
+                                   class="form-check-input size-checkbox"
+                                   id="size_@size.SizeId"
+                                   value="@size.SizeId"
+                                   data-name="@size.SizeName" />
+                            <label class="form-check-label" for="size_@size.SizeId">@size.SizeName</label>
+                        </div>
+                    }
+                </div>
             </div>
         </div>
 
-        <!-- Chọn size -->
-        <div class="mb-3">
-            <label class="form-label">Chọn kích cỡ:</label>
-            <div class="row">
-                @foreach (var size in ViewBag.Sizes)
-                {
-                    <div class="col-md-2">
-                        <input type="checkbox"
-                               class="form-check-input size-checkbox"
-                               id="size_@size.SizeId"
-                               value="@size.SizeId"
-                               data-name="@size.SizeName" />
-                        <label class="form-check-label" for="size_@size.SizeId">@size.SizeName</label>
-                    </div>
-                }
-            </div>
-        </div>
 
         <!-- Bảng tổ hợp biến thể -->
         <div class="mt-4" id="variantTableContainer">
@@ -124,8 +143,10 @@
             </table>
         </div>
 
-        <button type="submit" class="btn btn-primary">Lưu sản phẩm</button>
-        <a asp-controller="Product" asp-action="Index" class="btn btn-secondary">Quay lại</a>
+        <button type="submit" class="btn btn-primary"> <i class="fa-solid fa-file-export me-2"></i>Lưu sản phẩm</button>
+        <a asp-controller="Products1" asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-arrow-left-circle me-2"></i> Quay lại
+        </a>
     </form>
 </div>
 
@@ -134,8 +155,6 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/localization/messages_vi.min.js"></script>
-
-    <!-- Summernote & SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -180,32 +199,43 @@
                 return $('.size-checkbox:checked').length > 0;
             }, "Vui lòng chọn ít nhất một kích cỡ");
 
+            // rule: giá gốc phải lớn hơn giá bán
+            $.validator.addMethod("greaterThan", function (value, element, param) {
+                const salePrice = parseFloat($(param).val());
+                const originalPrice = parseFloat(value);
+                if (isNaN(salePrice) || isNaN(originalPrice)) return true;
+                return originalPrice > salePrice;
+            }, "Giá gốc phải lớn hơn giá bán");
+
             // validate toàn form
-                $("form").validate({
-        ignore: [],
-        rules: {
-            ProductName: { required: true, minlength: 10 },
-            Description: { required: true, minlength: 10 },
-            SalePrice: { required: true, onlyNumber: true, greaterThanZero: true },
-            OriginalPrice: { required: true, onlyNumber: true, greaterThanZero: true },
-            CategoryId: { required: true },
-            Status: { required: true, minlength: 3 },
-            Material: { required: true, minlength: 5 },
-            ImageFile: { required: true, extension: "jpg|jpeg|png|gif" },
-            colorGroup: { requireColor: true },
-            sizeGroup: { requireSize: true }
-        },
+            $("form").validate({
+                ignore: [],
+                rules: {
+                    ProductName: { required: true, minlength: 10 },
+                    Description: { required: true, minlength: 10 },
+                    SalePrice: { required: true, onlyNumber: true, greaterThanZero: true },
+                    OriginalPrice: { required: true, onlyNumber: true, greaterThanZero: true, greaterThan: "#SalePrice" },
+                    CategoryId: { required: true },
+                    Status: { required: true, minlength: 3 },
+                    Material: { required: true, minlength: 5 },
+                    ImageFile: { required: true, extension: "jpg|jpeg|png|gif" },
+                    colorGroup: { requireColor: true },
+                    sizeGroup: { requireSize: true }
+                },
                 messages: {
                     ProductName: {
                         required: "Vui lòng nhập tên sản phẩm",
                         minlength: "Tên sản phẩm phải ít nhất 10 ký tự"
                     },
                     Description: {
-            required: "Vui lòng nhập mô tả sản phẩm",
-            minlength: "Mô tả phải ít nhất 10 ký tự"
-        },
+                        required: "Vui lòng nhập mô tả sản phẩm",
+                        minlength: "Mô tả phải ít nhất 10 ký tự"
+                    },
                     SalePrice: { required: "Vui lòng nhập giá bán" },
-                    OriginalPrice: { required: "Vui lòng nhập giá gốc" },
+                    OriginalPrice: {
+                        required: "Vui lòng nhập giá gốc",
+                        greaterThan: "Giá gốc phải lớn hơn giá bán"
+                    },
                     CategoryId: { required: "Vui lòng chọn danh mục" },
                     Status: { required: "Vui lòng nhập trạng thái" },
                     Material: {
@@ -222,9 +252,7 @@
                 errorElement: "span",
                 errorClass: "text-danger",
                 errorPlacement: function (error, element) {
-                    if (element.attr("name") === "colorGroup") {
-                        error.appendTo(element.closest(".mb-3"));
-                    } else if (element.attr("name") === "sizeGroup") {
+                    if (element.attr("name") === "colorGroup" || element.attr("name") === "sizeGroup") {
                         error.appendTo(element.closest(".mb-3"));
                     } else {
                         error.insertAfter(element);
@@ -299,16 +327,18 @@
         @if (TempData["SuccessMessage"] != null)
         {
             <text>
-                            Swal.fire({
-                                icon: 'success',
-                                title: '@TempData["SuccessMessage"]',
-                                showConfirmButton: false,
-                                timer: 2000
-                            });
+                        Swal.fire({
+                            icon: 'success',
+                            title: '@TempData["SuccessMessage"]',
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
             </text>
         }
         });
     </script>
+}
+
 }
 
 
