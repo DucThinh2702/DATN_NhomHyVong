@@ -1,9 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using DATN.Data;
-using DATN.Models;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
+﻿using System;
 using System.IO;
 
 namespace DATN.Controllers
@@ -19,20 +14,47 @@ namespace DATN.Controllers
             _env = env;
         }
 
-        // GET: /Category
-        public async Task<IActionResult> Index()
+        // GET: Category
+        public async Task<IActionResult> Index(string searchString, string sortOrder, int? page)
         {
-            var categories = await _context.Categories.ToListAsync();
-            return View(categories);
+            ViewData["CurrentFilter"] = searchString;
+            ViewData["CurrentSort"] = sortOrder;
+            ViewData["NameSortParm"] = string.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+            ViewData["CountSortParm"] = sortOrder == "count" ? "count_desc" : "count";
+
+            var categories = _context.Categories.Include(c => c.Products).AsQueryable();
+
+            ViewBag.TotalCategoryCount = await categories.CountAsync();
+            ViewBag.TotalProductCount = await _context.Products.CountAsync();
+
+            // Tìm kiếm
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                categories = categories
+                    .Where(c => c.CategoryName.Contains(searchString))
+                    .OrderByDescending(c => c.CategoryName.Contains(searchString))
+                    .ThenBy(c => c.CategoryName);
+            }
+            else
+            {
+                categories = sortOrder switch
+                {
+                    "name_desc" => categories.OrderByDescending(c => c.CategoryName),
+                    "count" => categories.OrderBy(c => c.Products.Count),
+                    "count_desc" => categories.OrderByDescending(c => c.Products.Count),
+                    _ => categories.OrderBy(c => c.CategoryName)
+                };
+            }
+
+            int pageSize = 5;
+            int pageNumber = page ?? 1;
+            return View(await categories.ToPagedListAsync(pageNumber, pageSize));
         }
 
-        // GET: /Category/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
+        // GET: Create
+        public IActionResult Create() => View();
 
-        // POST: /Category/Create
+        // POST: Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Category category, IFormFile imageFile)
@@ -41,22 +63,15 @@ namespace DATN.Controllers
             {
                 if (imageFile != null && imageFile.Length > 0)
                 {
-                    var uniqueFileName = $"{Path.GetFileNameWithoutExtension(imageFile.FileName)}_{Guid.NewGuid()}{Path.GetExtension(imageFile.FileName)}";
-                    var uploadPath = Path.Combine(_env.WebRootPath, "hinh");
+                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
+                    var uploadPath = Path.Combine(_env.WebRootPath, "hinh", fileName);
 
-                    if (!Directory.Exists(uploadPath))
-                        Directory.CreateDirectory(uploadPath);
-
-                    var filePath = Path.Combine(uploadPath, uniqueFileName);
-                    using (var stream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await imageFile.CopyToAsync(stream);
-                    }
-
-                    category.CategoryImage = uniqueFileName;
+                    using var stream = new FileStream(uploadPath, FileMode.Create);
+                    await imageFile.CopyToAsync(stream);
+                    category.CategoryImage = fileName;
                 }
 
-                _context.Categories.Add(category);
+                _context.Add(category);
                 await _context.SaveChangesAsync();
 
                 return RedirectToAction(nameof(Index));
@@ -78,44 +93,47 @@ namespace DATN.Controllers
             return View(category);
         }
 
-        // POST: /Category/Edit/5
+        // GET: Edit
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null) return NotFound();
+            var category = await _context.Categories.FindAsync(id);
+            return category == null ? NotFound() : View(category);
+        }
+
+        // POST: Edit
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Category category, IFormFile imageFile)
         {
-            if (id != category.CategoryId)
-                return NotFound();
+            if (id != category.CategoryId) return NotFound();
+            if (!ModelState.IsValid) return View(category);
 
-            if (ModelState.IsValid)
+            try
             {
-                try
+                var existingCategory = await _context.Categories.AsNoTracking().FirstOrDefaultAsync(c => c.CategoryId == id);
+
+                if (imageFile != null && imageFile.Length > 0)
                 {
-                    if (imageFile != null && imageFile.Length > 0)
+                    // Xóa ảnh cũ nếu có
+                    if (!string.IsNullOrEmpty(existingCategory?.CategoryImage))
                     {
-                        var uniqueFileName = $"{Path.GetFileNameWithoutExtension(imageFile.FileName)}_{Guid.NewGuid()}{Path.GetExtension(imageFile.FileName)}";
-                        var uploadPath = Path.Combine(_env.WebRootPath, "hinh");
-
-                        if (!Directory.Exists(uploadPath))
-                            Directory.CreateDirectory(uploadPath);
-
-                        var filePath = Path.Combine(uploadPath, uniqueFileName);
-                        using (var stream = new FileStream(filePath, FileMode.Create))
-                        {
-                            await imageFile.CopyToAsync(stream);
-                        }
-
-                        category.CategoryImage = uniqueFileName;
+                        var oldPath = Path.Combine(_env.WebRootPath, "hinh", existingCategory.CategoryImage);
+                        if (System.IO.File.Exists(oldPath))
+                            System.IO.File.Delete(oldPath);
                     }
 
-                    _context.Update(category);
-                    await _context.SaveChangesAsync();
+                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
+                    var uploadPath = Path.Combine(_env.WebRootPath, "hinh", fileName);
+
+                    using var stream = new FileStream(uploadPath, FileMode.Create);
+                    await imageFile.CopyToAsync(stream);
+
+                    category.CategoryImage = fileName;
                 }
-                catch (DbUpdateConcurrencyException)
+                else
                 {
-                    if (!CategoryExists(category.CategoryId))
-                        return NotFound();
-                    else
-                        throw;
+                    category.CategoryImage = existingCategory?.CategoryImage;
                 }
 
                 return RedirectToAction(nameof(Index));
@@ -124,46 +142,33 @@ namespace DATN.Controllers
             return View(category);
         }
 
-        // GET: /Category/Delete/5
+        // GET: Delete
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-                return NotFound();
+            if (id == null) return NotFound();
 
             var category = await _context.Categories
+                .Include(c => c.Products)
                 .FirstOrDefaultAsync(m => m.CategoryId == id);
 
-            if (category == null)
-                return NotFound();
+            if (category == null) return NotFound();
 
-            return View(category);
-        }
-
-        // POST: /Category/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var category = await _context.Categories.FindAsync(id);
-            if (category != null)
+            if (category.Products.Any())
             {
-                if (!string.IsNullOrEmpty(category.CategoryImage))
-                {
-                    var path = Path.Combine(_env.WebRootPath, "hinh", category.CategoryImage);
-                    if (System.IO.File.Exists(path))
-                        System.IO.File.Delete(path);
-                }
-
-                _context.Categories.Remove(category);
-                await _context.SaveChangesAsync();
+                TempData["Error"] = "Không thể xóa danh mục vì còn sản phẩm!";
+                return RedirectToAction(nameof(Index));
             }
 
-            return RedirectToAction(nameof(Index));
-        }
+            if (!string.IsNullOrEmpty(category.CategoryImage))
+            {
+                var path = Path.Combine(_env.WebRootPath, "hinh", category.CategoryImage);
+                if (System.IO.File.Exists(path))
+                    System.IO.File.Delete(path);
+            }
 
-        private bool CategoryExists(int id)
-        {
-            return _context.Categories.Any(e => e.CategoryId == id);
+            _context.Categories.Remove(category);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
     }
 }

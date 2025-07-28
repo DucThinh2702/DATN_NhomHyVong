@@ -90,7 +90,7 @@ public partial class DatnContext : DbContext
             entity.HasIndex(e => e.CategoryName, "UQ__Categori__8517B2E01FC1CB53").IsUnique();
 
             entity.Property(e => e.CategoryId).HasColumnName("CategoryID");
-            entity.Property(e => e.CategoryDescription).HasMaxLength(225);
+
             entity.Property(e => e.CategoryImage).HasMaxLength(225);
             entity.Property(e => e.CategoryName).HasMaxLength(100);
         });

@@ -7,7 +7,8 @@
         public string? CategoryDescription { get; set; }
         public string? CategoryImage { get; set; }
 
-        // Navigation property
-        public ICollection<Product>? Products { get; set; }
+        // Navigation property đến Product
+        public virtual ICollection<Product>? Products { get; set; }
+
     }
 }
