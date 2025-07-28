@@ -7,120 +7,191 @@
     var totalCount = Model.Count;
 }
 
-<!-- CSS PHÂN TRANG Ô VUÔNG -->
-<style>
-    .pagination {
-        justify-content: center;
-        margin-top: 20px;
-    }
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Admin</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
 
-        .pagination .page-item {
-            margin: 0 3px;
+    <style>
+        :root { --primary-color: #ffc107; --sidebar-width: 280px; }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width); height: 100vh; position: fixed; top: 0; left: 0;
+            background: linear-gradient(135deg,#1a1d29 0%,#2c3142 100%); color: white;
+            overflow-y: auto; z-index: 1000; transition: all .3s ease;
         }
+        .sidebar.collapsed { width: 80px; }
+        .main-content { margin-left: var(--sidebar-width); transition: all .3s ease; }
+        .main-content.expanded { margin-left: 80px; }
+        .nav-link { color: rgba(255,255,255,0.8)!important; border-radius: 8px; margin: 2px 0; transition: all .3s ease; }
+        .nav-link:hover,.nav-link.active { background: rgba(255,255,255,0.1)!important; color: white!important; transform: translateX(8px); }
+        .sidebar.collapsed .nav-link:hover,.sidebar.collapsed .nav-link.active { transform: none; }
+        .sidebar.collapsed .nav-text { display: none; }
+        .brand-logo { background: linear-gradient(135deg,var(--primary-color),#e0a800); color:#1a1d29; padding:8px 12px; border-radius:8px; font-weight:bold; font-size:14px; }
 
+        /* Table & Pagination */
+        .pagination { justify-content: center; margin-top: 20px; }
+        .pagination .page-item { margin: 0 3px; }
         .pagination .page-link {
-            border: 1px solid #0d6efd;
-            border-radius: 0 !important; /* Vuông góc */
-            padding: 6px 12px;
-            color: #0d6efd;
-            background-color: white;
-            transition: all 0.2s;
-            font-weight: 500;
+            border: 1px solid #0d6efd; border-radius: 0 !important;
+            padding: 6px 12px; color: #0d6efd; background: white;
+            transition: all 0.2s; font-weight: 500;
         }
+        .pagination .page-link:hover { background: #0d6efd; color: #fff; border-color: #0d6efd; }
+        .pagination .active .page-link { background: #0d6efd; color: #fff; pointer-events: none; }
 
-            .pagination .page-link:hover {
-                background-color: #0d6efd;
-                color: white;
-                border-color: #0d6efd;
-            }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="p-3 border-bottom border-secondary">
+            <div class="d-flex align-items-center justify-content-center mb-3">
+                <div class="d-flex shadow-sm rounded overflow-hidden">
+                    <span class="px-3 py-1 text-warning fw-bold bg-secondary">THE BAG</span>
+                    <span class="px-3 py-1 text-dark fw-bold bg-warning">STUDIO</span>
+                </div>
+            </div>
+            <div class="text-center">
+                <div class="bg-light rounded-circle shadow-sm overflow-hidden" style="width:60px;height:60px;">
+                    <img src="~/hinh/logo.jpg" alt="Logo" class="img-fluid" />
+                </div>
+                <div class="mt-2">
+                    <h6 class="mb-0 text-white">Admin User</h6>
+                    <small class="text-secondary">Quản trị viên</small>
+                </div>
+            </div>
+        </div>
+        <nav class="p-3">
+            <h6 class="text-secondary fw-semibold mb-2">Tổng quan</h6>
+            <ul class="nav flex-column mb-4">
+                <li class="nav-item"><a class="nav-link active" asp-controller="Admin" asp-action="Index"><i class="fas fa-chart-pie me-2"></i><span class="nav-text">Thống kê</span></a></li>
+                <li class="nav-item"><a class="nav-link" asp-controller="Colors" asp-action="Index"><i class="fas fa-chart-line me-2"></i><span class="nav-text">Size và Màu</span></a></li>
+            </ul>
+            <h6 class="text-secondary fw-semibold mb-2">Quản lý</h6>
+            <ul class="nav flex-column mb-4">
+                <li class="nav-item"><a class="nav-link" asp-controller="Admin" asp-action="SanPham"><i class="fas fa-shopping-bag me-2"></i><span class="nav-text">Sản phẩm</span></a></li>
+                <li class="nav-item"><a class="nav-link" asp-controller="Admin" asp-action="DonHang"><i class="fas fa-shopping-cart me-2"></i><span class="nav-text">Đơn hàng</span></a></li>
+                <li class="nav-item"><a class="nav-link" asp-controller="Admin" asp-action="KhachHang"><i class="fas fa-users me-2"></i><span class="nav-text">Khách hàng</span></a></li>
+                <li class="nav-item"><a class="nav-link" asp-controller="Category" asp-action="Index"><i class="fas fa-tags me-2"></i><span class="nav-text">Danh mục</span></a></li>
+            </ul>
+            <h6 class="text-secondary fw-semibold mb-2">Marketing</h6>
+            <ul class="nav flex-column mb-4">
+                <li class="nav-item"><a class="nav-link" asp-controller="Admin" asp-action="ChienDich"><i class="fas fa-bullhorn me-2"></i><span class="nav-text">Chiến dịch</span></a></li>
+                <li class="nav-item"><a class="nav-link" asp-controller="Admin" asp-action="MaGiamGia"><i class="fas fa-ticket-alt me-2"></i><span class="nav-text">Mã giảm giá</span></a></li>
+            </ul>
+            <h6 class="text-secondary fw-semibold mb-2">Hệ thống</h6>
+            <ul class="nav flex-column">
+                <li class="nav-item"><a class="nav-link" asp-controller="Admin" asp-action="CaiDat"><i class="fas fa-cog me-2"></i><span class="nav-text">Cài đặt</span></a></li>
+                <li class="nav-item"><a class="nav-link text-danger" href="#" onclick="logout()"><i class="fas fa-sign-out-alt me-2"></i><span class="nav-text">Đăng xuất</span></a></li>
+            </ul>
+        </nav>
+    </div>
 
-        .pagination .active .page-link {
-            background-color: #0d6efd;
-            color: white;
-            border-color: #0d6efd;
-            pointer-events: none;
-        }
-</style>
+    <!-- Nội dung chính -->
+    <div class="main-content p-4" id="mainContent">
+        <h2 class="mb-3">Danh sách danh mục</h2>
+        <form asp-action="Index" method="get" class="mb-3 d-flex" id="filterForm">
+            <input type="text" id="searchInput" name="searchString" value="@ViewData["CurrentFilter"]" class="form-control w-25 me-2" placeholder="Tìm danh mục..." />
+            <button type="submit" class="btn btn-outline-primary">Tìm kiếm</button>
+        </form>
 
-<h2 class="mb-3">Danh sách danh mục</h2>
+        <div class="mb-3">
+            <span class="badge bg-primary">Tổng danh mục: @totalCount</span>
+            <span class="badge bg-success">Tổng số sản phẩm: @ViewBag.TotalProductCount</span>
+        </div>
 
-<form asp-action="Index" method="get" class="mb-3 d-flex">
-    <input type="text" name="searchString" value="@ViewData["CurrentFilter"]" class="form-control w-25 me-2" placeholder="Tìm danh mục..." />
-    <button type="submit" class="btn btn-outline-primary">Tìm kiếm</button>
-</form>
+        <div class="mb-3">
+            <a asp-action="Create" class="btn btn-success">+ Thêm danh mục</a>
+            <a asp-action="ExportToExcel" class="btn btn-outline-success ms-2">📥 Xuất Excel</a>
+        </div>
 
-<div class="mb-3">
-    <span class="badge bg-primary">Tổng danh mục: @totalCount</span>
-    <span class="badge bg-success">Tổng số sản phẩm: @ViewBag.TotalProductCount</span>
-</div>
-
-<div class="mb-3">
-    <a asp-action="Create" class="btn btn-success">+ Thêm danh mục</a>
-    <a asp-action="ExportToExcel" class="btn btn-outline-success ms-2">📥 Xuất Excel</a>
-</div>
-
-<table class="table table-bordered table-hover align-middle">
-    <thead class="table-dark">
-        <tr>
-            <th>#</th>
-            <th>
-                <a asp-action="Index" asp-route-sortOrder="@ViewData["NameSortParm"]">Tên danh mục</a>
-            </th>
-            <th>Ảnh</th>
-            <th>
-                <a asp-action="Index" asp-route-sortOrder="@ViewData["CountSortParm"]">Số sản phẩm</a>
-            </th>
-            <th>Hành động</th>
-        </tr>
-    </thead>
-    <tbody>
-        @if (!Model.Any())
-        {
-            <tr>
-                <td colspan="5" class="text-center text-danger">Không tìm thấy danh mục nào.</td>
-            </tr>
-        }
-        else
-        {
-            int stt = ((int?)ViewData["CurrentPage"] - 1 ?? 0) * Model.PageSize + 1;
-            foreach (var item in Model)
-            {
+        <table class="table table-bordered table-hover align-middle">
+            <thead class="table-dark">
                 <tr>
-                    <td>@(stt++)</td>
-                    <td>@item.CategoryName</td>
-                    <td>
-                        @if (!string.IsNullOrEmpty(item.CategoryImage))
-                        {
-                            <img src="~/hinh/@item.CategoryImage" width="100" height="80" style="object-fit:cover" />
-                        }
-                    </td>
-                    <td>
-                        <span class="badge bg-info text-dark">@item.Products?.Count() ?? 0</span>
-                    </td>
-                    <td>
-                        <a asp-action="Edit" asp-route-id="@item.CategoryId" class="btn btn-sm btn-warning">Sửa</a>
-                        <a asp-action="Delete" asp-route-id="@item.CategoryId" class="btn btn-sm btn-danger" onclick="return confirm('Xác nhận xóa?');">Xóa</a>
-                    </td>
+                    <th>#</th>
+                    <th><a asp-action="Index" asp-route-sortOrder="@ViewData["NameSortParm"]">Tên danh mục</a></th>
+                    <th>Ảnh</th>
+                    <th><a asp-action="Index" asp-route-sortOrder="@ViewData["CountSortParm"]">Số sản phẩm</a></th>
+                    <th>Hành động</th>
                 </tr>
-            }
-        }
-    </tbody>
-</table>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr><td colspan="5" class="text-center text-danger">Không tìm thấy danh mục nào.</td></tr>
+                }
+                else
+                {
+                    int stt = ((int?)ViewData["CurrentPage"] - 1 ?? 0) * Model.PageSize + 1;
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@(stt++)</td>
+                            <td>@item.CategoryName</td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(item.CategoryImage))
+                                { <img src="~/hinh/@item.CategoryImage" width="100" height="80" style="object-fit:cover" /> }
+                            </td>
+                            <td><span class="badge bg-info text-dark">@((item.Products?.Count() ?? 0))</span></td>
+                            <td>
+                                <a asp-action="Edit" asp-route-id="@item.CategoryId" class="btn btn-sm btn-warning">Sửa</a>
+                                <a asp-action="Delete" asp-route-id="@item.CategoryId" class="btn btn-sm btn-danger" onclick="return confirm('Xác nhận xóa?');">Xóa</a>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
 
-<<div class="d-flex justify-content-center mt-4">
-    @Html.PagedListPager(Model, page => Url.Action("Index",
-            new { page, sortOrder = ViewData["CurrentSort"], searchString = ViewData["CurrentFilter"] }),
-            new PagedListRenderOptions
-    {
-        DisplayLinkToFirstPage = PagedListDisplayMode.Always,
-        DisplayLinkToLastPage = PagedListDisplayMode.Always,
-        DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
-        DisplayLinkToNextPage = PagedListDisplayMode.Always,
-        DisplayEllipsesWhenNotShowingAllPageNumbers = true,
+        <div class="d-flex justify-content-center mt-4">
+            @Html.PagedListPager(Model, page => Url.Action("Index",
+                new { page, sortOrder = ViewData["CurrentSort"], searchString = ViewData["CurrentFilter"] }),
+                new PagedListRenderOptions
+                {
+                    DisplayLinkToFirstPage = PagedListDisplayMode.Always,
+                    DisplayLinkToLastPage = PagedListDisplayMode.Always,
+                    DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
+                    DisplayLinkToNextPage = PagedListDisplayMode.Always,
+                    DisplayEllipsesWhenNotShowingAllPageNumbers = true,
+                    UlElementClasses = new[] { "pagination" },
+                    LiElementClasses = new[] { "page-item" },
+                    PageClasses = new[] { "page-link" }
+                })
+        </div>
+    </div>
 
-        // ✅ Sửa lỗi bằng cách dùng mảng chuỗi
-        UlElementClasses = new[] { "pagination" },
-        LiElementClasses = new[] { "page-item" },
-        PageClasses = new[] { "page-link" }
-    })
-</div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // tìm + lọc
+        document.getElementById("searchInput").addEventListener("input", function () {
+            clearTimeout(this.searchTimer);
+            this.searchTimer = setTimeout(() => { document.getElementById("filterForm").submit(); }, 300);
+        });
+
+        // Sidebar Toggle
+        function logout() { if (confirm('Bạn có chắc chắn muốn đăng xuất?')) alert('Đăng xuất thành công!'); }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const navLinks = document.querySelectorAll(".sidebar .nav-link");
+            const currentPath = window.location.pathname.toLowerCase();
+            navLinks.forEach(link => {
+                const href = link.getAttribute("href");
+                if (href && currentPath === new URL(href, window.location.origin).pathname.toLowerCase()) {
+                    link.classList.add("active");
+                } else { link.classList.remove("active"); }
+                link.addEventListener("click", function () {
+                    navLinks.forEach(l => l.classList.remove("active"));
+                    this.classList.add("active");
+                });
+            });
+        });
+    </script>
+</body>
+</html>
