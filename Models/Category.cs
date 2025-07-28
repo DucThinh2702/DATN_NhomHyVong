@@ -18,5 +18,6 @@ namespace DATN.Models
 
         // Navigation property đến Product
         public virtual ICollection<Product>? Products { get; set; }
+
     }
 }

@@ -1,103 +1,127 @@
-﻿@model IEnumerable<DATN.Models.Category>
-
+﻿@model X.PagedList.IPagedList<DATN.Models.Category>
+@using X.PagedList.Mvc.Core
+@using X.PagedList
+@using X.PagedList.Web.Common
 @{
     ViewData["Title"] = "Danh sách danh mục";
-    var totalCategory = Model?.Count() ?? 0;
-    var totalProduct = Model?.Sum(c => c.Products?.Count() ?? 0) ?? 0;
-    string currentFilter = Context.Request.Query["searchString"];
+    var totalCount = Model.Count;
 }
 
-<div class="container mt-4">
-    <h2 class="mb-4">@ViewData["Title"]</h2>
+<!-- CSS PHÂN TRANG Ô VUÔNG -->
+<style>
+    .pagination {
+        justify-content: center;
+        margin-top: 20px;
+    }
 
-    <!-- Thống kê tổng quát -->
-    <div class="row mb-4">
-        <div class="col-md-6 mb-2">
-            <div class="card text-white bg-primary">
-                <div class="card-body d-flex justify-content-between align-items-center">
-                    <div>
-                        <h5 class="card-title mb-1">Tổng danh mục</h5>
-                        <p class="card-text fs-4 fw-bold mb-0">@totalCategory</p>
-                    </div>
-                    <i class="bi bi-tags fs-1"></i>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6 mb-2">
-            <div class="card text-white bg-success">
-                <div class="card-body d-flex justify-content-between align-items-center">
-                    <div>
-                        <h5 class="card-title mb-1">Tổng sản phẩm</h5>
-                        <p class="card-text fs-4 fw-bold mb-0">@totalProduct</p>
-                    </div>
-                    <i class="bi bi-box-seam fs-1"></i>
-                </div>
-            </div>
-        </div>
-    </div>
+        .pagination .page-item {
+            margin: 0 3px;
+        }
 
-    <!-- Tìm kiếm -->
-    <form method="get" asp-controller="Category" asp-action="Index" class="mb-3 row g-3">
-        <div class="col-md-4">
-            <input type="text" name="searchString" value="@currentFilter" class="form-control" placeholder="Nhập tên danh mục..." />
-        </div>
-        <div class="col-auto">
-            <button type="submit" class="btn btn-outline-primary">
-                <i class="bi bi-search"></i> Tìm kiếm
-            </button>
-        </div>
-        <div class="col-auto">
-            <a asp-action="Index" class="btn btn-outline-secondary">
-                <i class="bi bi-x-circle"></i> Xóa lọc
-            </a>
-        </div>
-    </form>
+        .pagination .page-link {
+            border: 1px solid #0d6efd;
+            border-radius: 0 !important; /* Vuông góc */
+            padding: 6px 12px;
+            color: #0d6efd;
+            background-color: white;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
 
-    <p>
-        <a class="btn btn-success" asp-action="Create">
-            <i class="bi bi-plus-circle"></i> Tạo mới danh mục
-        </a>
-    </p>
+            .pagination .page-link:hover {
+                background-color: #0d6efd;
+                color: white;
+                border-color: #0d6efd;
+            }
 
-    <table class="table table-bordered table-hover align-middle">
-        <thead class="table-dark">
+        .pagination .active .page-link {
+            background-color: #0d6efd;
+            color: white;
+            border-color: #0d6efd;
+            pointer-events: none;
+        }
+</style>
+
+<h2 class="mb-3">Danh sách danh mục</h2>
+
+<form asp-action="Index" method="get" class="mb-3 d-flex">
+    <input type="text" name="searchString" value="@ViewData["CurrentFilter"]" class="form-control w-25 me-2" placeholder="Tìm danh mục..." />
+    <button type="submit" class="btn btn-outline-primary">Tìm kiếm</button>
+</form>
+
+<div class="mb-3">
+    <span class="badge bg-primary">Tổng danh mục: @totalCount</span>
+    <span class="badge bg-success">Tổng số sản phẩm: @ViewBag.TotalProductCount</span>
+</div>
+
+<div class="mb-3">
+    <a asp-action="Create" class="btn btn-success">+ Thêm danh mục</a>
+    <a asp-action="ExportToExcel" class="btn btn-outline-success ms-2">📥 Xuất Excel</a>
+</div>
+
+<table class="table table-bordered table-hover align-middle">
+    <thead class="table-dark">
+        <tr>
+            <th>#</th>
+            <th>
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["NameSortParm"]">Tên danh mục</a>
+            </th>
+            <th>Ảnh</th>
+            <th>
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["CountSortParm"]">Số sản phẩm</a>
+            </th>
+            <th>Hành động</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (!Model.Any())
+        {
             <tr>
-                <th scope="col">Hình ảnh</th>
-                <th scope="col">Tên danh mục</th>
-                <th scope="col">Số sản phẩm</th>
-                <th scope="col" style="width:160px">Thao tác</th>
+                <td colspan="5" class="text-center text-danger">Không tìm thấy danh mục nào.</td>
             </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
+        }
+        else
+        {
+            int stt = ((int?)ViewData["CurrentPage"] - 1 ?? 0) * Model.PageSize + 1;
+            foreach (var item in Model)
             {
                 <tr>
+                    <td>@(stt++)</td>
+                    <td>@item.CategoryName</td>
                     <td>
                         @if (!string.IsNullOrEmpty(item.CategoryImage))
                         {
-                            <img src="~/hinh/@item.CategoryImage" class="img-thumbnail" style="max-height:80px;" />
-                        }
-                        else
-                        {
-                            <span class="text-muted fst-italic">Chưa có hình</span>
+                            <img src="~/hinh/@item.CategoryImage" width="100" height="80" style="object-fit:cover" />
                         }
                     </td>
-                    <td class="fw-semibold">@item.CategoryName</td>
                     <td>
-                        <span class="badge bg-info text-dark">
-                            @(item.Products?.Count() ?? 0) sản phẩm
-                        </span>
+                        <span class="badge bg-info text-dark">@item.Products?.Count() ?? 0</span>
                     </td>
                     <td>
-                        <a class="btn btn-sm btn-warning" asp-action="Edit" asp-route-id="@item.CategoryId">
-                            <i class="bi bi-pencil-square"></i> Sửa
-                        </a>
-                        <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@item.CategoryId">
-                            <i class="bi bi-trash"></i> Xóa
-                        </a>
+                        <a asp-action="Edit" asp-route-id="@item.CategoryId" class="btn btn-sm btn-warning">Sửa</a>
+                        <a asp-action="Delete" asp-route-id="@item.CategoryId" class="btn btn-sm btn-danger" onclick="return confirm('Xác nhận xóa?');">Xóa</a>
                     </td>
                 </tr>
             }
-        </tbody>
-    </table>
+        }
+    </tbody>
+</table>
+
+<<div class="d-flex justify-content-center mt-4">
+    @Html.PagedListPager(Model, page => Url.Action("Index",
+            new { page, sortOrder = ViewData["CurrentSort"], searchString = ViewData["CurrentFilter"] }),
+            new PagedListRenderOptions
+    {
+        DisplayLinkToFirstPage = PagedListDisplayMode.Always,
+        DisplayLinkToLastPage = PagedListDisplayMode.Always,
+        DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
+        DisplayLinkToNextPage = PagedListDisplayMode.Always,
+        DisplayEllipsesWhenNotShowingAllPageNumbers = true,
+
+        // ✅ Sửa lỗi bằng cách dùng mảng chuỗi
+        UlElementClasses = new[] { "pagination" },
+        LiElementClasses = new[] { "page-item" },
+        PageClasses = new[] { "page-link" }
+    })
 </div>
+
