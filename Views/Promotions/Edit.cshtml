@@ -36,6 +36,7 @@
         .form-floating label {
             padding-left: 12px;
         }
+
         :root {
             --primary-color: #ffc107;
             --sidebar-width: 280px;
@@ -182,6 +183,7 @@
             background-color: #ccc;
             border-radius: 3px;
         }
+
         @@media (max-width: 768px) {
             .sidebar {
                 width: 80px;
@@ -364,139 +366,231 @@
                         </ul>
                     </div>
                 }
+
+                <input type="hidden" asp-for="PromoCode" />
+
+                <div class="form-section">
+                    <h5><i class="fas fa-info-circle me-2"></i>Thông tin cơ bản</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6 form-floating">
+                            <input asp-for="PromoName" class="form-control" placeholder="" />
+                            <label asp-for="PromoName">Tên mã giảm giá</label>
+                            <span asp-validation-for="PromoName" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 form-floating">
+                            <input asp-for="PromoNameCode" class="form-control" readonly disabled placeholder="" />
+                            <label asp-for="PromoNameCode">Mã giảm giá tự tạo</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h5><i class="fas fa-percent me-2"></i>Giá trị & Loại giảm</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="PromoType" class="form-label">Loại giảm giá</label>
+                            <select asp-for="PromoType" class="form-select">
+                                <option value="">-- Chọn loại --</option>
+                                <option value="Phần trăm" selected=@(Model.PromoType == "Phần trăm")>Phần trăm</option>
+                                <option value="Số tiền cố định" selected=@(Model.PromoType == "Số tiền cố định")>Số tiền cố định</option>
+                                <option value="Miễn phí vận chuyển" selected=@(Model.PromoType == "Miễn phí vận chuyển")>Miễn phí vận chuyển</option>
+                            </select>
+                            <span asp-validation-for="PromoType" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 input-group">
+                            <input asp-for="DiscountValue" class="form-control" placeholder="Giá trị giảm" />
+                            <span class="input-group-text">VNĐ / %</span>
+                            <span asp-validation-for="DiscountValue" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h5><i class="fas fa-calendar-alt me-2"></i>Thời gian áp dụng</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6 form-floating">
+                            <input asp-for="StartDate" type="date" class="form-control" placeholder="" />
+                            <label asp-for="StartDate">Ngày bắt đầu</label>
+                            <span asp-validation-for="StartDate" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 form-floating">
+                            <input asp-for="EndDate" type="date" class="form-control" placeholder="" />
+                            <label asp-for="EndDate">Ngày kết thúc</label>
+                            <span asp-validation-for="EndDate" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h5><i class="fas fa-layer-group me-2"></i>Điều kiện khác</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6 form-floating">
+                            <input asp-for="Quantity" class="form-control" placeholder="" />
+                            <label asp-for="Quantity">Số lượng</label>
+                            <span asp-validation-for="Quantity" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 form-floating">
+                            <input asp-for="MinOrderAmount" class="form-control" placeholder="" />
+                            <label asp-for="MinOrderAmount">Giá trị đơn hàng tối thiểu</label>
+                            <span asp-validation-for="MinOrderAmount" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Status" class="form-label">Đối tượng áp dụng</label>
+                            <select asp-for="Status" class="form-select">
+                                <option value="Tất cả khách hàng" selected=@(Model.Status == "Tất cả khách hàng")>Tất cả khách hàng</option>
+                                <option value="Khách hàng mới" selected=@(Model.Status == "Khách hàng mới")>Khách hàng mới</option>
+                                <option value="Khách hàng VIP" selected=@(Model.Status == "Khách hàng VIP")>Khách hàng VIP</option>
+                                <option value="Sinh viên" selected=@(Model.Status == "Sinh viên")>Sinh viên</option>
+                            </select>
+                            <span asp-validation-for="Status" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-12">
+                            <label asp-for="Description" class="form-label">Mô tả</label>
+                            <textarea asp-for="Description" class="form-control" rows="3" placeholder="Mô tả chi tiết về mã giảm giá..."></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-section">
+                    <h5><i class="fas fa-truck me-2"></i>Đơn vị vận chuyển áp dụng</h5>
+
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label for="ShippingProvider" class="form-label mb-0">Chọn đơn vị vận chuyển</label>
+                        <button type="button" class="btn btn-sm btn-outline-primary" id="toggleSelectAll">
+                            <i class="fas fa-check-double me-1"></i><span id="toggleText">Chọn tất cả</span>
+                        </button>
+                    </div>
+
+                    <select id="ShippingProvider"
+                            name="selectedShippingProviderIds"
+                            class="form-select"
+                            multiple>
+                        @{
+                            var providers = ViewBag.ShippingProviders as List<SelectListItem>;
+                            var selectedIds = ViewBag.SelectedProviderIds as int[] ?? Array.Empty<int>();
+                        }
+
+                        @if (providers != null && providers.Any())
+                        {
+                            foreach (var provider in providers)
+                            {
+                                bool isSelected = selectedIds.Contains(int.Parse(provider.Value));
+                                var selectedAttr = isSelected ? " selected" : "";
+
+                                @Html.Raw($"<option value='{provider.Value}'{selectedAttr}>{provider.Text}</option>")
+                            }
+                        }
+                        else
+                        {
+                            <option disabled>Không có đơn vị vận chuyển</option>
+                        }
+
+                    </select>
+
+                    <span class="text-danger">
+                        @Html.ValidationMessage("selectedShippingProviderIds", "", new { @class = "text-danger" })
+                    </span>
+                </div>
+                <div class="d-flex justify-content-end gap-2">
+                    <button type="submit" class="btn btn-primary px-4"><i class="fas fa-save me-2"></i>Lưu thay đổi</button>
+                    <a asp-action="MaGiamGia" asp-controller="Admin" class="btn btn-outline-secondary px-4">Quay lại</a>
+                </div>
             </form>
-
-<form asp-action="Edit" asp-controller="Promotions" method="post">
-    <input type="hidden" asp-for="PromoCode" />
-
-    <div class="row">
-        <div class="col-md-6">
-            <div class="mb-3">
-                <label asp-for="PromoName" class="form-label">Tên mã giảm giá</label>
-                <input asp-for="PromoName" class="form-control" placeholder="Ví dụ: SALE20" />
-                <span asp-validation-for="PromoName" class="text-danger"></span>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="mb-3">
-                <label asp-for="PromoType" class="form-label">Loại giảm giá</label>
-                <select asp-for="PromoType" class="form-select">
-                    <option value="">-- Chọn loại giảm giá --</option>
-                    <option>Phần trăm</option>
-                    <option>Số tiền cố định</option>
-                    <option>Miễn phí vận chuyển</option>
-                </select>
-                <span asp-validation-for="PromoType" class="text-danger"></span>
-            </div>
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-md-6">
-            <div class="mb-3">
-                <label asp-for="DiscountValue" class="form-label">Giá trị giảm</label>
-                <input asp-for="DiscountValue" class="form-control" />
-                <span asp-validation-for="DiscountValue" class="text-danger"></span>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="mb-3">
-                <label asp-for="Quantity" class="form-label">Số lượng</label>
-                <input asp-for="Quantity" class="form-control" />
-                <span asp-validation-for="Quantity" class="text-danger"></span>
-            </div>
-        </div>
-    </div>
+    @section Scripts {
+        @{
+            await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        }
+    }
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-    <div class="row">
-        <div class="col-md-6">
-            <div class="mb-3">
-                <label asp-for="StartDate" class="form-label">Ngày bắt đầu</label>
-                <input asp-for="StartDate" class="form-control" type="date" />
-                <span asp-validation-for="StartDate" class="text-danger"></span>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="mb-3">
-                <label asp-for="EndDate" class="form-label">Ngày kết thúc</label>
-                <input asp-for="EndDate" class="form-control" type="date" />
-                <span asp-validation-for="EndDate" class="text-danger"></span>
-            </div>
-        </div>
-    </div>
+    <script>
+        $('form').on('submit', function () {
+            const selected = $('#ShippingProvider').val();
+            console.log("✅ Đã chọn đơn vị vận chuyển:", selected);
+        });
+        $(document).ready(function () {
+            const $select = $('#ShippingProvider');
+            const $toggleBtn = $('#toggleSelectAll');
+            const $toggleText = $('#toggleText');
 
-    <div class="mb-3">
-        <label asp-for="MinOrderAmount" class="form-label">Giá trị đơn hàng tối thiểu</label>
-        <input asp-for="MinOrderAmount" class="form-control" />
-        <span asp-validation-for="MinOrderAmount" class="text-danger"></span>
-    </div>
-
-    <div class="mb-3">
-        <label asp-for="Status" class="form-label">Đối tượng áp dụng</label>
-        <select asp-for="Status" class="form-select">
-            <option>Tất cả khách hàng</option>
-            <option>Khách hàng mới</option>
-            <option>Khách hàng VIP</option>
-            <option>Sinh viên</option>
-        </select>
-        <span asp-validation-for="Status" class="text-danger"></span>
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Mô tả</label>
-        <textarea class="form-control" rows="3" placeholder="Nhập mô tả chi tiết về mã giảm giá..."></textarea>
-    </div>
-
-    <div class="d-flex justify-content-between">
-        <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
-        <a asp-action="MaGiamGia" asp-controller="Admin" class="btn btn-outline-secondary">Quay lại danh sách</a>
-    </div>
-</form>
-
-@section Scripts {
-    @await Html.PartialAsync("_ValidationScriptsPartial")
-}
-</div>
-        <!-- Bootstrap JS -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-        <script>
-                // Sidebar Toggle
-                document.getElementById('sidebarToggle').addEventListener('click', function() {
-                    const sidebar = document.getElementById('sidebar');
-                    const mainContent = document.getElementById('mainContent');
-
-                    sidebar.classList.toggle('collapsed');
-                    mainContent.classList.toggle('expanded');
-
-                    localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
-                });
-
-                // Restore sidebar state
-                if (localStorage.getItem('sidebarCollapsed') === 'true') {
-                    document.getElementById('sidebar').classList.add('collapsed');
-                    document.getElementById('mainContent').classList.add('expanded');
-                }
-
-                // Logout function
-                function logout() {
-                    if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
-                        alert('Đăng xuất thành công!');
-                    }
-                }
-                  document.addEventListener("DOMContentLoaded", function () {
-                const currentPath = window.location.pathname.split("/").pop(); // Lấy tên file cuối
-                const navLinks = document.querySelectorAll(".sidebar .nav-link");
-
-                navLinks.forEach(link => {
-                    const href = link.getAttribute("href");
-                    if (href && currentPath === href) {
-                        link.classList.add("active");
-                    } else {
-                        link.classList.remove("active");
-                    }
-                });
+            // Kích hoạt Select2
+            $select.select2({
+                allowClear: true,
+                width: '100%'
             });
-        </script>
+
+            // Cập nhật text nút dựa trên trạng thái hiện tại
+            function updateToggleLabel() {
+                const total = $select.find('option').length;
+                const selected = $select.find('option:selected').length;
+                const isAllSelected = total > 0 && total === selected;
+                $toggleText.text(isAllSelected ? "Bỏ chọn tất cả" : "Chọn tất cả");
+            }
+
+            // Gọi khi khởi tạo
+            updateToggleLabel();
+
+            // Toggle hành vi
+            $toggleBtn.on('click', function () {
+                const total = $select.find('option').length;
+                const selected = $select.find('option:selected').length;
+                const isAllSelected = total > 0 && total === selected;
+
+                // Nếu đã chọn hết thì bỏ chọn, ngược lại thì chọn hết
+                $select.find('option').prop('selected', !isAllSelected);
+                $select.trigger('change'); // cập nhật lại UI Select2
+
+                updateToggleLabel();
+            });
+
+            // Nếu người dùng chọn/bỏ thủ công
+            $select.on('change', updateToggleLabel);
+        });
+
+        // Sidebar Toggle
+        document.getElementById('sidebarToggle').addEventListener('click', function () {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
+
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('expanded');
+
+            localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+        });
+
+        // Restore sidebar state
+        if (localStorage.getItem('sidebarCollapsed') === 'true') {
+            document.getElementById('sidebar').classList.add('collapsed');
+            document.getElementById('mainContent').classList.add('expanded');
+        }
+
+        // Logout function
+        function logout() {
+            if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+                alert('Đăng xuất thành công!');
+            }
+        }
+        document.addEventListener("DOMContentLoaded", function () {
+            const currentPath = window.location.pathname.split("/").pop(); // Lấy tên file cuối
+            const navLinks = document.querySelectorAll(".sidebar .nav-link");
+
+            navLinks.forEach(link => {
+                const href = link.getAttribute("href");
+                if (href && currentPath === href) {
+                    link.classList.add("active");
+                } else {
+                    link.classList.remove("active");
+                }
+            });
+        });
+    </script>
 </body>
 </html>

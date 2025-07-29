@@ -51,6 +51,7 @@
                 .voucher-detail ul li::before {
                     content: none;
                 }
+
         :root {
             --primary-color: #ffc107;
             --sidebar-width: 280px;
@@ -341,44 +342,16 @@
                 <dt class="col-sm-4">Mô tả:</dt>
                 <dd class="col-sm-8">@Model.Description</dd>
 
-        <dt class="col-sm-3">Đã sử dụng</dt>
-        <dd class="col-sm-9">@Model.UsedQuantity</dd>
-
-        <dt class="col-sm-3">Trạng thái</dt>
-        <dd class="col-sm-9">@Model.Status</dd>
-    </dl>
-</div>
-
-<div class="d-flex gap-2">
-    <a class="btn btn-warning" asp-action="Edit" asp-route-id="@Model.PromoCode">Chỉnh sửa</a>
-    <a class="btn btn-secondary" asp-action="MaGiamGia" asp-controller="Admin">Quay lại</a>
-</div>
-</div>
-        <!-- Bootstrap JS -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-        <script>
-                // Sidebar Toggle
-                document.getElementById('sidebarToggle').addEventListener('click', function() {
-                    const sidebar = document.getElementById('sidebar');
-                    const mainContent = document.getElementById('mainContent');
-
-                    sidebar.classList.toggle('collapsed');
-                    mainContent.classList.toggle('expanded');
-
-                    localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
-                });
-
-                // Restore sidebar state
-                if (localStorage.getItem('sidebarCollapsed') === 'true') {
-                    document.getElementById('sidebar').classList.add('collapsed');
-                    document.getElementById('mainContent').classList.add('expanded');
-                }
-
-                // Logout function
-                function logout() {
-                    if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
-                        alert('Đăng xuất thành công!');
+                <dt class="col-sm-4">Đơn vị vận chuyển:</dt>
+                <dd class="col-sm-8">
+                    @if (Model.ShippingProviders != null && Model.ShippingProviders.Any())
+                    {
+                        <ul class="mb-0">
+                            @foreach (var provider in Model.ShippingProviders)
+                            {
+                                <li>@provider.ShippingProviderName</li>
+                            }
+                        </ul>
                     }
                     else
                     {
@@ -419,30 +392,30 @@
 
     <script>
 
-            // Sidebar Toggle
-            document.getElementById('sidebarToggle').addEventListener('click', function() {
-                const sidebar = document.getElementById('sidebar');
-                const mainContent = document.getElementById('mainContent');
+        // Sidebar Toggle
+        document.getElementById('sidebarToggle').addEventListener('click', function () {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
 
-                sidebar.classList.toggle('collapsed');
-                mainContent.classList.toggle('expanded');
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('expanded');
 
-                localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
-            });
+            localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+        });
 
-            // Restore sidebar state
-            if (localStorage.getItem('sidebarCollapsed') === 'true') {
-                document.getElementById('sidebar').classList.add('collapsed');
-                document.getElementById('mainContent').classList.add('expanded');
+        // Restore sidebar state
+        if (localStorage.getItem('sidebarCollapsed') === 'true') {
+            document.getElementById('sidebar').classList.add('collapsed');
+            document.getElementById('mainContent').classList.add('expanded');
+        }
+
+        // Logout function
+        function logout() {
+            if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+                alert('Đăng xuất thành công!');
             }
-
-            // Logout function
-            function logout() {
-                if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
-                    alert('Đăng xuất thành công!');
-                }
-            }
-              document.addEventListener("DOMContentLoaded", function () {
+        }
+        document.addEventListener("DOMContentLoaded", function () {
             const currentPath = window.location.pathname.split("/").pop(); // Lấy tên file cuối
             const navLinks = document.querySelectorAll(".sidebar .nav-link");
 

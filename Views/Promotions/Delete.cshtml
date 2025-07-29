@@ -46,6 +46,7 @@
         .btn-danger {
             font-weight: 500;
         }
+
         :root {
             --primary-color: #ffc107;
             --sidebar-width: 280px;
@@ -331,10 +332,8 @@
                 <dt class="col-sm-4">Thời gian áp dụng</dt>
                 <dd class="col-sm-8">@Model.StartDate?.ToString("dd/MM/yyyy") - @Model.EndDate?.ToString("dd/MM/yyyy")</dd>
 
-        <dt class="col-sm-3">Trạng thái</dt>
-        <dd class="col-sm-9">@Model.Status</dd>
-    </dl>
-</div>
+                <dt class="col-sm-4">Số lượng / Đã dùng</dt>
+                <dd class="col-sm-8">@Model.Quantity / @Model.UsedQuantity</dd>
 
                 <dt class="col-sm-4">Đối tượng áp dụng</dt>
                 <dd class="col-sm-8">@Model.Status</dd>
@@ -388,30 +387,30 @@
     }
 
     <script>
-            // Sidebar Toggle
-            document.getElementById('sidebarToggle').addEventListener('click', function() {
-                const sidebar = document.getElementById('sidebar');
-                const mainContent = document.getElementById('mainContent');
+        // Sidebar Toggle
+        document.getElementById('sidebarToggle').addEventListener('click', function () {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
 
-                sidebar.classList.toggle('collapsed');
-                mainContent.classList.toggle('expanded');
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('expanded');
 
-                localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
-            });
+            localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+        });
 
-            // Restore sidebar state
-            if (localStorage.getItem('sidebarCollapsed') === 'true') {
-                document.getElementById('sidebar').classList.add('collapsed');
-                document.getElementById('mainContent').classList.add('expanded');
+        // Restore sidebar state
+        if (localStorage.getItem('sidebarCollapsed') === 'true') {
+            document.getElementById('sidebar').classList.add('collapsed');
+            document.getElementById('mainContent').classList.add('expanded');
+        }
+
+        // Logout function
+        function logout() {
+            if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+                alert('Đăng xuất thành công!');
             }
-
-            // Logout function
-            function logout() {
-                if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
-                    alert('Đăng xuất thành công!');
-                }
-            }
-              document.addEventListener("DOMContentLoaded", function () {
+        }
+        document.addEventListener("DOMContentLoaded", function () {
             const currentPath = window.location.pathname.split("/").pop(); // Lấy tên file cuối
             const navLinks = document.querySelectorAll(".sidebar .nav-link");
 

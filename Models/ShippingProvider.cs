@@ -1,4 +1,6 @@
-﻿namespace DATN.Models
+﻿using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+
+namespace DATN.Models
 {
     public class ShippingProvider
     {
