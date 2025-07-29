@@ -25,8 +25,15 @@ app.UseRouting();
 
 app.UseAuthorization();
 
+app.UseEndpoints(endpoints =>)
+    endpoints.MapControllerRoute(
+    name: "contact",
+    pattern: "lien-he",
+    defaults: new { controller = "Contact", action = "Index" });
+
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Category}/{action=Index}/{id?}");
-
+    pattern: "{controller=User}/{action=LienHe}/{id?}");
+  
 app.Run();
+

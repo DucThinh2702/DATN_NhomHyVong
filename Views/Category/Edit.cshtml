@@ -18,13 +18,13 @@
 
         <div class="mb-3">
             <label asp-for="CategoryName" class="form-label"></label>
-            <input asp-for="CategoryName" class="form-control" />
+            <input asp-for="CategoryName" class="form-control" id="CategoryName"  />
             <span asp-validation-for="CategoryName" class="text-danger"></span>
         </div>
 
         <div class="mb-3">
             <label class="form-label">Hình ảnh mới (nếu thay đổi)</label>
-            <input type="file" name="imageFile" class="form-control" />
+            <input type="file" name="imageFile" class="form-control" id="CategoryName"/>
         </div>
 
         @if (!string.IsNullOrEmpty(Model.CategoryImage))
@@ -46,4 +46,34 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+}
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function () {
+            $('#ProductName').on('blur', function () {
+                var productName = $(this).val();
+                var productId = $('input[name="ProductId"]').val() || 0;
+
+                if (productName.trim() === '') return;
+
+                $.get('/Product/IsProductNameAvailable', {
+                    productName: productName,
+                    id: productId
+                }, function (isAvailable) {
+                    if (!isAvailable) {
+                        // Hiển thị lỗi thủ công
+                        if ($('#product-name-error').length === 0) {
+                            $('#ProductName').after('<span id="product-name-error" class="text-danger">Tên sản phẩm đã tồn tại.</span>');
+                        }
+                    } else {
+                        $('#product-name-error').remove();
+                    }
+                });
+            });
+        });
+    </script>
 }

@@ -36,5 +36,6 @@ namespace DATN.Controllers
         {
             return View();
         }
+      
     }
 }
