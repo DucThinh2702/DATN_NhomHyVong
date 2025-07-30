@@ -28,6 +28,8 @@ public partial class User
     public bool? Status { get; set; }
 
     public int? RoleId { get; set; }
+    public string? Salt { get; set; } // Salt để mã hóa mật khẩu
+
 
     public virtual Cart? Cart { get; set; }
 

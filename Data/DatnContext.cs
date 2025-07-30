@@ -1,22 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using DATN.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace DATN.Data;
 
-public partial class DatnContext : DbContext
-{
-    public DatnContext()
+    public partial class DatnContext : DbContext
     {
-    }
+        public DatnContext(DbContextOptions<DatnContext> options)
+            : base(options)
+        {
+        }
 
-    public DatnContext(DbContextOptions<DatnContext> options)
-        : base(options)
-    {
-    }
-
-    public virtual DbSet<Cart> Carts { get; set; }
+        public virtual DbSet<Cart> Carts { get; set; }
 
     public virtual DbSet<CartDetail> CartDetails { get; set; }
 
