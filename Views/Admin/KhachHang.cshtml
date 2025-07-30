@@ -11,10 +11,10 @@
     int currentPage = string.IsNullOrEmpty(Context.Request.Query["page"])
         ? 1
         : int.Parse(Context.Request.Query["page"]!);
-
+    var totalCustomers = users.Count();
     int totalPages = ViewBag.TotalPages ?? 1;
     string searchKeyword = ViewBag.SearchKeyword as string ?? "";
-    string currentFilter = ViewBag.CurrentFilter as string ?? ""; 
+    string currentFilter = ViewBag.CurrentFilter as string ?? "";
 }
 
 <head>
@@ -106,7 +106,7 @@
         }
 
             .sidebar.collapsed {
-                width: 80px;
+                width: 100px;
             }
 
         .main-content {
@@ -163,7 +163,7 @@
 
         @@media (max-width: 768px) {
             .sidebar {
-                width: 80px;
+                width: 100px;
             }
 
             .main-content {
@@ -180,10 +180,11 @@
             }
         }
     </style>
-    <style>      
-        .skiptranslate{
+    <style>
+        .skiptranslate {
             display: none !important;
         }
+
         #languageSelector {
             padding: 6px 12px;
             border: 1px solid #ccc;
@@ -315,14 +316,14 @@
             <div class="container-fluid">
                 <button class="btn btn-outline-secondary me-3" id="sidebarToggle">
                     <i class="fas fa-bars"></i>
-                </button>               
+                </button>
                 <div>
                     <h4 class="mb-0">Khách hàng</h4>
                     <small class="text-muted">Quản lý thông tin khách hàng</small>
                 </div>
 
-                <div class="d-flex align-items-center ms-auto">
-                    <select id="languageSelector" onchange="changeLanguage(this.value)">
+                <div class="d-flex align-items-center ms-auto me-1">
+                    <select id="languageSelector" class="form-select w-auto d-inline-block me-2" onchange="changeLanguage(this.value)">
                         <option value="vi" selected>Tiếng Việt</option>
                         <option value="en">English</option>
                     </select>
@@ -330,7 +331,7 @@
                     <form method="get" asp-action="KhachHang" asp-controller="Admin">
                         <div class="input-group" style="width: 300px;">
                             <input type="text" name="searchName" class="form-control" placeholder="Tìm kiếm khách hàng..." value="@ViewBag.ListSearchKH" />
-                            <button type="submit" class="btn btn-primary">
+                            <button type="submit" class="btn btn-primary ms-1">
                                 <i class="fas fa-search"></i>
                             </button>
                         </div>
@@ -375,12 +376,12 @@
             <div class="row mb-4">
 
                 <div class="col-xl-3 col-md-6 mb-4">
-                    <div class="card border-left-primary h-100">
+                    <div class="card border-left-primary">
                         <div class="card-body">
                             <div class="row align-items-center">
                                 <div class="col">
                                     <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Tổng khách hàng</div>
-                                    <div class="h5 mb-0 font-weight-bold">3,892</div>
+                                    <div class="h5 mb-0 font-weight-bold">@ViewBag.TotalCustomer</div>
                                 </div>
                                 <div class="col-auto">
                                     <i class="fas fa-users fa-2x text-primary"></i>
@@ -391,13 +392,14 @@
                 </div>
 
                 <div class="col-xl-3 col-md-6 mb-4">
-                    <div class="card border-left-success h-100">
+                    <div class="card border-left-success">
                         <div class="card-body">
                             <div class="row align-items-center">
                                 <div class="col">
-                                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Khách hàng mới</div>
-                                    <div class="h5 mb-0 font-weight-bold">156</div>
-                                    <div class="text-success small">Tháng này</div>
+                                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                        Khách hàng mới <small>(Tháng này)</small>
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold"> @ViewBag.LogisterInMonth</div>
                                 </div>
                                 <div class="col-auto">
                                     <i class="fas fa-user-plus fa-2x text-success"></i>
@@ -408,7 +410,7 @@
                 </div>
 
                 <div class="col-xl-3 col-md-6 mb-4">
-                    <div class="card border-left-warning h-100">
+                    <div class="card border-left-warning">
                         <div class="card-body">
                             <div class="row align-items-center">
                                 <div class="col">
@@ -424,12 +426,12 @@
                 </div>
 
                 <div class="col-xl-3 col-md-6 mb-4">
-                    <div class="card border-left-info h-100">
+                    <div class="card border-left-info">
                         <div class="card-body">
                             <div class="row align-items-center">
                                 <div class="col">
                                     <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Đang hoạt động</div>
-                                    <div class="h5 mb-0 font-weight-bold">2,847</div>
+                                    <div class="h5 mb-0 font-weight-bold">@ViewBag.TotalUsersOnline</div>
                                 </div>
                                 <div class="col-auto">
                                     <i class="fas fa-user-check fa-2x text-info"></i>
@@ -442,44 +444,52 @@
 
             <!-- Customers Table -->
             <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
+                <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
                     <div id="google_translate_element" style="display:none;"></div>
-                    <h6 class="m-0 font-weight-bold">Danh sách khách hàng</h6>
-                    <div class="d-flex">
 
+                    <h6 class="m-0 fw-bold">Danh sách khách hàng</h6>
+
+                    <div class="d-flex align-items-center flex-wrap gap-2">
                         @* Form filter *@
-                        <form method="get" asp-action="KhachHang" class="d-flex me-2">
-                            <select name="filterBy" class="form-select me-2" style="width: 150px;">
+                        <form method="get" asp-action="KhachHang" class="d-flex align-items-center gap-2">
+                            <select name="filterBy" class="form-select form-select-sm" style="width: 150px;">
                                 <option value="">-- Bộ lọc --</option>
                                 <option value="money" selected="@(ViewBag.CurrentFilter == "money")">Theo tiền</option>
                                 <option value="date" selected="@(ViewBag.CurrentFilter == "date")">Theo ngày</option>
                             </select>
-                            <button class="btn btn-outline-secondary btn-sm me-2" type="submit">
+                            <button class="btn btn-outline-secondary btn-sm" type="submit">
                                 <i class="fas fa-filter"></i> Lọc
                             </button>
                         </form>
                         @* END Form filter *@
 
-                        <button class="btn btn-outline-primary btn-sm me-2">
-                            <i class="fas fa-download"></i> Xuất Excel
-                        </button>
-                        <!-- Thêm -->
-                        <button class="btn btn-success" onclick='openUserModal("create")'>
+                        @* Nút xuất Excel *@
+                        <form id="exportForm" method="post" asp-controller="User" asp-action="ExportAllUsersToExcel" class="d-flex align-items-center gap-2">
+                            <input type="hidden" name="selectedIds" id="selectedIdsInput" />
+                            <button type="button" id="exportAll" class="btn btn-success btn-sm">Xuất tất cả</button>
+                            <button type="submit" id="exportSelected" class="btn btn-primary btn-sm">Xuất đã chọn</button>
+                        </form>
+
+                        @* Nút thêm *@
+                        <button class="btn btn-success btn-sm" onclick='openUserModal("create")'>
                             <i class="fas fa-plus"></i> Thêm khách hàng
                         </button>
-
                     </div>
                 </div>
+
                 <div class="card-body">
 
                     <div class="table-responsive">
                         <table class="table table-hover" id="customersTable">
                             <thead>
                                 <tr>
+                                    <th><input type="checkbox" id="selectAll" /></th>
                                     <th>Khách hàng</th>
+                                    <th>Giới tính</th>
+                                    <th>Địa chỉ</th>
                                     <th>Liên hệ</th>
-                                    <th>Đơn hàng</th>
-                                    <th>Tổng chi tiêu</th>
+                                    @* <th>Đơn hàng</th>
+                                    <th>Tổng chi tiêu</th> *@
                                     <th>Trạng thái</th>
                                     <th>Ngày tham gia</th>
                                     <th>Thao tác</th>
@@ -489,6 +499,9 @@
                                 @foreach (var user in users)
                                 {
                                     <tr>
+                                        <td>
+                                            <input type="checkbox" class="rowCheckbox" data-user-id="@user.UserId" />
+                                        </td>
                                         <td>
                                             <div class="d-flex align-items-center">
                                                 <div class="customer-avatar me-3">
@@ -502,46 +515,73 @@
                                         </td>
                                         <td>
                                             <div>
+                                                <div class="text-muted">@user.Gender</div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div>
+                                                <div class="text-muted">@user.Address</div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div>
                                                 <div>@user.Email</div>
                                                 <small class="text-muted">@user.PhoneNumber</small>
                                             </div>
                                         </td>
-                                        <td><strong>@(user.Orders?.Count() ?? 0)</strong></td>
+                                        @*     <td><strong>@(user.Orders?.Count() ?? 0)</strong></td>
                                         <td>
                                             <strong>@string.Format("{0:C0}", user.Orders?.Sum(o => o.TotalAmount) ?? 0)</strong>
                                         </td>
                                         <td>
                                             <span class="badge
-                                                                                                                        @(user.Orders?.Count() >= 10 ? "bg-warning" :
+                                              @(user.Orders?.Count() >= 10 ? "bg-warning" :
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             user.Orders?.Count() >= 5 ? "bg-primary" : "bg-success")">
                                                 @(user.Orders?.Count() >= 10 ? "VIP" :
                                                                                             user.Orders?.Count() >= 5 ? "Thường xuyên" : "Mới")
                                         </span>
-                                    </td>
-                                    <td>@user.CreatedDate.ToString("dd/MM/yyyy")</td>
-                                    <td>
-                                        <div class="btn-group btn-group-sm">
-                                            <!-- Xem chi tiết -->
-                                            <button class="btn btn-outline-primary" onclick='openUserModal("view", @Html.Raw(Json.Serialize(user)))'>
-                                                <i class="fas fa-eye"></i>
-                                            </button>
-                                            <!-- Sửa -->
-                                            <button class="btn btn-warning" onclick='openUserModal("edit", @Html.Raw(Json.Serialize(user)))'>
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <a href="mailto:@user.Email" class="btn btn-outline-info" title="Gửi email">
-                                                <i class="fas fa-envelope"></i>
-                                            </a>
-                                        </div>
-                                    </td>
-                                </tr>
-                                                                }
+                                    </td> *@
+                                        <td>
+                                            @if (user.Status == true)
+                                            {
+                                                <span class="badge bg-success">Hoạt động</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary">Không hoạt động</span>
+                                            }
+
+                                        </td>
+                                        <td>@user.CreatedDate.ToString("dd/MM/yyyy")</td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <!-- Xem chi tiết -->
+                                                <button class="btn btn-outline-primary" onclick='openUserModal("view", @Html.Raw(Json.Serialize(user)))'>
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <!-- Sửa -->
+                                                <button class="btn btn-warning" onclick='openUserModal("edit", @Html.Raw(Json.Serialize(user)))'>
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <a href="mailto:@user.Email" class="btn btn-outline-info" title="Gửi email">
+                                                    <i class="fas fa-envelope"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
 
                             </tbody>
                         </table>
                     </div>
+                    <!-- Label tổng và đã chọn -->
+                    <div class="mt-2">
+                        <label id="alertLabel">Tổng số khách hàng: @totalCustomers </label><br />
+                        <label id="selectedCountLabel">Đã chọn: 0 dòng</label>
+                    </div>
                     <!-- Pagination -->
                     <nav>
+
                         <ul class="pagination justify-content-center">
                             @for (int i = 1; i <= totalPages; i++)
                             {
@@ -604,6 +644,14 @@
                                         <label for="phoneNumber" class="form-label">Số điện thoại</label>
                                         <input type="tel" name="PhoneNumber" id="phoneNumber" pattern="[0-9]{7,15}" class="form-control" />
                                         <span id="phoneNumberError" class="text-danger"></span>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="status" class="form-label">Status</label>
+                                        <select name="Status" id="status" class="form-select">
+                                            <option value="true">Hoạt động</option>
+                                            <option value="false">Không hoạt động</option>
+                                        </select>
+                                        <span id="statusError" class="text-danger"></span>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -742,6 +790,7 @@
                 document.getElementById('roleId').value = userData.roleId ?? '';
                 document.getElementById('createdDate').value = userData.createdDate?.split('T')[0] || '';
                 document.getElementById('password').value = userData.password ?? '';
+                document.getElementById('status').value = userData.status ? 'true' : 'false';
 
                 passwordGroup.style.display = 'none';
                 submitBtn.style.display = isView ? 'none' : 'inline-block';
@@ -770,6 +819,123 @@
             });
         }
     </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const LOCAL_STORAGE_KEY = "selected_user_ids";
+            const EXPIRATION_TIME = 15 * 60 * 1000; // 15 phút
+
+            const selectedLabel = document.getElementById("selectedCountLabel");
+            const selectAll = document.getElementById("selectAll");
+            const exportForm = document.getElementById("exportForm");
+            const selectedIdsInput = document.getElementById("selectedIdsInput");
+            const exportAllBtn = document.getElementById("exportAll");
+            const exportSelectedBtn = document.getElementById("exportSelected");
+
+            function getSelectedIds() {
+                const data = localStorage.getItem(LOCAL_STORAGE_KEY);
+                if (!data) return new Set();
+                try {
+                    const parsed = JSON.parse(data);
+                    return new Set(parsed.ids || []);
+                } catch {
+                    return new Set();
+                }
+            }
+
+            function saveSelectedIds(idsSet) {
+                const data = {
+                    ids: [...idsSet],
+                    timestamp: Date.now()
+                };
+                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
+            }
+
+            function updateSelectedCount() {
+                const selectedIds = getSelectedIds();
+                selectedLabel.textContent = `Đã chọn: ${selectedIds.size} dòng`;
+            }
+
+            function syncCheckboxes() {
+                const selectedIds = getSelectedIds();
+                document.querySelectorAll(".rowCheckbox").forEach(cb => {
+                    const id = parseInt(cb.dataset.userId);
+                    cb.checked = selectedIds.has(id);
+                });
+
+                const totalCheckboxes = document.querySelectorAll(".rowCheckbox").length;
+                const checkedCount = document.querySelectorAll(".rowCheckbox:checked").length;
+                if (selectAll) {
+                    selectAll.checked = totalCheckboxes > 0 && totalCheckboxes === checkedCount;
+                }
+
+                updateSelectedCount();
+            }
+
+            // Hạn sử dụng
+            const rawData = localStorage.getItem(LOCAL_STORAGE_KEY);
+            if (rawData) {
+                try {
+                    const parsed = JSON.parse(rawData);
+                    if (parsed.timestamp && Date.now() - parsed.timestamp <= EXPIRATION_TIME) {
+                        syncCheckboxes(); // Còn hiệu lực
+                    } else {
+                        localStorage.removeItem(LOCAL_STORAGE_KEY); // Hết hạn
+                    }
+                } catch {
+                    localStorage.removeItem(LOCAL_STORAGE_KEY); // lỗi format JSON
+                }
+            }
+
+            document.querySelectorAll(".rowCheckbox").forEach(cb => {
+                cb.addEventListener("change", function () {
+                    const selectedIds = getSelectedIds();
+                    const id = parseInt(cb.dataset.userId);
+                    if (cb.checked) selectedIds.add(id);
+                    else selectedIds.delete(id);
+                    saveSelectedIds(selectedIds);
+                    updateSelectedCount();
+                });
+            });
+
+            if (selectAll) {
+                selectAll.addEventListener("change", function () {
+                    const selectedIds = getSelectedIds();
+                    const isChecked = selectAll.checked;
+
+                    document.querySelectorAll(".rowCheckbox").forEach(cb => {
+                        cb.checked = isChecked;
+                        const id = parseInt(cb.dataset.userId);
+                        if (isChecked) selectedIds.add(id);
+                        else selectedIds.delete(id);
+                    });
+
+                    saveSelectedIds(selectedIds);
+                    updateSelectedCount();
+                });
+            }
+
+            exportAllBtn.addEventListener("click", function () {
+                selectedIdsInput.value = "";
+                localStorage.removeItem(LOCAL_STORAGE_KEY);
+                exportForm.submit();
+            });
+
+            exportSelectedBtn.addEventListener("click", function (e) {
+                const selectedIds = [...getSelectedIds()];
+                if (selectedIds.length === 0) {
+                    e.preventDefault();
+                    alert("Vui lòng chọn ít nhất một khách hàng để xuất.");
+                    return;
+                }
+
+                selectedIdsInput.value = JSON.stringify(selectedIds);
+                localStorage.removeItem(LOCAL_STORAGE_KEY);
+            });
+        });
+    </script>
+
+
+
 
 
 
@@ -790,8 +956,6 @@
                 document.getElementById('sidebar').classList.add('collapsed');
                 document.getElementById('mainContent').classList.add('expanded');
             }
-
-
 
             // Search functionality
             document.querySelector('input[placeholder="Tìm kiếm khách hàng..."]').addEventListener('input', function(e) {

@@ -23,5 +23,8 @@ namespace DATN.IRepository
         Task<bool> IsPhoneNumberExistsAsync(string phoneNumber, int id);
         Task<int> CountUsersAsync();
         bool IsValidUser(string email, string password);
+        Task<List<User>> GetUsersByIdsAsync(List<int> ids);  // thêm vào interface
+        Task<int> CountUsersStatusAsync();
+        Task<int> LogisterInMonth();
     }
 }

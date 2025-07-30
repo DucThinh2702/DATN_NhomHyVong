@@ -21,11 +21,21 @@ namespace DATN.Service
                 .Include(u => u.Orders!)
                 .ToListAsync();       
         }
+        public async Task<int> LogisterInMonth(){
+            return await _context.Users
+                .Where(u => u.CreatedDate.Month == DateTime.Now.Month && u.CreatedDate.Year == DateTime.Now.Year)
+                .CountAsync();
+        }
         public async Task<int> CountUsersAsync()
         {
             return await _context.Users.CountAsync();
         }
-
+        public async Task<int> CountUsersStatusAsync()
+        {
+            return await _context.Users
+                .Select(x => x.Status ==true)
+                .CountAsync();
+        }
         public async Task<User> CreateUser(User user)
         {
             ArgumentNullException.ThrowIfNull(user);
@@ -206,6 +216,12 @@ namespace DATN.Service
         {
             return _context.Users.Any(u => u.Email == email);
         }
-       
+        public async Task<List<User>> GetUsersByIdsAsync(List<int> ids)
+        {
+            return await _context.Users
+                .Include(u => u.Orders)
+                .Where(u => ids.Contains(u.UserId))
+                .ToListAsync();
+        }
     }
 }

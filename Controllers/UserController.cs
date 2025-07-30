@@ -1,10 +1,12 @@
-﻿using DATN.IRepository;
+﻿using ClosedXML.Excel;
+using DATN.IRepository;
 using DATN.Middleware;
 using DATN.Models;
 using DATN.Service;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
 using System.ComponentModel.DataAnnotations;
@@ -12,6 +14,7 @@ using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using System.IO;
 namespace DATN.Controllers
 {
     public class UserController(ILogger<UserController> logger, IUsersRepository usersRepository) : Controller
@@ -199,6 +202,7 @@ namespace DATN.Controllers
                 return View("~/Views/User/DangKy.cshtml", model);
             }
         }
+
         [HttpGet]
         public IActionResult DangNhap()
         {
@@ -274,7 +278,7 @@ namespace DATN.Controllers
                         new(ClaimTypes.NameIdentifier, matchedUser.UserId.ToString()),
                         new(ClaimTypes.Email, matchedUser!.Email!),
                         new(ClaimTypes.Name, matchedUser!.FullName!),
-                       new(ClaimTypes.Role, matchedUser.Role?.RoleName?.ToLower() ?? "khachhang")
+                       new(ClaimTypes.Role, matchedUser.Role!.RoleName!.ToLower() ?? "khachhang")
                     };
                 Console.WriteLine($"Role: {matchedUser.Role?.RoleName}");
 
@@ -297,6 +301,70 @@ namespace DATN.Controllers
                 return View("DangNhap", user);
             }
         }
+        [HttpPost]
+        public async Task<IActionResult> ExportAllUsersToExcel(string selectedIds)
+        {
+            List<User> users;
+
+            if (!string.IsNullOrEmpty(selectedIds))
+            {
+                var ids = JsonConvert.DeserializeObject<List<int>>(selectedIds);
+                users = await _usersRepository.GetUsersByIdsAsync(ids);
+            }
+            else
+            {
+                users = (await _usersRepository.GetAllUsers()).ToList();
+            }
+
+            return GenerateExcel(users, "users_export.xlsx");
+        }
+        private FileResult GenerateExcel(List<User> users, string fileName)
+        {
+            using var workbook = new XLWorkbook();
+            var worksheet = workbook.Worksheets.Add("Users");
+
+            // Tiêu đề cột
+            //worksheet.Row(worksheet.FirstRowUsed()!.RowNumber()).Style.Font.Bold = true;
+            worksheet.Cell(1, 1).Value = "Họ tên";
+            worksheet.Cell(1, 2).Value = "Email";
+            worksheet.Cell(1, 3).Value = "SĐT";
+            worksheet.Cell(1, 4).Value = "Số đơn hàng";
+            worksheet.Cell(1, 5).Value = "Tổng chi tiêu";
+            worksheet.Cell(1, 6).Value = "Trạng thái";
+            worksheet.Cell(1, 7).Value = "Ngày tham gia";
+
+            for (int i = 0; i < users.Count; i++)
+            {
+                var user = users[i];
+                var row = i + 2;
+
+                var orderCount = user.Orders?.Count ?? 0;
+                var totalAmount = user.Orders?.Sum(o => o.TotalAmount) ?? 0;
+                var status = orderCount >= 10 ? "VIP" :
+                             orderCount >= 5 ? "Thường xuyên" : "Mới";
+
+                worksheet.Cell(row, 1).Value = user.FullName;
+                worksheet.Cell(row, 2).Value = user.Email;
+                worksheet.Cell(row, 3).Value = user.PhoneNumber;
+                worksheet.Cell(row, 4).Value = orderCount;
+                worksheet.Cell(row, 5).Value = totalAmount;
+                worksheet.Cell(row, 6).Value = status;
+                worksheet.Cell(row, 7).Value = user.CreatedDate.ToString("dd/MM/yyyy");
+            }
+
+            worksheet.Columns().AdjustToContents();
+
+            var stream = new MemoryStream();
+            workbook.SaveAs(stream); // hoặc package.SaveAs(stream)
+            stream.Position = 0;     // rất quan trọng: reset về đầu stream
+
+            return File(
+                stream,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                fileName
+            );
+        }
+
 
         [HttpPost]
         public IActionResult Logout()
@@ -308,6 +376,10 @@ namespace DATN.Controllers
         public IActionResult KhongDuQuyen()
         {
             return View(); // Thông báo bạn không có quyền
+        }
+        public IActionResult DangKy()
+        {
+            return View();
         }
         //public IActionResult GioHang()
         //{

@@ -35,7 +35,8 @@ namespace DATN.Controllers
         {
             return View();
         }
-        [Authorize(Roles = "Admin")]
+        
+       // [Authorize(Roles = "admin")]
         [HttpGet]
         public async Task<IActionResult> KhachHang(string? searchName, string? filterBy, int page = 1, int pageSize = 6)
         {
@@ -50,7 +51,7 @@ namespace DATN.Controllers
                                 u.FullName.Contains(searchName, StringComparison.OrdinalIgnoreCase))
                     .ToList()!;
             }
-           
+            
             // 2. Lọc theo điều kiện
             if (!string.IsNullOrEmpty(filterBy))
             {
@@ -78,7 +79,9 @@ namespace DATN.Controllers
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToList();
-
+            ViewBag.TotalCustomer = await _context.CountUsersAsync();
+            ViewBag.TotalUsersOnline = await _context.CountUsersStatusAsync();
+            ViewBag.LogisterInMonth = await _context.LogisterInMonth();
             // 5. Truyền dữ liệu sang View
             ViewBag.Users = usersPaged;
             ViewBag.CurrentPage = page;
@@ -134,6 +137,5 @@ namespace DATN.Controllers
 
             return Json(new { exists });
         }
-
     }
 }
