@@ -68,6 +68,9 @@ app.UseAuthorization();
 // Đảm bảo sử dụng session để lưu OTP
 app.UseSession();
 
+// Đảm bảo sử dụng session để lưu OTP
+app.UseSession();
+
 app.UseRouting();
 
 // Thêm xác thực và phân quyền
