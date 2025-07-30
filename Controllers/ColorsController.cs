@@ -17,39 +17,60 @@ namespace DATN.Controllers
         // GET: Colors
         public async Task<IActionResult> Index(string? search)
         {
-            // Truy vấn cơ bản
-            var query = _context.Colors.AsQueryable();
-
-            // Tìm kiếm (nếu có)
+            // ===== Lọc Màu =====
+            var colorQuery = _context.Colors.AsQueryable();
             if (!string.IsNullOrEmpty(search))
             {
-                query = query.Where(c => c.ColorName.Contains(search));
+                colorQuery = colorQuery.Where(c => c.ColorName.Contains(search));
             }
+            var colors = await colorQuery.OrderByDescending(c => c.ColorId).ToListAsync();
+            ViewBag.TotalColors = await _context.Colors.CountAsync();
+            ViewBag.FilteredColorCount = colors.Count;
 
-            // Lấy danh sách
-            var colors = await query.OrderByDescending(c => c.ColorId).ToListAsync();
+            // ===== Lọc Size =====
+            var sizeQuery = _context.Sizes.AsQueryable();
+            if (!string.IsNullOrEmpty(search))
+            {
+                sizeQuery = sizeQuery.Where(s => s.SizeName.Contains(search));
+            }
+            var sizes = await sizeQuery.OrderByDescending(s => s.SizeId).ToListAsync();
+            ViewBag.TotalSizes = await _context.Sizes.CountAsync();
+            ViewBag.FilteredSizeCount = sizes.Count;
 
-
-            // Đếm tổng số lượng
-            ViewBag.TotalColors = await _context.Colors.CountAsync(); // tổng tất cả màu
-            ViewBag.FilteredCount = colors.Count;                     // tổng theo tìm kiếm
+            // Truyền sang View
+            ViewBag.Sizes = sizes;
             ViewBag.Search = search;
 
             return View(colors);
         }
 
+
+        // API xóa (AJAX)
         // API xóa (AJAX)
         [HttpPost]
         public async Task<IActionResult> DeleteAjax(int id)
         {
             var color = await _context.Colors.FindAsync(id);
-            if (color == null) return Json(new { success = false, message = "Không tìm thấy màu" });
+            if (color == null)
+                return Json(new { success = false, message = "Không tìm thấy màu" });
+
+            // --- Kiểm tra sản phẩm đang dùng màu này ---
+            bool hasProduct = await _context.ProductVariants.AnyAsync(pv => pv.ColorId == id);
+            if (hasProduct)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Không thể xóa màu này vì vẫn còn sản phẩm đang sử dụng!"
+                });
+            }
 
             _context.Colors.Remove(color);
             await _context.SaveChangesAsync();
 
             return Json(new { success = true, message = "Xóa màu thành công!" });
         }
+
 
 
 
@@ -153,18 +174,38 @@ namespace DATN.Controllers
             return View(color);
         }
 
-        // POST: Colors/Delete
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var color = await _context.Colors.FindAsync(id);
-            _context.Colors.Remove(color);
-            await _context.SaveChangesAsync();
-            // Đặt thông báo
-            TempData["SuccessMessage"] = "Xóa màu thành công!";
+            if (color == null)
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy màu cần xóa!";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // Kiểm tra có sản phẩm đang dùng màu này không
+            bool hasProduct = await _context.ProductVariants.AnyAsync(pv => pv.ColorId == id);
+            if (hasProduct)
+            {
+                TempData["ErrorMessage"] = "Không thể xóa màu này vì vẫn còn sản phẩm đang sử dụng!";
+                return RedirectToAction(nameof(Index));
+            }
+
+            try
+            {
+                _context.Colors.Remove(color);
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Xóa màu thành công!";
+            }
+            catch (Exception)
+            {
+                TempData["ErrorMessage"] = "Xảy ra lỗi khi xóa màu!";
+            }
 
             return RedirectToAction(nameof(Index));
         }
+
     }
 }

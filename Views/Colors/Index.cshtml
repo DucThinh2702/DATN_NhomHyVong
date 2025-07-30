@@ -1,6 +1,8 @@
 ﻿@model IEnumerable<DATN.Models.Color>
+@using DATN.Models
 @{
-    ViewData["Title"] = "Danh sách màu sắc";
+    ViewData["Title"] = "Danh sách màu sắc và kích cỡ";
+    var sizes = ViewBag.Sizes as List<Size>;
 }
 
 <div class="main-content" id="mainContent">
@@ -12,15 +14,17 @@
             </button>
             <div>
                 <h4 class="mb-0">@ViewData["Title"]</h4>
-                <small class="text-muted">Quản lý màu sắc</small>
+                <small class="text-muted">Quản lý màu sắc & kích cỡ</small>
             </div>
 
             <div class="d-flex align-items-center ms-auto">
                 <!-- Form tìm kiếm -->
                 <form method="get" class="input-group me-3" style="width: 300px;">
                     <span class="input-group-text"><i class="fas fa-search"></i></span>
-                    <input type="text" name="search" class="form-control" placeholder="Tìm màu..." value="@Context.Request.Query["search"]">
+                    <input type="text" name="search" class="form-control" placeholder="Tìm màu hoặc kích cỡ..."
+                           value="@ViewBag.Search">
                 </form>
+
                 <!-- Tài khoản -->
                 <div class="dropdown">
                     <button class="btn btn-outline-secondary d-flex align-items-center" data-bs-toggle="dropdown">
@@ -44,15 +48,9 @@
     </nav>
 
     <!-- Thông tin tổng quan -->
-    <div class="my-3">
-        <span class="fw-bold">Tổng số màu:</span> @ViewBag.TotalColors
-        @if (!string.IsNullOrEmpty(Context.Request.Query["search"]))
-        {
-            <span class="ms-3 text-muted">Kết quả tìm thấy: @ViewBag.FilteredCount</span>
-        }
-    </div>
+   
 
-    <!-- Table -->
+    <!-- Bảng màu sắc -->
     <div class="card shadow-sm mt-2">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="mb-0">Danh sách màu sắc</h5>
@@ -60,8 +58,16 @@
                 <i class="fas fa-plus"></i> Thêm mới
             </a>
         </div>
+        
         <div class="card-body">
-            <table class="table table-hover table-striped table-bordered align-middle mb-0">
+              
+            <span class="fw-bold">Tổng số màu:</span> @ViewBag.TotalColors
+            @if (!string.IsNullOrEmpty(ViewBag.Search as string))
+            {
+                <span class="ms-3 text-muted">Kết quả tìm thấy: @ViewBag.FilteredColorCount</span>
+            }
+
+                <table class="table table-hover table-striped table-bordered align-middle mb-0 mt-2">
                 <thead class="table-dark">
                     <tr class="text-center">
                         <th style="width: 10%;">Thứ tự</th>
@@ -72,10 +78,11 @@
                 <tbody>
                     @if (Model.Any())
                     {
+                        var indexColor = 1;
                         foreach (var item in Model)
                         {
                             <tr id="row_@item.ColorId">
-                                <td class="text-center">@item.ColorId</td>
+                                <td class="text-center">@indexColor</td>
                                 <td>@item.ColorName</td>
                                 <td class="text-center">
                                     <a asp-action="Edit" asp-route-id="@item.ColorId" class="btn btn-warning btn-sm me-2">
@@ -86,6 +93,64 @@
                                     </button>
                                 </td>
                             </tr>
+                            indexColor++;
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="3" class="text-center text-muted">Chưa có dữ liệu</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Bảng kích cỡ -->
+    <div class="card shadow-sm mt-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Danh sách kích cỡ</h5>
+            <a asp-action="Create" asp-controller="Sizes" class="btn btn-primary btn-sm">
+                <i class="fas fa-plus"></i> Thêm mới
+            </a>
+        </div>
+        <div class="card-body">
+            <span class="fw-bold">Tổng số kích cỡ:</span> @ViewBag.TotalSizes
+            @if (!string.IsNullOrEmpty(ViewBag.Search as string))
+            {
+                <span class="ms-3 text-muted">Kết quả tìm thấy: @ViewBag.FilteredSizeCount</span>
+            }
+
+            <table class="table table-hover table-striped table-bordered align-middle mb-0 mt-2">
+                <thead class="table-dark text-center">
+                    <tr>
+                        <th style="width: 10%;">Thứ tự</th>
+                        <th style="width: 60%;">Tên kích cỡ</th>
+                        <th style="width: 30%;">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (sizes != null && sizes.Any())
+                    {
+                        var indexSize = 1;
+                        foreach (var item in sizes)
+                        {
+                            <tr id="row_size_@item.SizeId" class="text-center">
+                                <td>@indexSize</td>
+                                <td class="text-start">@item.SizeName</td>
+                                <td>
+                                    <div class="d-inline-flex gap-1">
+                                        <a asp-action="Edit" asp-controller="Sizes" asp-route-id="@item.SizeId" class="btn btn-warning btn-sm">
+                                            <i class="fas fa-pen"></i> Sửa
+                                        </a>
+                                        <button class="btn btn-danger btn-sm" onclick="confirmDeleteSize(@item.SizeId)">
+                                            <i class="fas fa-trash"></i> Xóa
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            indexSize++;
                         }
                     }
                     else
@@ -110,8 +175,10 @@
             }
         }
 
-        // Hiển thị thông báo thành công (TempData)
-        var successMessage = '@Html.Raw(TempData["SuccessMessage"])';
+        // ===== Hiển thị TempData (Success / Error) =====
+        var successMessage = '@TempData["SuccessMessage"]';
+        var errorMessage = '@TempData["ErrorMessage"]';
+
         if (successMessage) {
             Swal.fire({
                 icon: 'success',
@@ -124,7 +191,16 @@
             });
         }
 
-        // Xác nhận xoá SweetAlert2
+        if (errorMessage) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi!',
+                text: errorMessage,
+                confirmButtonText: 'OK'
+            });
+        }
+
+        // ===== Xóa Color =====
         function confirmDelete(id) {
             Swal.fire({
                 title: 'Bạn có chắc muốn xoá?',
@@ -140,6 +216,31 @@
                     $.post('/Colors/DeleteAjax', { id: id }, function (response) {
                         if (response.success) {
                             $('#row_' + id).remove();
+                            Swal.fire('Đã xoá!', response.message, 'success');
+                        } else {
+                            Swal.fire('Lỗi', response.message, 'error');
+                        }
+                    });
+                }
+            });
+        }
+
+        // ===== Xóa Size =====
+        function confirmDeleteSize(id) {
+            Swal.fire({
+                title: 'Bạn có chắc muốn xoá?',
+                text: "Hành động này không thể hoàn tác!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Xoá',
+                cancelButtonText: 'Huỷ'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post('/Sizes/DeleteAjax', { id: id }, function (response) {
+                        if (response.success) {
+                            $('#row_size_' + id).remove();
                             Swal.fire('Đã xoá!', response.message, 'success');
                         } else {
                             Swal.fire('Lỗi', response.message, 'error');

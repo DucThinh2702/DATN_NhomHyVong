@@ -9,10 +9,10 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="utf-8">
     <title>DuAn_NhomHyVong</title>
@@ -218,27 +218,27 @@
         }
 
     /* Nút quay lại đầu trang */
-    .back-to-top {
-        position: fixed;
-        bottom: 30px;
-        right: 30px;
-        background-color: #ffc107 !important;
-        border: none;
-        color: #000;
-        width: 45px;
-        height: 45px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 999;
-        transition: all 0.3s ease-in-out;
-    }
+    /* .back-to-top {   */
+    /*     position: fixed; */
+    /*     bottom: 30px; */
+    /*     right: 30px; */
+    /*     background-color: #ffc107 !important; */
+    /*     border: none; */
+    /*     color: #000; */
+    /*     width: 45px; */
+    /*     height: 45px; */
+    /*     border-radius: 50%; */
+    /*     display: flex; */
+    /*     align-items: center; */
+    /*     justify-content: center; */
+    /*     z-index: 999; */
+    /*     transition: all 0.3s ease-in-out; */
+    /* } */
 
-        .back-to-top:hover {
-            background-color: #e0a800 !important;
-            color: #fff;
-        }
+    /*     .back-to-top:hover { */
+    /*         background-color: #e0a800 !important; */
+    /*         color: #fff; */
+    /*     } */
 
     /* Nền container */
     .container-fluid.border-bottom {
@@ -246,13 +246,13 @@
     }
 
     /* Footer spacing */
-    .footer-custom-spacing {
-        padding-top: 1rem !important;
-    }
+    /* .footer-custom-spacing { */
+    /*     padding-top: 1rem !important; */
+    /* } */
 
-    .product-section-spacing {
-        padding-bottom: 1rem !important;
-    }
+    /* .product-section-spacing { */
+    /*     padding-bottom: 1rem !important; */
+    /* } */
 
     /* Swiper nút */
     /* .swiper-button-prev, */
@@ -263,10 +263,10 @@
     /* } */
 
     /* Nút mạng xã hội footer */
-    .container-fluid.bg-dark .btn-warning:hover {
-        background-color: #00bfff;
-        color: #fff;
-    }
+    /* .container-fluid.bg-dark .btn-warning:hover { */
+    /*     background-color: #00bfff; */
+    /*     color: #fff; */
+    /* } */
 
     /*banner*/
     .offer-card {
@@ -300,137 +300,203 @@
 </style>
 
 <body>
+    <!--Hàng 1-->
+    <div class="row" style="background:#f8f9fa; padding:5px 40px;">
+        <div class="col-lg-6 d-none d-lg-block">
+            <div class="d-inline-flex align-items-center h-100">
+                <a href="#" class="text-muted me-3 text-decoration-none">Liên hệ</a>
+                <a href="#" class="text-muted text-decoration-none">Giúp đỡ</a>
+            </div>
+        </div>
+        <div class="col-lg-6 d-flex justify-content-end align-items-center">
+            <!-- Tài khoản -->
+            <div class="dropdown me-2">
+                <button class="btn btn-sm dropdown-toggle border" type="button" data-toggle="dropdown">
+                    Tài khoản
+                </button>
+                <div class="dropdown-menu dropdown-menu-right">
+                    <a class="dropdown-item" href="login.html">Đăng nhập</a>
+                    <a class="dropdown-item" href="register.html">Đăng ký</a>
+                </div>
+            </div>
+            <!-- Ngôn ngữ -->
+            <div class="dropdown">
+                <button class="btn btn-sm dropdown-toggle border" type="button" data-toggle="dropdown">
+                    Ngôn ngữ
+                </button>
+                <div class="dropdown-menu dropdown-menu-right">
+                    <a class="dropdown-item" href="#">Tiếng Việt</a>
+                    <a class="dropdown-item" href="#">Tiếng Anh</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Logo + Search + Hotline -->
     <div class="container-fluid border-bottom">
-        <!-- trợ giúp hàng 1 -->
-        <div class="row" style="background:#f8f9fa; padding:5px 40px;">
-            <div class="col-lg-6 d-none d-lg-block">
-                <div class="d-inline-flex align-items-center h-100">
-                    <a href="#" class="text-muted me-3 text-decoration-none">Liên hệ</a>
-                    <a href="#" class="text-muted text-decoration-none">Giúp đỡ</a>
-                </div>
-            </div>
-            <div class="col-lg-6 d-flex justify-content-end align-items-center">
-                <!-- Tài khoản -->
-                <div class="dropdown me-2">
-                    <button class="btn btn-sm dropdown-toggle border" type="button" data-toggle="dropdown">
-                        Tài khoản
-                    </button>
-                    <div class="dropdown-menu dropdown-menu-right">
-                        <a class="dropdown-item" href="login.html">Đăng nhập</a>
-                        <a class="dropdown-item" href="register.html">Đăng ký</a>
+        <div class="d-flex align-items-center justify-content-between px-4 py-3">
+            <!-- Logo (trái) -->
+            <a href="#" class="text-decoration-none d-flex align-items-center">
+                <span class="fw-bold fs-2 text-warning px-2" style="background:#343a40;">THE BAG</span>
+                <span class="fw-bold fs-2 text-dark px-2" style="background:#ffc107;">STUDIO</span>
+            </a>
+            <!-- Search (giữa) -->
+            <div class="flex-grow-1 d-flex justify-content-center px-3">
+                <form method="get" asp-action="Index" style="width: 100%; max-width: 500px;">
+                    <div class="input-group">
+                        <input type="text" name="search" value="@ViewBag.Search" class="form-control" placeholder="Tìm kiếm nhanh">
+                        <button class="btn border border-warning text-warning" type="submit">
+                            <i class="fa fa-search"></i>
+                        </button>
                     </div>
-                </div>
-                <!-- Ngôn ngữ -->
-                <div class="dropdown">
-                    <button class="btn btn-sm dropdown-toggle border" type="button" data-toggle="dropdown">
-                        Ngôn ngữ
-                    </button>
-                    <div class="dropdown-menu dropdown-menu-right">
-                        <a class="dropdown-item" href="#">Tiếng Việt</a>
-                        <a class="dropdown-item" href="#">Tiếng Anh</a>
-                    </div>
-                </div>
+                </form>
+
             </div>
-
-        </div>
-
-        <!-- Logo + Search + Hotline -->
-        <div class="container-fluid border-bottom">
-            <div class="d-flex align-items-center justify-content-between px-4 py-3">
-                <!-- Logo (trái) -->
-                <a href="#" class="text-decoration-none d-flex align-items-center">
-                    <span class="fw-bold fs-2 text-warning px-2" style="background:#343a40;">THE BAG</span>
-                    <span class="fw-bold fs-2 text-dark px-2" style="background:#ffc107;">STUDIO</span>
-                </a>
-                <!-- Search (giữa) -->
-                <div class="flex-grow-1 d-flex justify-content-center px-3">
-                    <form method="get" asp-action="Index" style="width: 100%; max-width: 500px;">
-                        <div class="input-group">
-                            <input type="text" name="search" value="@ViewBag.Search" class="form-control" placeholder="Tìm kiếm nhanh">
-                            <button class="btn border border-warning text-warning" type="submit">
-                                <i class="fa fa-search"></i>
-                            </button>
-                        </div>
-                    </form>
-
-                </div>
-                <!-- Hotline (phải) -->
-                <div class="text-end">
-                    <small class="text-muted">Chăm sóc khách hàng</small>
-                    <h5 class="fw-bold m-0">012 345 6789</h5>
-                </div>
+            <!-- Hotline (phải) -->
+            <div class="text-end">
+                <small class="text-muted">Chăm sóc khách hàng</small>
+                <h5 class="fw-bold m-0">012 345 6789</h5>
             </div>
         </div>
-
+    </div>
+    </div>
     <!-- menu -->
-        <div class="w-100" style="display:flex; height:55px;">
-            <!-- Cột Thể loại -->
-            <div style="width:260px;">
-                <a class="btn d-flex align-items-center justify-content-between w-100"
-                   data-toggle="collapse" href="#navbar-vertical"
-                   style="height:100%; padding:0 30px; background:#ffc107; border-radius:0;">
-                    <h6 class="m-0 text-dark"><i class="fa fa-bars mr-2"></i>Thể loại</h6>
-                    <i class="fa fa-angle-down text-dark"></i>
-                </a>
 
-                <nav class="collapse position-absolute navbar navbar-vertical navbar-light align-items-start p-0 bg-white border"
-                     id="navbar-vertical" style="width:260px; z-index:999;">
-                    <div class="navbar-nav w-100">
-                        <div class="nav-item dropdown dropright">
-                            <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
-                                Sản phẩm <i class="fa fa-angle-right float-right mt-1"></i>
-                            </a>
-                            <div class="dropdown-menu position-absolute rounded-0 border-0 m-0">
-                                <a asp-controller="Products" asp-action="Index" class="dropdown-item">Túi xách</a>
-                                <a asp-controller="Products" asp-action="Index" class="dropdown-item">Túi du lịch</a>
-                                <a asp-controller="Products" asp-action="Index" class="dropdown-item">Túi công sở</a>
+    <div class="container-fluid bg-dark mb-30">
+        <div class="row px-xl-5 align-items-center" style="height: 55px;">
+            <!-- Menu Thể loại -->
+            <div class="col-lg-auto d-none d-lg-block">
+                <div style="width: 220px;">
+                    <a class="btn d-flex align-items-center justify-content-between w-100"
+                       data-bs-toggle="collapse" href="#navbar-vertical"
+                       style="height:100%; padding: 0 10px 0 30px; background:#ffc107; border-radius:0; margin-left: -10px;">
+                        <h6 class="m-0 text-dark d-flex align-items-center">
+                            <i class="fa fa-bars mr-2"></i>Thể loại
+                        </h6>
+                        <i class="fa fa-angle-down text-dark"></i>
+                    </a>
+
+                    <nav class="collapse position-absolute navbar navbar-vertical navbar-light align-items-start p-0 bg-light"
+                         id="navbar-vertical"
+                         style="width: calc(100% - 30px); z-index: 999; top: 65px; padding: 5px 0;">
+                        <div class="navbar-nav w-100">
+                            <div class="nav-item dropdown dropright">
+                                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"
+                                   style="padding: 10px 20px;"
+                                   onmouseover="this.style.color='black'; this.style.fontWeight='bold'; this.style.transform='translateY(-2px)'; this.style.transition='0.2s';"
+                                   onmouseout="this.style.color=''; this.style.fontWeight=''; this.style.transform='';">
+                                    Sản phẩm 
+                                </a>
+                                <div class="dropdown-menu position-absolute rounded-0 border-0 shadow-sm"
+                                     style="min-width:180px; margin-left: 8px; margin-top: 0; padding:5px 0;">
+                                    @foreach (var cat in (List<DATN.Models.Category>)ViewBag.Categories)
+                                    {
+                                        <a class="dropdown-item" style="padding: 8px 15px;"
+                                           onmouseover="this.style.color='black'; this.style.fontWeight='bold'; this.style.transform='translateY(-2px)'; this.style.transition='0.2s';"
+                                           onmouseout="this.style.color=''; this.style.fontWeight=''; this.style.transform='';"
+                                           asp-controller="User"
+                                           asp-action="Index"
+                                           asp-route-categoryId="@cat.CategoryId"
+                                           asp-fragment="recentProducts">
+                                            @cat.CategoryName
+                                        </a>
+                                    }
+                                </div>
                             </div>
+                            <a asp-controller="Products" asp-action="Index" class="nav-item nav-link" style="padding: 10px 20px;"
+                               onmouseover="this.style.color='black'; this.style.fontWeight='bold'; this.style.transform='translateY(-2px)'; this.style.transition='0.2s';"
+                               onmouseout="this.style.color=''; this.style.fontWeight=''; this.style.transform='';">
+                                Balo
+                            </a>
+                            <a asp-controller="Products" asp-action="Index" class="nav-item nav-link" style="padding: 10px 20px;"
+                               onmouseover="this.style.color='black'; this.style.fontWeight='bold'; this.style.transform='translateY(-2px)'; this.style.transition='0.2s';"
+                               onmouseout="this.style.color=''; this.style.fontWeight=''; this.style.transform='';">
+                                Phụ kiện khác
+                            </a>
                         </div>
-                        <a asp-controller="Products" asp-action="Index" class="nav-item nav-link">Balo</a>
-                        <a asp-controller="Products" asp-action="Index" class="nav-item nav-link">Phụ kiện khác</a>
+                    </nav>
+
+                </div>
+            </div>
+
+            <!-- Navbar chính -->
+            <div class="col-lg">
+                <nav class="navbar navbar-expand-lg bg-dark navbar-dark py-0 px-0">
+                    <a href="#" class="text-decoration-none d-block d-lg-none">
+                        <span class="h1 text-uppercase text-dark bg-light px-2">Multi</span>
+                        <span class="h1 text-uppercase text-light bg-primary px-2 ml-n1">Shop</span>
+                    </a>
+                    <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
+                        <div class="navbar-nav mr-auto py-0">
+                            <a href="index.html" class="nav-item nav-link text-white text-decoration-none"
+                               onmouseover="this.classList.replace('text-white','text-warning')"
+                               onmouseout="this.classList.replace('text-warning','text-white')">
+                                Trang chủ
+                            </a>
+
+                            <a href="index.html" class="nav-item nav-link text-white text-decoration-none"
+                               onmouseover="this.classList.replace('text-white','text-warning')"
+                               onmouseout="this.classList.replace('text-warning','text-white')">
+                                Khuyến mãi
+                            </a>
+                            <a href="index.html" class="nav-item nav-link text-white text-decoration-none"
+                               onmouseover="this.classList.replace('text-white','text-warning')"
+                               onmouseout="this.classList.replace('text-warning','text-white')">
+                                Bộ sưu tập
+                            </a>
+                            <div class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-white px-3" href="#" id="pageDropdown"
+                                   role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Trang
+                                </a>
+                                <ul class="dropdown-menu shadow border-0 mt-1" aria-labelledby="pageDropdown">
+                                    <li>
+                                        <a class="dropdown-item" href="cart.html"
+                                           onmouseover="this.style.color='black'; this.style.fontWeight='bold'; this.style.transform='translateY(-2px)'; this.style.transition='0.2s';"
+                                           onmouseout="this.style.color=''; this.style.fontWeight=''; this.style.transform='';">
+                                            <i class="fa fa-shopping-cart me-2"></i> Giỏ hàng
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="checkout.html"
+                                           onmouseover="this.style.color='black'; this.style.fontWeight='bold'; this.style.transform='translateY(-2px)'; this.style.transition='0.2s';"
+                                           onmouseout="this.style.color=''; this.style.fontWeight=''; this.style.transform='';">
+                                            <i class="fa fa-credit-card me-2"></i> Thanh toán
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+
+
+                            <a href="index.html" class="nav-item nav-link text-white text-decoration-none"
+                               onmouseover="this.classList.replace('text-white','text-warning')"
+                               onmouseout="this.classList.replace('text-warning','text-white')">
+                                Tin tức
+                            </a>
+                        </div>
+                        <div class="navbar-nav ml-auto py-0 d-none d-lg-flex align-items-center">
+                            <a href="@Url.Action("GioHang", "User")" class="btn px-0 ml-3">
+                                <i class="fas fa-shopping-cart text-warning"></i>
+                                <span class="badge bg-danger text-white border rounded-circle"
+                                      style="padding-bottom: 2px;">
+                                    @* @Model.CartDetails?.Count() *@
+                                </span>
+
+                            </a>
+                        </div>
+
                     </div>
                 </nav>
             </div>
-
-            <!-- Menu ngang -->
-            <nav class="navbar navbar-expand-lg flex-grow-1 py-0" style="background:#343a40;">
-                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
-                    <!-- Menu chữ gom sát -->
-                    <div class="navbar-nav d-flex main-menu">
-                        <a href="@Url.Action("Index","Home")" class="nav-item nav-link active text-warning px-3">Trang chủ</a>
-                        <a href="@Url.Action("Shop","Products")" class="nav-item nav-link text-white px-3">Khuyến mãi</a>
-                        <a href="@Url.Action("Collection","Products")" class="nav-item nav-link text-white px-3">Bộ sưu tập</a>
-                        <div class="nav-item dropdown">
-                            <a href="#" class="nav-link dropdown-toggle text-white px-3" data-toggle="dropdown">
-                                Trang <i class="fa fa-angle-down mt-1"></i>
-                            </a>
-                            <div class="dropdown-menu rounded-0 border-0 m-0">
-                                <a href="@Url.Action("Cart","Orders")" class="dropdown-item">Giỏ hàng</a>
-                                <a href="@Url.Action("Checkout","Orders")" class="dropdown-item">Thanh toán</a>
-                            </div>
-                        </div>
-                        <a href="@Url.Action("Contact","Home")" class="nav-item nav-link text-white px-3">Tin tức</a>
-                    </div>
-
-                    <!-- Icon bên phải -->
-                    <div class="navbar-nav ml-auto d-none d-lg-flex align-items-center">
-                        <a href="@Url.Action("Wishlist","Account")" class="btn px-0">
-                            <i class="fas fa-heart" style="color:#ffc107;"></i>
-                            <span class="badge text-secondary border border-secondary rounded-circle"
-                                  style="padding-bottom:2px;">0</span>
-                        </a>
-                        <a href="@Url.Action("Cart","Orders")" class="btn px-0 ml-3">
-                            <i class="fas fa-shopping-cart" style="color:#ffc107;"></i>
-                            <span class="badge text-secondary border border-secondary rounded-circle"
-                                  style="padding-bottom:2px;">0</span>
-                        </a>
-                    </div>
-                </div>
-            </nav>
         </div>
+    </div>
+    <div class="container-fluid border-bottom">
+
+       
 
 
     <!-- banner -->
@@ -462,7 +528,7 @@
                                 </div>
                             </div>
                             <div class="carousel-item" style="height:430px;">
-                                <img class="d-block w-100 h-100" src="@Url.Content("~/hinh/hinh4.jpg")" style="object-fit:cover;">
+                                <img class="d-block w-100 h-100" src="@Url.Content("~/hinh/hinh6.jpg")" style="object-fit:cover;">
                                 <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
                                     <h1 class="display-4 text-white mb-3">Thời trang trẻ em</h1>
                                     <p class="mb-4">Tôn lên sự sang trọng, hiện đại của giới trẻ</p>
@@ -560,13 +626,31 @@
     <!-- Sản phẩm nổi bật -->
         <div id="productContainer">
 
-            <div class="row px-xl-5">
+            <div class="row px-xl-5" id="recentProducts">
                 <div class="container-fluid pt-5 pb-3">
                     <div class="d-flex align-items-center mb-4">
                         <h2 class="section-title mb-0">SẢN PHẨM MỚI NHẤT</h2>
                         <div class="flex-grow-1 border-bottom ml-3"></div>
                     </div>
                 </div>
+                @if (ViewBag.SelectedCategoryId != null)
+                {
+                    var selectedCategory = (ViewBag.Categories as List<DATN.Models.Category>)
+                    .FirstOrDefault(c => c.CategoryId == (int)ViewBag.SelectedCategoryId);
+
+                    if (selectedCategory != null)
+                    {
+                        <div class="container mt-1 mb-5">
+                            <h5 class="fw-semibold text-dark mb-2">
+                                Mời bạn tham khảo những mẫu:
+                                <span class="fw-bold text-dark">@selectedCategory.CategoryName</span>
+                            </h5>
+                            <hr class="my-2" />
+                        </div>
+                    }
+                }
+
+
                 @foreach (var item in Model)
                 {
                     <div class="col-lg-3 col-md-4 col-sm-6 pb-1">
@@ -574,7 +658,11 @@
                             <div class="product-img position-relative overflow-hidden">
                                 <img class="img-fluid w-100" src="@Url.Content(item.ThumbnailImage)" alt="@item.ProductName">
                                 <div class="product-action">
-                                    <a href="#" class="btn btn-outline-dark btn-square"><i class="fa fa-shopping-cart"></i></a>
+                                    <a href="#" class="btn btn-outline-dark btn-square order-btn"
+                                       data-id="@item.ProductId">
+                                        <i class="fa fa-shopping-cart"></i>
+                                    </a>
+
                                     <a href="#" class="btn btn-outline-dark btn-square"><i class="far fa-heart"></i></a>
                                     <a href="#" class="btn btn-outline-dark btn-square"><i class="fa fa-sync-alt"></i></a>
                                     <a href="#" class="btn btn-outline-dark btn-square"><i class="fa fa-search"></i></a>
@@ -711,7 +799,6 @@
     <!-- Footer -->
     <div class="container-fluid bg-dark text-light" style="margin-top:0; padding-top:10px; padding-bottom:10px;">
         <div class="row px-xl-5 pt-5">
-
             <!-- Liên Lạc -->
             <div class="col-lg-4 col-md-12 mb-5 pr-3 pr-xl-5">
                 <h5 class="text-white text-uppercase mb-4 font-weight-bold">Liên lạc</h5>
@@ -719,30 +806,84 @@
                     Hãy liên lạc với chúng tôi nếu bạn đang thất mất hoặc muốn chúng tôi tư vấn sản phẩm phù hợp với bạn thì cứ liên lạc với chúng tôi
                 </p>
                 <p class="mb-2">
-                    <i class="fa fa-map-marker-alt text-warning mr-3"></i>123 Ngô Quyền, P. Thường Thạnh, Q. Cái Răng, TP. Cần Thơ
+                    <i class="fa fa-map-marker-alt text-warning me-2"></i> 23 Ngô Quyền, P. Thường Thạnh, Q. Cái Răng, TP. Cần Thơ
                 </p>
-                <p class="mb-2"><i class="fa fa-envelope text-warning mr-3"></i>nhomhyvongdatn@gmail.com</p>
-                <p class="mb-0"><i class="fa fa-phone-alt text-warning mr-3"></i>012 345 67890</p>
+                <p class="mb-2">
+                    <i class="fa fa-envelope text-warning me-2"></i> nhomhyvongdatn@gmail.com
+                </p>
+                <p class="mb-0">
+                    <i class="fa fa-phone-alt text-warning me-2"></i> 012 345 67890
+                </p>
             </div>
 
             <!-- Cửa hàng nhanh -->
             <div class="col-lg-2 col-md-4 mb-5">
                 <h5 class="text-white text-uppercase mb-4 font-weight-bold">Cửa hàng nhanh</h5>
-                <a class="text-light mb-2 d-block" href="#"><i class="fa fa-angle-right mr-2"></i>Trang chủ</a>
-                <a class="text-light mb-2 d-block" href="#"><i class="fa fa-angle-right mr-2"></i>Cửa hàng của chúng tôi</a>
-                <a class="text-light mb-2 d-block" href="#"><i class="fa fa-angle-right mr-2"></i>Chi tiết cửa hàng</a>
-                <a class="text-light mb-2 d-block" href="#"><i class="fa fa-angle-right mr-2"></i>Giỏ hàng</a>
-                <a class="text-light mb-2 d-block" href="#"><i class="fa fa-angle-right mr-2"></i>Thanh toán</a>
+                <a class="text-light mb-2 d-block text-decoration-none"
+                   href="#"
+                   onmouseover="this.classList.replace('text-light','text-warning')"
+                   onmouseout="this.classList.replace('text-warning','text-light')">
+                    Trang chủ
+                </a>
+                <a class="text-light mb-2 d-block text-decoration-none"
+                   href="#"
+                   onmouseover="this.classList.replace('text-light','text-warning')"
+                   onmouseout="this.classList.replace('text-warning','text-light')">
+                    Cửa hàng của chúng tôi
+                </a>
+                <a class="text-light mb-2 d-block text-decoration-none"
+                   href="#"
+                   onmouseover="this.classList.replace('text-light','text-warning')"
+                   onmouseout="this.classList.replace('text-warning','text-light')">
+                    Chi tiết cửa hàng
+                </a>
+                <a class="text-light mb-2 d-block text-decoration-none"
+                   href="#"
+                   onmouseover="this.classList.replace('text-light','text-warning')"
+                   onmouseout="this.classList.replace('text-warning','text-light')">
+                    Giỏ hàng
+                </a>
+                <a class="text-light mb-2 d-block text-decoration-none"
+                   href="#"
+                   onmouseover="this.classList.replace('text-light','text-warning')"
+                   onmouseout="this.classList.replace('text-warning','text-light')">
+                    Thanh toán
+                </a>
             </div>
 
             <!-- Tài khoản của tôi -->
             <div class="col-lg-2 col-md-4 mb-5">
                 <h5 class="text-white text-uppercase mb-4 font-weight-bold">Tài khoản của tôi</h5>
-                <a class="text-light mb-2 d-block" href="#"><i class="fa fa-angle-right mr-2"></i>Trang chủ</a>
-                <a class="text-light mb-2 d-block" href="#"><i class="fa fa-angle-right mr-2"></i>Cửa hàng của chúng tôi</a>
-                <a class="text-light mb-2 d-block" href="#"><i class="fa fa-angle-right mr-2"></i>Chi tiết cửa hàng</a>
-                <a class="text-light mb-2 d-block" href="#"><i class="fa fa-angle-right mr-2"></i>Giỏ hàng</a>
-                <a class="text-light mb-2 d-block" href="#"><i class="fa fa-angle-right mr-2"></i>Thanh toán</a>
+                <a class="text-light mb-2 d-block text-decoration-none"
+                   href="#"
+                   onmouseover="this.classList.replace('text-light','text-warning')"
+                   onmouseout="this.classList.replace('text-warning','text-light')">
+                    Trang chủ
+                </a>
+                <a class="text-light mb-2 d-block text-decoration-none"
+                   href="#"
+                   onmouseover="this.classList.replace('text-light','text-warning')"
+                   onmouseout="this.classList.replace('text-warning','text-light')">
+                    Cửa hàng của chúng tôi
+                </a>
+                <a class="text-light mb-2 d-block text-decoration-none"
+                   href="#"
+                   onmouseover="this.classList.replace('text-light','text-warning')"
+                   onmouseout="this.classList.replace('text-warning','text-light')">
+                    Chi tiết cửa hàng
+                </a>
+                <a class="text-light mb-2 d-block text-decoration-none"
+                   href="#"
+                   onmouseover="this.classList.replace('text-light','text-warning')"
+                   onmouseout="this.classList.replace('text-warning','text-light')">
+                    Giỏ hàng
+                </a>
+                <a class="text-light mb-2 d-block text-decoration-none"
+                   href="#"
+                   onmouseover="this.classList.replace('text-light','text-warning')"
+                   onmouseout="this.classList.replace('text-warning','text-light')">
+                    Thanh toán
+                </a>
             </div>
 
             <!-- Bản tin -->
@@ -758,18 +899,41 @@
                     </div>
                 </form>
                 <h6 class="text-white text-uppercase mt-4 mb-3 font-weight-bold">Theo dõi chúng tôi</h6>
-                <div class="d-flex">
-                    <a class="btn btn-warning btn-square mr-2" href="#"><i class="fab fa-twitter text-dark"></i></a>
-                    <a class="btn btn-warning btn-square mr-2" href="#"><i class="fab fa-facebook-f text-dark"></i></a>
-                    <a class="btn btn-warning btn-square mr-2" href="#"><i class="fab fa-linkedin-in text-dark"></i></a>
-                    <a class="btn btn-warning btn-square" href="#"><i class="fab fa-instagram text-dark"></i></a>
+                <div class="d-flex gap-2">
+                    <a class="btn btn-warning btn-square"
+                       href="#"
+                       onmouseover="this.classList.replace('btn-warning','btn-light')"
+                       onmouseout="this.classList.replace('btn-light','btn-warning')">
+                        <i class="fab fa-twitter text-dark"></i>
+                    </a>
+                    <a class="btn btn-warning btn-square"
+                       href="#"
+                       onmouseover="this.classList.replace('btn-warning','btn-light')"
+                       onmouseout="this.classList.replace('btn-light','btn-warning')">
+                        <i class="fab fa-facebook-f text-dark"></i>
+                    </a>
+                    <a class="btn btn-warning btn-square"
+                       href="#"
+                       onmouseover="this.classList.replace('btn-warning','btn-light')"
+                       onmouseout="this.classList.replace('btn-light','btn-warning')">
+                        <i class="fab fa-linkedin-in text-dark"></i>
+                    </a>
+                    <a class="btn btn-warning btn-square"
+                       href="#"
+                       onmouseover="this.classList.replace('btn-warning','btn-light')"
+                       onmouseout="this.classList.replace('btn-light','btn-warning')">
+                        <i class="fab fa-instagram text-dark"></i>
+                    </a>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Back to Top -->
-        <a href="#" class="btn btn-primary back-to-top"><i class="fa fa-angle-double-up"></i></a>
+    <a href="#" class="btn btn-warning text-dark btn-square position-fixed"
+       style="bottom: 20px; right: 20px;">
+        <i class="fa fa-angle-double-up"></i>
+    </a>
 
 
 
@@ -824,5 +988,23 @@
             $("#productContainer").html(newContent);
         });
     });
-
+     document.addEventListener("DOMContentLoaded", function () {
+        // Nếu URL có chứa #recentProducts thì cuộn tới nó
+        if (window.location.hash === "#recentProducts") {
+            const target = document.querySelector(window.location.hash);
+            if (target) {
+                target.scrollIntoView({ behavior: "smooth" });
+            }
+        }
+    });
+    /*chọn biến thể*/
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".order-btn").forEach(btn => {
+            btn.addEventListener("click", function (e) {
+                e.preventDefault();
+                const productId = this.dataset.id;
+                window.location.href = `/User/ChonBienThe/${productId}`;
+            });
+        });
+    });
 </script>

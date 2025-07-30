@@ -150,11 +150,51 @@ namespace DATN.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            _context.Sizes.Remove(entity);
-            await _context.SaveChangesAsync();
-            TempData["SuccessMessage"] = "Xóa kích cỡ thành công!";
+            // --- Kiểm tra size có sản phẩm sử dụng không ---
+            bool hasProduct = await _context.ProductVariants.AnyAsync(pv => pv.SizeId == id);
+            if (hasProduct)
+            {
+                TempData["ErrorMessage"] = "Không thể xóa kích cỡ này vì vẫn còn sản phẩm đang sử dụng!";
+                return RedirectToAction(nameof(Index));
+            }
+
+            try
+            {
+                _context.Sizes.Remove(entity);
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Xóa kích cỡ thành công!";
+            }
+            catch (Exception)
+            {
+                TempData["ErrorMessage"] = "Xảy ra lỗi khi xóa kích cỡ!";
+            }
+
             return RedirectToAction(nameof(Index));
         }
+        [HttpPost]
+        public async Task<IActionResult> DeleteAjax(int id)
+        {
+            var size = await _context.Sizes.FindAsync(id);
+            if (size == null)
+                return Json(new { success = false, message = "Không tìm thấy kích cỡ" });
+
+            bool hasProduct = await _context.ProductVariants.AnyAsync(pv => pv.SizeId == id);
+            if (hasProduct)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Không thể xóa kích cỡ này vì vẫn còn sản phẩm đang sử dụng!"
+                });
+            }
+
+            _context.Sizes.Remove(size);
+            await _context.SaveChangesAsync();
+
+            return Json(new { success = true, message = "Xóa kích cỡ thành công!" });
+        }
+
+
 
 
 

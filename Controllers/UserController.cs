@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using DATN.Data;
 using System.Linq;
 using DATN.Models;
+using Newtonsoft.Json;
+using static NuGet.Packaging.PackagingConstants;
 
 namespace DATN.Controllers
 {
@@ -15,77 +17,63 @@ namespace DATN.Controllers
             _context = context;
         }
 
-        public IActionResult Index(int page = 1, string search = "")
+        public IActionResult Index(int page = 1, string search = "", int? categoryId = null)
         {
             int pageSize = 8;
 
-            // Lấy danh mục
+            // Lấy danh mục để hiển thị trên menu
             var categories = _context.Categories.ToList();
+            ViewBag.Categories = categories;
 
-            // Lấy danh sách sản phẩm (lọc trước khi phân trang)
+            // Query sản phẩm
             var query = _context.Products.AsQueryable();
+
+            // Lọc theo tìm kiếm
             if (!string.IsNullOrEmpty(search))
             {
                 query = query.Where(p => p.ProductName.Contains(search));
             }
 
+            // Lọc theo danh mục
+            if (categoryId.HasValue)
+            {
+                query = query.Where(p => p.CategoryId == categoryId.Value);
+            }
+                
+
+
+            // Tổng sản phẩm để phân trang
             var totalProducts = query.Count();
+
+            // Sản phẩm theo trang
             var products = query
                 .OrderByDescending(p => p.CreatedDate)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToList();
 
-            // Lấy 4 sản phẩm mới nhất (section riêng)
+            // 4 sản phẩm mới nhất cho phần "Sản phẩm gần đây"
             var top4Products = _context.Products
                 .OrderByDescending(p => p.CreatedDate)
                 .Take(4)
                 .ToList();
+            ViewBag.Top4Products = top4Products;
 
-            // Truyền dữ liệu sang View
+            // Gửi thông tin phân trang + lọc sang View
             ViewBag.Page = page;
             ViewBag.TotalPages = (int)Math.Ceiling(totalProducts / (double)pageSize);
-            ViewBag.Categories = categories;
             ViewBag.Search = search;
-            ViewBag.Top4Products = top4Products; // 4 sản phẩm mới nhất
+            ViewBag.SelectedCategoryId = categoryId;
 
-            return View(products); // danh sách chính có phân trang
+            return View(products);
         }
+    
 
-        public IActionResult GioHang() => View();
-        //public IActionResult ThanhToan() => View();
-        public IActionResult LienHe() => View();
-        public IActionResult QuenMatKhau() => View();
-        public IActionResult DangNhap() => View();
+
         [HttpPost]
-        public IActionResult DangNhap(string username, string password)
+        public IActionResult ThanhToan(string recipientName, string recipientPhone, string deliveryAddress, int paymentMethodId)
         {
-            // Tìm user trong DB
-            var user = _context.Users
-                .FirstOrDefault(u => u.Username == username && u.Password == password);
-
-            if (user == null)
-            {
-                ViewBag.Error = "Tên đăng nhập hoặc mật khẩu không đúng!";
-                return View();
-            }
-
-            // Lưu session UserID
-            HttpContext.Session.SetInt32("UserID", user.UserId);
-
-            // ➜ Chuyển đến trang đơn hàng
-            return RedirectToAction("ThanhToan", "User");
-        }
-
-        public IActionResult DangKy() => View();
-        public IActionResult ChiTiet() => View();
-        public IActionResult ThanhToan()
-        {
-            var userId = HttpContext.Session.GetInt32("UserId");
-            if (userId == null)
-            {
-                return RedirectToAction("DangNhap");
-            }
+            var userId = HttpContext.Session.GetInt32("UserID") ?? 2;
 
             var cart = _context.Carts
                 .Include(c => c.CartDetails)
@@ -93,58 +81,13 @@ namespace DATN.Controllers
                         .ThenInclude(v => v.Product)
                 .FirstOrDefault(c => c.UserId == userId);
 
-            if (cart == null)
-            {
-                ViewBag.CartItems = new List<object>();
-                ViewBag.Total = 0;
-                ViewBag.ShippingFee = 0;
-                return View();
-            }
-
-            var items = cart.CartDetails.Select(cd => new
-            {
-                ProductName = cd.Variant.Product.ProductName,
-                Quantity = cd.Quantity ?? 0,
-                UnitPrice = cd.Variant.SalePrice ?? 0,
-                TotalPrice = (cd.Quantity ?? 0) * (cd.Variant.SalePrice ?? 0)
-            }).ToList();
-
-            int totalQuantity = items.Sum(i => i.Quantity);
-            decimal total = items.Sum(i => i.TotalPrice);
-            decimal shippingFee = 30000 + (totalQuantity - 1) * 15000;
-
-            ViewBag.CartItems = items;
-            ViewBag.Total = total;
-            ViewBag.ShippingFee = shippingFee;
-
-            return View();
-        }
-
-
-        [HttpPost]
-        public IActionResult ThanhToan(string recipientName, string recipientPhone, string deliveryAddress, int paymentMethodId)
-        {
-            // 1. Lấy UserID đang đăng nhập
-            var userId = HttpContext.Session.GetInt32("UserID");
-            if (userId == null)
-                return Json(new { success = false, message = "Bạn chưa đăng nhập!" });
-
-            // 2. Lấy giỏ hàng
-            var cart = _context.Carts
-                .Include(c => c.CartDetails)
-                    .ThenInclude(cd => cd.Variant)
-                        .ThenInclude(v => v.Product)
-                .FirstOrDefault(c => c.UserId == userId);  // DÙNG UserId (đúng với model)
-
             if (cart == null || !cart.CartDetails.Any())
                 return Json(new { success = false, message = "Giỏ hàng trống!" });
 
-            // 3. Tính phí ship
             int totalQuantity = cart.CartDetails.Sum(x => x.Quantity ?? 0);
             decimal productTotal = cart.CartDetails.Sum(x => (x.Quantity ?? 0) * (x.Variant.SalePrice ?? 0));
             decimal shippingFee = 30000 + (totalQuantity - 1) * 15000;
 
-            // 4. Tạo đơn hàng
             var order = new Order
             {
                 UserId = userId,
@@ -152,7 +95,7 @@ namespace DATN.Controllers
                 Quantity = totalQuantity,
                 TotalAmount = productTotal + shippingFee,
                 PaymentMethodId = paymentMethodId,
-                PaymentStatus = "Chưa thanh toán",
+                PaymentStatus = paymentMethodId == 2 ? "Chờ chuyển khoản" : "Chưa thanh toán",
                 OrderStatus = "Chờ xử lý",
                 RecipientName = recipientName,
                 RecipientPhone = recipientPhone,
@@ -163,7 +106,6 @@ namespace DATN.Controllers
             _context.Orders.Add(order);
             _context.SaveChanges();
 
-            // 5. Chi tiết đơn hàng & cập nhật tồn kho
             foreach (var item in cart.CartDetails)
             {
                 _context.OrderDetails.Add(new OrderDetail
@@ -174,38 +116,175 @@ namespace DATN.Controllers
                     UnitPrice = item.Variant.SalePrice,
                     TotalPrice = (item.Quantity ?? 0) * (item.Variant.SalePrice ?? 0)
                 });
-
                 if (item.Variant.Stock.HasValue)
                     item.Variant.Stock -= item.Quantity ?? 0;
             }
             _context.SaveChanges();
-
-            // 6. Xóa giỏ hàng
             _context.CartDetails.RemoveRange(cart.CartDetails);
             _context.SaveChanges();
 
-            // 7. Trả kết quả
-            var orderData = new
-            {
-                order.OrderId,
-                order.OrderDate,
-                order.TotalAmount,
-                order.ShippingFee,
-                order.OrderStatus,
-                Items = _context.OrderDetails
-                        .Include(od => od.Variant)
-                            .ThenInclude(v => v.Product)
-                        .Where(od => od.OrderId == order.OrderId)
-                        .Select(od => new
-                        {
-                            od.Variant.Product.ProductName,
-                            od.Quantity,
-                            od.TotalPrice
-                        }).ToList()
-            };
+            // Tạo QR link động (MBbank)
+            string content = $"TTDH{order.OrderId}";
+            string qrUrl = $"https://img.vietqr.io/image/MB-0836641809-qr_only.png?amount={(int)order.TotalAmount}&addInfo={content}";
 
-            return Json(new { success = true, order = orderData });
+            return Json(new
+            {
+                success = true,
+                order = new
+                {
+                    order.OrderId,
+                    order.OrderDate,
+                    order.TotalAmount,
+                    order.ShippingFee,
+                    order.OrderStatus,
+                    order.PaymentStatus,
+                    order.PaymentMethodId
+                },
+                bankInfo = paymentMethodId == 2 ? new
+                {
+                    BankName = "MB Bank",
+                    AccountName = "Nguyễn Đức Thịnh",
+                    AccountNumber = "0836641809",
+                    Content = content,
+                    QR = qrUrl
+                } : null
+            });
+        }
+        public IActionResult GioHang()
+        {
+            var userId = HttpContext.Session.GetInt32("UserID") ?? 2;
+
+            var cart = _context.Carts
+                .Include(c => c.CartDetails)
+                    .ThenInclude(cd => cd.Variant)
+                        .ThenInclude(v => v.Product)
+                .Include(c => c.CartDetails)
+                    .ThenInclude(cd => cd.Variant.Color)
+                .Include(c => c.CartDetails)
+                    .ThenInclude(cd => cd.Variant.Size)
+                .FirstOrDefault(c => c.UserId == userId);
+
+            if (cart == null)
+                return RedirectToAction("Index", "User");
+
+            return View(cart); // Model là Cart
+        }
+
+
+
+        public IActionResult ChonBienThe(int id)
+        {
+            var product = _context.Products.FirstOrDefault(p => p.ProductId == id);
+            if (product == null) return NotFound();
+
+            var variants = _context.ProductVariants
+                .Include(v => v.Color)
+                .Include(v => v.Size)
+                .Where(v => v.ProductId == id && v.Status == "Active")
+                .ToList();
+
+            // lấy màu và size duy nhất
+            ViewBag.Colors = variants.Select(v => v.Color).Distinct().ToList();
+            ViewBag.Sizes = variants.Select(v => v.Size).Distinct().ToList();
+
+            // serialize data tránh vòng lặp
+            var variantDtos = variants.Select(v => new
+            {
+                v.VariantId,
+                v.ColorId,
+                v.SizeId,
+                v.SalePrice,
+                v.Stock,
+                v.ThumbnailImage
+            }).ToList();
+            ViewBag.VariantsJson = JsonConvert.SerializeObject(variantDtos);
+
+            return View(product);
+        }
+
+        [HttpPost]
+        public IActionResult ThemVaoGio(int variantId, int quantity)
+        {
+            var userId = HttpContext.Session.GetInt32("UserID") ?? 2;
+
+            var cart = _context.Carts.Include(c => c.CartDetails)
+                                     .FirstOrDefault(c => c.UserId == userId);
+
+            if (cart == null)
+            {
+                cart = new Cart { UserId = userId, CreatedDate = DateTime.Now, LastUpdated = DateTime.Now };
+                _context.Carts.Add(cart);
+                _context.SaveChanges();
+            }
+
+            var existingItem = cart.CartDetails.FirstOrDefault(c => c.VariantId == variantId);
+            if (existingItem != null)
+                existingItem.Quantity += quantity;
+            else
+                _context.CartDetails.Add(new CartDetail { CartId = cart.CartId, VariantId = variantId, Quantity = quantity });
+
+            cart.LastUpdated = DateTime.Now;
+            _context.SaveChanges();
+
+            return RedirectToAction("Index", "User");
+        }
+
+        [HttpPost]
+        public IActionResult MuaNgay(int variantId, int quantity)
+        {
+            var userId = HttpContext.Session.GetInt32("UserID") ?? 2;
+
+            var cart = _context.Carts
+                               .Include(c => c.CartDetails)
+                               .FirstOrDefault(c => c.UserId == userId);
+
+            if (cart == null)
+            {
+                cart = new Cart
+                {
+                    UserId = userId,
+                    CreatedDate = DateTime.Now,
+                    LastUpdated = DateTime.Now
+                };
+                _context.Carts.Add(cart);
+                _context.SaveChanges();
+            }
+
+            var existingItem = cart.CartDetails.FirstOrDefault(c => c.VariantId == variantId);
+            if (existingItem != null)
+                existingItem.Quantity += quantity;
+            else
+                _context.CartDetails.Add(new CartDetail
+                {
+                    CartId = cart.CartId,
+                    VariantId = variantId,
+                    Quantity = quantity
+                });
+
+            cart.LastUpdated = DateTime.Now;
+            _context.SaveChanges();
+
+            // ➡️ Chuyển đến giỏ hàng
+            return RedirectToAction("GioHang", "User", new { id = cart.CartId });
+        }
+        [HttpPost]
+        public IActionResult XoaKhoiGio(int cartDetailId)
+        {
+            var detail = _context.CartDetails.FirstOrDefault(x => x.CartDetailId == cartDetailId);
+            if (detail != null)
+            {
+                _context.CartDetails.Remove(detail);
+                _context.SaveChanges();
+            }
+            return RedirectToAction("GioHang");
+        }
+
+       
+        public IActionResult ThanhToan()
+        {
+            return View();
         }
 
     }
+
 }
