@@ -10,39 +10,34 @@ namespace DATN.Controllers
     public class AdminController : Controller
     {
         private readonly DatnContext _context;
+        private readonly OrderRepository _orderRepo;
 
-        public AdminController(DatnContext context)
+        public AdminController(DatnContext context, OrderRepository orderRepo)
         {
             _context = context;
+            _orderRepo = orderRepo;
         }
 
         public async Task<IActionResult> SanPham(string search)
         {
-            // Query ban đầu
             var query = _context.Products.AsQueryable();
 
-            // Tìm kiếm nếu có từ khoá
             if (!string.IsNullOrEmpty(search))
             {
                 query = query.Where(p => p.ProductName.Contains(search));
             }
 
-            // Lấy dữ liệu
             var products = await query.ToListAsync();
 
-            // Tính toán thống kê
             ViewBag.TotalCount = products.Count;
             ViewBag.InStockCount = products.Count(p => p.Stock > 5);
             ViewBag.LowStockCount = products.Count(p => p.Stock > 0 && p.Stock <= 5);
             ViewBag.OutOfStockCount = products.Count(p => p.Stock == 0);
-
-            // Sản phẩm sắp hết hàng
             ViewBag.LowStockProducts = products.Where(p => p.Stock > 0 && p.Stock <= 5).ToList();
 
             return View(products);
         }
 
-        
         public async Task<IActionResult> Index()
         {
             var now = DateTime.Now;
@@ -77,31 +72,28 @@ namespace DATN.Controllers
                     }).ToListAsync(),
 
                 SanPhamBanChay = await (
-    from od in _context.OrderDetails
-    join v in _context.ProductVariants on od.VariantId equals v.VariantId
-    join p in _context.Products on v.ProductId equals p.ProductId
-    join c in _context.Categories on p.CategoryId equals c.CategoryId into cat
-    from c in cat.DefaultIfEmpty()
-    group od by new { p.ProductName, c.CategoryName } into g
-    select new SanPhamBanChayDto
-    {
-        TenSanPham = g.Key.ProductName,
-        DanhMuc = g.Key.CategoryName,
-        SoLuongBan = g.Sum(x => (int?)x.Quantity) ?? 0,
-        DoanhThu = g.Sum(x => (decimal?)x.TotalPrice) ?? 0
-    }
-)
-.OrderByDescending(x => x.SoLuongBan)
-.Take(5)
-.ToListAsync(),
-
+                    from od in _context.OrderDetails
+                    join v in _context.ProductVariants on od.VariantId equals v.VariantId
+                    join p in _context.Products on v.ProductId equals p.ProductId
+                    join c in _context.Categories on p.CategoryId equals c.CategoryId into cat
+                    from c in cat.DefaultIfEmpty()
+                    group od by new { p.ProductName, c.CategoryName } into g
+                    select new SanPhamBanChayDto
+                    {
+                        TenSanPham = g.Key.ProductName,
+                        DanhMuc = g.Key.CategoryName,
+                        SoLuongBan = g.Sum(x => (int?)x.Quantity) ?? 0,
+                        DoanhThu = g.Sum(x => (decimal?)x.TotalPrice) ?? 0
+                    }
+                ).OrderByDescending(x => x.SoLuongBan)
+                .Take(5)
+                .ToListAsync(),
 
                 LabelsDoanhThu = Enumerable.Range(0, 7)
                     .Select(i => DateTime.Today.AddDays(-6 + i).ToString("dd/MM"))
                     .ToList()
             };
 
-            // 🛠 Fix chạy tuần tự (KHÔNG dùng Task.WhenAll)
             var dataDoanhThu = new List<decimal>();
             var dataDonHang = new List<int>();
 
@@ -127,23 +119,14 @@ namespace DATN.Controllers
             return View(model);
         }
 
-        public IActionResult PhanTich()
-        {
-            return View();
-        }
-        public IActionResult ChienDich()
-        {
-            return View();
-        }
-        public IActionResult DanhMuc()
-        {
-            return View();
-        }
+        public IActionResult PhanTich() => View();
+        public IActionResult ChienDich() => View();
+        public IActionResult DanhMuc() => View();
+
         public async Task<IActionResult> MaGiamGia(string status = "Tất cả", string search = "")
         {
             var today = DateTime.Today;
 
-            // Lấy danh sách mã giảm giá và xử lý null tại đây
             var danhSach = await _context.Promotions
                 .Select(p => new Promotion
                 {
@@ -163,34 +146,23 @@ namespace DATN.Controllers
                 .AsNoTracking()
                 .ToListAsync();
 
-            // 1. Trạng thái theo thời gian và số lượng
             foreach (var promo in danhSach)
             {
                 if (promo.EndDate.HasValue && promo.EndDate.Value < today)
-                {
                     promo.Status = "Hết hạn";
-                }
                 else if (promo.EndDate.HasValue && (promo.EndDate.Value - today).TotalDays <= 5)
-                {
                     promo.Status = "Sắp hết hạn";
-                }
                 else if (promo.Quantity == promo.UsedQuantity)
-                {
                     promo.Status = "Đã dùng hết";
-                }
                 else
-                {
                     promo.Status = "Đang hoạt động";
-                }
             }
 
-            // 2. Lọc theo trạng thái
             if (!string.IsNullOrEmpty(status) && status != "Tất cả")
             {
                 danhSach = danhSach.Where(p => p.Status == status).ToList();
             }
 
-            // 3. Tìm kiếm
             if (!string.IsNullOrWhiteSpace(search))
             {
                 var keyword = search.ToLower();
@@ -201,14 +173,12 @@ namespace DATN.Controllers
                 ).ToList();
             }
 
-            // 4. Thống kê
             object tongMa = danhSach.Count;
             var daSuDung = danhSach.Sum(p => p.UsedQuantity ?? 0);
             var tongGiamGia = danhSach.Sum(p => (p.UsedQuantity ?? 0) * (p.DiscountValue ?? 0));
             var tongSoLuong = danhSach.Sum(p => p.Quantity ?? 0);
             var tyLeChuyenDoi = tongSoLuong > 0 ? ((double)daSuDung / tongSoLuong * 100).ToString("0.0") : "0";
 
-            // 5. Truyền lên view
             ViewBag.TongMa = tongMa;
             ViewBag.DaSuDung = daSuDung;
             ViewBag.TietKiem = tongGiamGia;
@@ -219,29 +189,15 @@ namespace DATN.Controllers
             return View(danhSach);
         }
 
-        public IActionResult KhachHang()
-        {
-            return View();
-        }
-        public IActionResult KhoHang()
-        {
-            return View();
-        }
-        private readonly OrderRepository _orderRepo;
-
-        public AdminController(OrderRepository orderRepo) // Inject repository
-        {
-            _orderRepo = orderRepo;
-        }
+        public IActionResult KhachHang() => View();
+        public IActionResult KhoHang() => View();
 
         public async Task<IActionResult> DonHang()
         {
             var orders = await _orderRepo.GetAllAsync();
-            return View(orders); // Truyền danh sách đơn hàng sang view
+            return View(orders);
         }
-        public IActionResult CaiDat()
-        {
-            return View();
-        }
+
+        public IActionResult CaiDat() => View();
     }
 }

@@ -1,38 +1,61 @@
 ﻿@model DATN.Models.Category
-
 @{
     ViewData["Title"] = "Xóa danh mục";
+    var productCount = ViewBag.ProductCount ?? 0;
 }
+
 <div class="main-content" id="mainContent">
-<div class="container mt-4">
-    <h2>@ViewData["Title"]</h2>
+    <div class="container mt-4">
+        <h2>@ViewData["Title"]</h2>
 
-    <div class="alert alert-warning mt-3">
-        <h5>Bạn có chắc chắn muốn xóa danh mục này không?</h5>
+        @if (productCount > 0)
+        {
+            <div class="alert alert-danger">
+                Danh mục này đang có @productCount sản phẩm. Không thể xóa.
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-warning mt-3">
+                <h5>Bạn có chắc chắn muốn xóa danh mục này không?</h5>
+            </div>
+        }
+
+        <dl class="row">
+            <dt class="col-sm-3">Tên danh mục</dt>
+            <dd class="col-sm-9">@Model.CategoryName</dd>
+
+            <dt class="col-sm-3">Hình ảnh</dt>
+            <dd class="col-sm-9">
+                @if (!string.IsNullOrEmpty(Model.CategoryImage))
+                {
+                    <img src="~/hinh/@Model.CategoryImage" class="img-thumbnail" style="max-height:100px;" />
+                }
+                else
+                {
+                    <span class="text-muted fst-italic">Chưa có hình</span>
+                }
+            </dd>
+        </dl>
+
+        <form id="deleteForm" asp-action="Delete" asp-route-id="@Model.CategoryId" method="post">
+            <button type="submit" class="btn btn-danger" id="deleteBtn"
+            @(productCount > 0 ? "disabled" : "")>
+                <i class="bi bi-trash"></i> Xóa
+            </button>
+            <a asp-action="Index" class="btn btn-secondary">Hủy</a>
+        </form>
     </div>
-
-    <dl class="row">
-        <dt class="col-sm-3">Tên danh mục</dt>
-        <dd class="col-sm-9">@Model.CategoryName</dd>
-
-        <dt class="col-sm-3">Hình ảnh</dt>
-        <dd class="col-sm-9">
-            @if (!string.IsNullOrEmpty(Model.CategoryImage))
-            {
-                <img src="~/hinh/@Model.CategoryImage" class="img-thumbnail" style="max-height:100px;" />
-            }
-            else
-            {
-                <span class="text-muted fst-italic">Chưa có hình</span>
-            }
-        </dd>
-    </dl>
-
-    <form asp-action="Delete" asp-route-id="@Model.CategoryId" method="post">
-        <button type="submit" class="btn btn-danger">
-            <i class="bi bi-trash"></i> Xóa
-        </button>
-        <a asp-action="Index" class="btn btn-secondary">Hủy</a>
-    </form>
 </div>
-</div>
+
+@section Scripts {
+    <script>
+        document.getElementById("deleteForm").addEventListener("submit", function (e) {
+            var productCount = @productCount;
+            if (productCount > 0) {
+                alert("Danh mục này có sản phẩm. Không thể xóa.");
+                e.preventDefault();
+            }
+        });
+    </script>
+}
