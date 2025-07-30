@@ -1,5 +1,9 @@
-﻿using DATN.Repositories;
+﻿using DATN.Data;
+using DATN.Models;
+using DATN.Models.ViewModels;
+using DATN.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace DATN.Controllers
 {
@@ -198,7 +202,7 @@ namespace DATN.Controllers
             }
 
             // 4. Thống kê
-            var tongMa = danhSach.Count;
+            object tongMa = danhSach.Count;
             var daSuDung = danhSach.Sum(p => p.UsedQuantity ?? 0);
             var tongGiamGia = danhSach.Sum(p => (p.UsedQuantity ?? 0) * (p.DiscountValue ?? 0));
             var tongSoLuong = danhSach.Sum(p => p.Quantity ?? 0);
