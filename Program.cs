@@ -1,6 +1,5 @@
 using DATN.Data;
 using DATN.Repositories;
-using DATN.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,9 +8,8 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddSingleton<DapperHelper>();
 builder.Services.AddSingleton<OrderRepository>();
 builder.Services.AddSingleton<OrderDetailRepository>();
-builder.Services.AddScoped<ProductRepository>();
+
 builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
-builder.Services.AddScoped<PhotoService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

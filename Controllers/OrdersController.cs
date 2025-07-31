@@ -89,48 +89,48 @@ namespace DATN.Controllers
         //}
 
         // GET: /Orders/Edit/5
-        public async Task<IActionResult> Edit(int id)
-        {
-            var order = await _orderRepo.GetByIdAsync(id);
-            var details = await _orderDetailRepo.GetByOrderIdAsync(id);
-            if (order == null) return NotFound();
+        //public async Task<IActionResult> Edit(int id)
+        //{
+        //    var order = await _orderRepo.GetByIdAsync(id);
+        //    var details = await _orderDetailRepo.GetByOrderIdAsync(id);
+        //    if (order == null) return NotFound();
 
-            var model = new OrderCreateViewModel
-            {
-                Order = order,
-                OrderDetails = details.ToList()
-            };
-            return View(model);
-        }
+        //    var model = new OrderCreateViewModel
+        //    {
+        //        Order = order,
+        //        OrderDetails = details.ToList()
+        //    };
+        //    return View(model);
+        //}
 
-        // POST: /Orders/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(OrderCreateViewModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View(model); // giữ nguyên nếu lỗi
-            }
+        //// POST: /Orders/Edit/5
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> Edit(OrderCreateViewModel model)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return View(model); // giữ nguyên nếu lỗi
+        //    }
 
-            // lấy đơn hàng gốc từ database
-            var existingOrder = await _orderRepo.GetByIdAsync(model.Order.OrderId);
-            if (existingOrder == null)
-            {
-                return NotFound();
-            }
+        //    // lấy đơn hàng gốc từ database
+        //    var existingOrder = await _orderRepo.GetByIdAsync(model.Order.OrderId);
+        //    if (existingOrder == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            // chỉ cập nhật các trường cho phép sửa
-            existingOrder.RecipientName = model.Order.RecipientName;
-            existingOrder.RecipientPhone = model.Order.RecipientPhone;
-            existingOrder.DeliveryAddress = model.Order.DeliveryAddress;
-            existingOrder.OrderStatus = model.Order.OrderStatus;
-            existingOrder.PaymentStatus = model.Order.PaymentStatus;
-            existingOrder.Note = model.Order.Note;
+        //    // chỉ cập nhật các trường cho phép sửa
+        //    existingOrder.RecipientName = model.Order.RecipientName;
+        //    existingOrder.RecipientPhone = model.Order.RecipientPhone;
+        //    existingOrder.DeliveryAddress = model.Order.DeliveryAddress;
+        //    existingOrder.OrderStatus = model.Order.OrderStatus;
+        //    existingOrder.PaymentStatus = model.Order.PaymentStatus;
+        //    existingOrder.Note = model.Order.Note;
 
-            await _orderRepo.UpdateAsync(existingOrder);
-            return RedirectToAction(nameof(Index));
-        }
+        //    await _orderRepo.UpdateAsync(existingOrder);
+        //    return RedirectToAction(nameof(Index));
+        //}
 
 
 
