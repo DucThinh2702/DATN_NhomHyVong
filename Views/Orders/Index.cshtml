@@ -2,7 +2,7 @@
 
 @{
     ViewData["Title"] = "Đơn hàng";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    // Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <div class="main-content" id="mainContent">
@@ -61,7 +61,7 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <div class="text-uppercase text-warning small">Chờ xử lý</div>
-                            <div class="h5 mb-0 fw-bold">@Model.Count(x => x.OrderStatus?.ToLower() == "đang xử lý")</div>
+                            <div class="h5 mb-0 fw-bold">@Model.Count(x => x.OrderStatus?.ToLower() == "processing")</div>
                         </div>
                         <i class="fas fa-spinner fa-2x text-warning"></i>
                     </div>
@@ -74,7 +74,7 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <div class="text-uppercase text-success small">Hoàn thành</div>
-                            <div class="h5 mb-0 fw-bold">@Model.Count(x => x.OrderStatus?.ToLower() == "hoàn thành")</div>
+                            <div class="h5 mb-0 fw-bold">@Model.Count(x => x.OrderStatus?.ToLower() == "delivered")</div>
                         </div>
                         <i class="fas fa-check-circle fa-2x text-success"></i>
                     </div>
@@ -87,7 +87,7 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <div class="text-uppercase text-danger small">Đã huỷ</div>
-                            <div class="h5 mb-0 fw-bold">@Model.Count(x => x.OrderStatus?.ToLower() == "đã huỷ")</div>
+                            <div class="h5 mb-0 fw-bold">@Model.Count(x => x.OrderStatus?.ToLower() == "cancelled")</div>
                         </div>
                         <i class="fas fa-times-circle fa-2x text-danger"></i>
                     </div>
