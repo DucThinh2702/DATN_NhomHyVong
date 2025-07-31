@@ -1,0 +1,127 @@
+﻿@model X.PagedList.IPagedList<DATN.Models.Category>
+@using X.PagedList.Mvc.Core
+@using X.PagedList
+@using X.PagedList.Web.Common
+@{
+    ViewData["Title"] = "Danh sách danh mục";
+    var totalCount = Model.Count;
+}
+
+<!-- CSS PHÂN TRANG Ô VUÔNG -->
+<style>
+    .pagination {
+        justify-content: center;
+        margin-top: 20px;
+    }
+
+        .pagination .page-item {
+            margin: 0 3px;
+        }
+
+        .pagination .page-link {
+            border: 1px solid #0d6efd;
+            border-radius: 0 !important; /* Vuông góc */
+            padding: 6px 12px;
+            color: #0d6efd;
+            background-color: white;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+            .pagination .page-link:hover {
+                background-color: #0d6efd;
+                color: white;
+                border-color: #0d6efd;
+            }
+
+        .pagination .active .page-link {
+            background-color: #0d6efd;
+            color: white;
+            border-color: #0d6efd;
+            pointer-events: none;
+        }
+</style>
+
+<h2 class="mb-3">Danh sách danh mục</h2>
+
+<form asp-action="Index" method="get" class="mb-3 d-flex">
+    <input type="text" name="searchString" value="@ViewData["CurrentFilter"]" class="form-control w-25 me-2" placeholder="Tìm danh mục..." />
+    <button type="submit" class="btn btn-outline-primary">Tìm kiếm</button>
+</form>
+
+<div class="mb-3">
+    <span class="badge bg-primary">Tổng danh mục: @totalCount</span>
+    <span class="badge bg-success">Tổng số sản phẩm: @ViewBag.TotalProductCount</span>
+</div>
+
+<div class="mb-3">
+    <a asp-action="Create" class="btn btn-success">+ Thêm danh mục</a>
+    <a asp-action="ExportToExcel" class="btn btn-outline-success ms-2">📥 Xuất Excel</a>
+</div>
+
+<table class="table table-bordered table-hover align-middle">
+    <thead class="table-dark">
+        <tr>
+            <th>#</th>
+            <th>
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["NameSortParm"]">Tên danh mục</a>
+            </th>
+            <th>Ảnh</th>
+            <th>
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["CountSortParm"]">Số sản phẩm</a>
+            </th>
+            <th>Hành động</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (!Model.Any())
+        {
+            <tr>
+                <td colspan="5" class="text-center text-danger">Không tìm thấy danh mục nào.</td>
+            </tr>
+        }
+        else
+        {
+            int stt = ((int?)ViewData["CurrentPage"] - 1 ?? 0) * Model.PageSize + 1;
+            foreach (var item in Model)
+            {
+                <tr>
+                    <td>@(stt++)</td>
+                    <td>@item.CategoryName</td>
+                    <td>
+                        @if (!string.IsNullOrEmpty(item.CategoryImage))
+                        {
+                            <img src="~/hinh/@item.CategoryImage" width="100" height="80" style="object-fit:cover" />
+                        }
+                    </td>
+                    <td>
+                        <span class="badge bg-info text-dark">@item.Products?.Count() ?? 0</span>
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.CategoryId" class="btn btn-sm btn-warning">Sửa</a>
+                        <a asp-action="Delete" asp-route-id="@item.CategoryId" class="btn btn-sm btn-danger" onclick="return confirm('Xác nhận xóa?');">Xóa</a>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+<<div class="d-flex justify-content-center mt-4">
+    @Html.PagedListPager(Model, page => Url.Action("Index",
+            new { page, sortOrder = ViewData["CurrentSort"], searchString = ViewData["CurrentFilter"] }),
+            new PagedListRenderOptions
+    {
+        DisplayLinkToFirstPage = PagedListDisplayMode.Always,
+        DisplayLinkToLastPage = PagedListDisplayMode.Always,
+        DisplayLinkToPreviousPage = PagedListDisplayMode.Always,
+        DisplayLinkToNextPage = PagedListDisplayMode.Always,
+        DisplayEllipsesWhenNotShowingAllPageNumbers = true,
+
+        // ✅ Sửa lỗi bằng cách dùng mảng chuỗi
+        UlElementClasses = new[] { "pagination" },
+        LiElementClasses = new[] { "page-item" },
+        PageClasses = new[] { "page-link" }
+    })
+</div>
+

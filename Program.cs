@@ -1,7 +1,12 @@
+using DATN.Data;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddDbContext<DatnContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 var app = builder.Build();
 
@@ -20,8 +25,15 @@ app.UseRouting();
 
 app.UseAuthorization();
 
+app.UseEndpoints(endpoints =>)
+    endpoints.MapControllerRoute(
+    name: "contact",
+    pattern: "lien-he",
+    defaults: new { controller = "Contact", action = "Index" });
+
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Admin}/{action=Index}/{id?}");
-
+    pattern: "{controller=User}/{action=LienHe}/{id?}");
+  
 app.Run();
+
