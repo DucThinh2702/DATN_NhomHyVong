@@ -5,6 +5,7 @@
 @{
     ViewData["Title"] = "Danh sách danh mục";
     var totalCount = Model.Count;
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <!DOCTYPE html>
@@ -21,11 +22,11 @@
         :root { --primary-color: #ffc107; --sidebar-width: 280px; }
 
         /* Sidebar */
-        .sidebar {
+/*         .sidebar {
             width: var(--sidebar-width); height: 100vh; position: fixed; top: 0; left: 0;
             background: linear-gradient(135deg,#1a1d29 0%,#2c3142 100%); color: white;
             overflow-y: auto; z-index: 1000; transition: all .3s ease;
-        }
+ */        }
         .sidebar.collapsed { width: 80px; }
         .main-content { margin-left: var(--sidebar-width); transition: all .3s ease; }
         .main-content.expanded { margin-left: 80px; }
@@ -49,50 +50,6 @@
     </style>
 </head>
 <body>
-    <!-- Sidebar -->
-    <div class="sidebar" id="sidebar">
-        <div class="p-3 border-bottom border-secondary">
-            <div class="d-flex align-items-center justify-content-center mb-3">
-                <div class="d-flex shadow-sm rounded overflow-hidden">
-                    <span class="px-3 py-1 text-warning fw-bold bg-secondary">THE BAG</span>
-                    <span class="px-3 py-1 text-dark fw-bold bg-warning">STUDIO</span>
-                </div>
-            </div>
-            <div class="text-center">
-                <div class="bg-light rounded-circle shadow-sm overflow-hidden" style="width:60px;height:60px;">
-                    <img src="~/hinh/logo.jpg" alt="Logo" class="img-fluid" />
-                </div>
-                <div class="mt-2">
-                    <h6 class="mb-0 text-white">Admin User</h6>
-                    <small class="text-secondary">Quản trị viên</small>
-                </div>
-            </div>
-        </div>
-        <nav class="p-3">
-            <h6 class="text-secondary fw-semibold mb-2">Tổng quan</h6>
-            <ul class="nav flex-column mb-4">
-                <li class="nav-item"><a class="nav-link active" asp-controller="Admin" asp-action="Index"><i class="fas fa-chart-pie me-2"></i><span class="nav-text">Thống kê</span></a></li>
-                <li class="nav-item"><a class="nav-link" asp-controller="Colors" asp-action="Index"><i class="fas fa-chart-line me-2"></i><span class="nav-text">Size và Màu</span></a></li>
-            </ul>
-            <h6 class="text-secondary fw-semibold mb-2">Quản lý</h6>
-            <ul class="nav flex-column mb-4">
-                <li class="nav-item"><a class="nav-link" asp-controller="Admin" asp-action="SanPham"><i class="fas fa-shopping-bag me-2"></i><span class="nav-text">Sản phẩm</span></a></li>
-                <li class="nav-item"><a class="nav-link" asp-controller="Orders" asp-action="Index"><i class="fas fa-shopping-cart me-2"></i><span class="nav-text">Đơn hàng</span></a></li>
-                <li class="nav-item"><a class="nav-link" asp-controller="Admin" asp-action="KhachHang"><i class="fas fa-users me-2"></i><span class="nav-text">Khách hàng</span></a></li>
-                <li class="nav-item"><a class="nav-link" asp-controller="Category" asp-action="Index"><i class="fas fa-tags me-2"></i><span class="nav-text">Danh mục</span></a></li>
-            </ul>
-            <h6 class="text-secondary fw-semibold mb-2">Marketing</h6>
-            <ul class="nav flex-column mb-4">
-                <li class="nav-item"><a class="nav-link" asp-controller="Admin" asp-action="ChienDich"><i class="fas fa-bullhorn me-2"></i><span class="nav-text">Chiến dịch</span></a></li>
-                <li class="nav-item"><a class="nav-link" asp-controller="Admin" asp-action="MaGiamGia"><i class="fas fa-ticket-alt me-2"></i><span class="nav-text">Mã giảm giá</span></a></li>
-            </ul>
-            <h6 class="text-secondary fw-semibold mb-2">Hệ thống</h6>
-            <ul class="nav flex-column">
-                <li class="nav-item"><a class="nav-link" asp-controller="Admin" asp-action="CaiDat"><i class="fas fa-cog me-2"></i><span class="nav-text">Cài đặt</span></a></li>
-                <li class="nav-item"><a class="nav-link text-danger" href="#" onclick="logout()"><i class="fas fa-sign-out-alt me-2"></i><span class="nav-text">Đăng xuất</span></a></li>
-            </ul>
-        </nav>
-    </div>
 
     <!-- Nội dung chính -->
     <div class="main-content p-4" id="mainContent">
