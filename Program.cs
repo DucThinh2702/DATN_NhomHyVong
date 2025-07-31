@@ -1,6 +1,5 @@
 using DATN.Data;
 using DATN.Repositories;
-﻿using DATN.Data;
 using DATN.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -17,7 +16,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddSingleton<DapperHelper>();
 builder.Services.AddSingleton<OrderRepository>();
 builder.Services.AddSingleton<OrderDetailRepository>();
-builder.Services.AddScoped<ProductRepository>();
+
 builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
 // Add services to the container.
 
